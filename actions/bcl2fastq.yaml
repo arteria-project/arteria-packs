@@ -1,0 +1,26 @@
+---
+name: bcl2fastq 
+description: Run bcl2fastq
+enabled: true
+runner_type: mistral-v2
+entry_point: workflows/bcl2fastq.yaml
+pack: arteria-packs
+parameters:
+  context:
+    default: {}
+    immutable: true
+    type: object
+  workflow:
+    default: arteria-packs.bcl2fastq 
+    immutable: true
+    type: string
+  host:
+    default: null
+    type: string
+  runfolder:
+    default: null
+    type: string
+  run_type:
+    default: hiseq_x
+    type: string
+

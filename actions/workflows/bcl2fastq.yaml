@@ -1,0 +1,28 @@
+version: "2.0" # mistral version
+name: arteria-packs.bcl2fastq
+description: Workflow to run bcl2fastq
+
+workflows:
+
+    main:
+        type: direct
+        input:
+            - host
+            - runfolder
+            - run_type
+        output:
+            std_out: <% $.std_out %>
+        tasks:
+            run_bcl2fastq:
+                action: core.local
+                input:
+                    cmd: "sleep 1; printf 'Running on this runfolder: <% $.runfolder %> of type <% $.run_type%> on <% $.host %>...'"
+                publish:
+                    status_message: "Runfolder <% $.runfolder %> run on <% $.host %>..."
+                on-success:
+                    - notify
+            notify:
+                action: core.local
+                input:
+                    cmd: "printf '<% $.status_message %>'"
+
