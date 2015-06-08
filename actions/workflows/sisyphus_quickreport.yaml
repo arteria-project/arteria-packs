@@ -1,0 +1,27 @@
+version: "2.0" # mistral version
+name: arteria-packs.sisyphus_quickreport
+description: Workflow to generate a Sisyphus quick report
+
+workflows:
+
+    main:
+        type: direct
+        input:
+            - host
+            - runfolder
+        output:
+            std_out: <% $.std_out %>
+        tasks:
+            run_quickreport:
+                action: core.local
+                input:
+                    cmd: "sleep 1; printf 'Generated a quick report for <% $.runfolder %> on <% $.host %>...'"
+                publish:
+                    status_message: "Quick report generated!"
+                on-success:
+                    - notify
+            notify:
+                action: core.local
+                input:
+                    cmd: "printf '<% $.status_message %>'"
+
