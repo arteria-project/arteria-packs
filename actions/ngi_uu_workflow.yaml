@@ -29,7 +29,7 @@ parameters:
   remote_host:
     default: milou-b.uppmax.uu.se
     type: string
-  trigger_ngi_pipline:
+  trigger_ngi_pipeline:
     default: false
     type: boolean
 

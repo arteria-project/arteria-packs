@@ -10,7 +10,7 @@ trigger:
 
 criteria:
     trigger.body.start_ngi_pipeline:
-        pattern: "1"
+        pattern: "True"
         type: "equals"
 
 action:

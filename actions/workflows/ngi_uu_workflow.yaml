@@ -11,7 +11,7 @@ workflows:
             - runfolder
             - run_type
             - remote_host
-            - trigger_ngi_pipline
+            - trigger_ngi_pipeline
         output:
             std_out: <% $.std_out %>
         tasks:
@@ -46,6 +46,10 @@ workflows:
             start_ngi_pipeline:
                 action: core.http
                 input:
-                    url: "http://www.uu.se"
-                    method: "GET"
+                    #url: "http://www.uu.se"
+                    url: "http://localhost:9101/v1/webhooks/ngi_pipeline"
+                    method: "POST"
+                    headers: "X-Auth-Token=8e776fe2d4c940f692c95af7d762a941&Content-Type=application/json"
+                    body: '{ "start_ngi_pipeline": "<% $.trigger_ngi_pipeline %>" }'
+                    
 
