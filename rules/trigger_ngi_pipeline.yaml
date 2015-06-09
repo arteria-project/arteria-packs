@@ -1,0 +1,22 @@
+---
+name: "arteria-packs.trigger_ngi_pipeline"
+description: "Fires of the NGI pipeline"
+enabled: true
+
+trigger:
+    type: "core.st2.webhook"
+    parameters:
+        url: "ngi_pipeline"
+
+criteria:
+    trigger.body.start_ngi_pipeline:
+        pattern: "1"
+        type: "equals"
+
+action:
+    ref: "core.http"
+    parameters:
+        url: "http://www.uu.se"
+        method: "GET"
+
+
