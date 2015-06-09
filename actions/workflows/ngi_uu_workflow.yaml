@@ -1,0 +1,51 @@
+version: "2.0" # mistral version
+name: arteria-packs.ngi_uu_workflow
+description: The ngi workflow, from sequencer to remote system...
+
+workflows:
+
+    main:
+        type: direct
+        input:
+            - host
+            - runfolder
+            - run_type
+            - remote_host
+            - trigger_ngi_pipline
+        output:
+            std_out: <% $.std_out %>
+        tasks:
+            run_bcl2fastq:
+                action: arteria-packs.bcl2fastq
+                input:
+                    host: "<% $.host %>" 
+                    runfolder: "<% $.runfolder %>"
+                    run_type: "<% $.run_type %>"
+                publish:
+                    status_message: "Runfolder <% $.runfolder %> run on <% $.host %>..."
+                on-success:
+                    - run_sisyphus_quick_report
+                    - run_sisyphus_local_processing
+
+            run_sisyphus_quick_report:
+                action: arteria-packs.sisyphus_quickreport 
+                input:
+                    host:  "<% $.host %>"
+                    runfolder:  "<% $.runfolder %>"
+              
+            run_sisyphus_local_processing:
+                action: arteria-packs.sisyphus_local_processing
+                input:
+                    host:  "<% $.host %>"
+                    runfolder:  "<% $.runfolder %>"
+                on-success:
+                    - start_ngi_pipeline
+
+            # TODO Split out the ngi pipeline processing stuff..
+
+            start_ngi_pipeline:
+                action: core.http
+                input:
+                    url: "http://www.uu.se"
+                    method: "GET"
+

@@ -1,0 +1,35 @@
+---
+name: ngi_uu_workflow
+description: >
+  Run the complete NGI Uppsala workflow, taking data of the sequencing instrument 
+  running bcl2fastq, collecting qc metrics using Sisyphus and delivering it to
+  a remote host. 
+enabled: true
+runner_type: mistral-v2
+entry_point: workflows/ngi_uu_workflow.yaml
+pack: arteria-packs
+parameters:
+  context:
+    default: {}
+    immutable: true
+    type: object
+  workflow:
+    default: arteria-packs.ngi_uu_workflow
+    immutable: true
+    type: string
+  host:
+    default: test
+    type: string
+  runfolder:
+    default: test
+    type: string
+  run_type:
+    default: hiseq_x
+    type: string
+  remote_host:
+    default: milou-b.uppmax.uu.se
+    type: string
+  trigger_ngi_pipline:
+    default: false
+    type: boolean
+

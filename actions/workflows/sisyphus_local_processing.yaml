@@ -1,0 +1,27 @@
+version: "2.0" # mistral version
+name: arteria-packs.sisyphus_local_processing
+description: Workflow to generate a Sisphus reports - local style...
+
+workflows:
+
+    main:
+        type: direct
+        input:
+            - host
+            - runfolder
+        output:
+            std_out: <% $.std_out %>
+        tasks:
+            run_quickreport:
+                action: core.local
+                input:
+                    cmd: "sleep 1; printf 'Did some local processing for <% $.runfolder %> on <% $.host %>...'"
+                publish:
+                    status_message: "Processing done!"
+                on-success:
+                    - notify
+            notify:
+                action: core.local
+                input:
+                    cmd: "printf '<% $.status_message %>'"
+

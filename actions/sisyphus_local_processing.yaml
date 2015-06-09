@@ -1,0 +1,23 @@
+---
+name: sisyphus_local_processing 
+description: Generate reports, etc in a local Sisyphus style...
+enabled: true
+runner_type: mistral-v2
+entry_point: workflows/sisyphus_local_processing.yaml
+pack: arteria-packs
+parameters:
+  context:
+    default: {}
+    immutable: true
+    type: object
+  workflow:
+    default: arteria-packs.sisyphus_local_processing
+    immutable: true
+    type: string
+  host:
+    default: null
+    type: string
+  runfolder:
+    default: null
+    type: string
+
