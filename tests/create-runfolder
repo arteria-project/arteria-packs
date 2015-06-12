@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
 
+if [ "$(whoami)" != "stanley" ] && [ "$(whoami)" != "root" ]; then 
+  echo "This script should be run with the stanley account or as root" 1>&2
+  exit 1
+fi 
+
 # Ensure that we have the folders to be followed:o
 
 monitored_base=/home/stanley/arteria/tests/monitored
