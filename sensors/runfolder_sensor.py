@@ -25,47 +25,43 @@ class RunfolderClient():
         path = "/home/stanley/arteria/tests/monitored/mon1/" + postfix
         return { "server": "art-worker", "path": path }
 
+import syslog
+
 class RunfolderSensor(PollingSensor):
 
     def __init__(self, sensor_service, config=None, poll_interval=None):
         super(RunfolderSensor, self).__init__(sensor_service=sensor_service,
                                               config=config,
                                               poll_interval=poll_interval)
-        xxx
         self._logger = self._sensor_service.get_logger(__name__)
+        self._logger.info("dude, we just initialized")
 
     def setup(self):
-        self._logger.debug(_logmsg("Entering setup"))
-        self._client = RunfolderClient()
+        self._logger.info("[RunfolderSensor]: " + "setup")
+        pass
 
     def poll(self):
-        result = self._client.get_available_runfolder()
-
-        if not result:
-            return
-
-        self._handle_result(result)
+        self._logger.info("[RunfolderSensor]: " + "poll")
+        pass
 
     def cleanup(self):
+        self._logger.info("[RunfolderSensor]: " + "cleanup")
         pass
 
     def add_trigger(self, trigger):
+        self._logger.info("[RunfolderSensor]: " + "add_trigger")
         pass
 
     def update_trigger(self, trigger):
+        self._logger.info("[RunfolderSensor]: " + "update_trigger")
         pass
 
     def remove_trigger(self, trigger):
+        self._logger.info("[RunfolderSensor]: " + "remove_trigger")
         pass
  
     def _logmsg(self, msg):
         return "[RunfolderSensor]" + msg
 
     def _handle_result(self, result):
-        trigger="arteria-pack.runfolder"
-        payload = {
-            'server': 'art-worker',
-            'timestamp': "" + time.time()  
-        }
-
-        self._sensor_service.dispatch(trigger=trigger, payload=payload)
+        pass
