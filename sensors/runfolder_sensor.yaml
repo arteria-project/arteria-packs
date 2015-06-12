@@ -2,7 +2,7 @@
   class_name: "RunfolderSensor"
   entry_point: "runfolder_sensor.py"
   description: "Sensor which monitors runfolders"
-  poll_interval: 15
+  poll_interval: 5
   trigger_types:
     -
       name: "runfolder_ready"
