@@ -16,7 +16,7 @@ workflows:
             std_out: <% $.std_out %>
         tasks:
             run_bcl2fastq:
-                action: arteria-packs.bcl2fastq
+                action: arteria-packs.demultiplexing
                 input:
                     host: "<% $.host %>" 
                     runfolder: "<% $.runfolder %>"
@@ -42,7 +42,6 @@ workflows:
                     - start_ngi_pipeline
 
             # TODO Split out the ngi pipeline processing stuff..
-
             start_ngi_pipeline:
                 action: core.http
                 input:
