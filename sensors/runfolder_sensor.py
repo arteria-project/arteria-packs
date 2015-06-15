@@ -1,32 +1,9 @@
 from st2reactor.sensor.base import PollingSensor
-import time
-
-class RunfolderClient():
-
-    """Queries runfolders for their state"""
-
-    def __init__(self, hosts):
-        self._hosts = hosts
-
-    def get_available_runfolder():
-        """Checks for an available runfolder on one of the monitored hosts"""
-        # TODO: Get this file out of the sensor and create some tests
-        # TODO: Implement
-        # Go through each monitored folder on each machine in order
-        #   Conditions:
-        #     - Must have a file called RTAComplete.txt
-        #     - Must not have an arteria processing state file, .arteria/state. 
-        #       this indicates that the file is already being maintained in some workflow
-        #       (the file itself and the stackstorm key/value store contain more info)
-        # If a folder is ready, it is fired away to the rule engine 
-
-        # TODO: Testing, for now, there is always a new runfolder returned
-        postfix = int(time.time() * 10)
-        path = "/home/stanley/arteria/tests/monitored/mon1/" + postfix
-        return { "server": "art-worker", "path": path }
-
 import syslog
+#import arteria_services
 
+# NOTE: This sensor is not in use, it is here for test purposes only.
+#       Runfolders are instead monitored by dedicated services running on the workers.
 class RunfolderSensor(PollingSensor):
 
     def __init__(self, sensor_service, config=None, poll_interval=None):
@@ -34,34 +11,39 @@ class RunfolderSensor(PollingSensor):
                                               config=config,
                                               poll_interval=poll_interval)
         self._logger = self._sensor_service.get_logger(__name__)
-        self._logger.info("dude, we just initialized")
+        self._infolog("__init__")
 
     def setup(self):
-        self._logger.info("[RunfolderSensor]: " + "setup")
-        pass
+        self._infolog("setup")
+        # TODO: Get the hosts from a config file
+        #self._client = RunfolderClient("art-worker")
+        self._infolog("setup finished")
 
     def poll(self):
-        self._logger.info("[RunfolderSensor]: " + "poll")
-        pass
+        self._infolog("poll")
+
+        self._infolog("Checking for available runfolders") 
+        #result = self._client.get_available_runfolder()
+        result = None
+        self._infolog("Result from client: " + result)
+        
+        if result:
+           self._handle_result(result) 
 
     def cleanup(self):
-        self._logger.info("[RunfolderSensor]: " + "cleanup")
-        pass
+        self._infolog("cleanup")
 
     def add_trigger(self, trigger):
-        self._logger.info("[RunfolderSensor]: " + "add_trigger")
-        pass
+        self._infolog("add_trigger")
 
     def update_trigger(self, trigger):
-        self._logger.info("[RunfolderSensor]: " + "update_trigger")
-        pass
+        self._infolog("update_trigger")
 
     def remove_trigger(self, trigger):
-        self._logger.info("[RunfolderSensor]: " + "remove_trigger")
-        pass
- 
-    def _logmsg(self, msg):
-        return "[RunfolderSensor]" + msg
+        self._infolog("remove_trigger")
 
     def _handle_result(self, result):
-        pass
+        self._infolog("_handle_result")
+
+    def _infolog(self, msg):
+        self._logger.info("[" + self.__class__.__name__ + "] " + msg)
