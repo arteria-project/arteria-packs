@@ -1,0 +1,7 @@
+#!/bin/bash
+what=$1
+if [ "$what" == "" ]; then
+    what="arteria-packs"
+fi
+#grep $what /var/log/st2/* | less
+tac /var/log/st2/* | grep $what | less

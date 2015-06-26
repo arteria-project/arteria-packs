@@ -1,0 +1,8 @@
+# Usage: source st2token
+function st2token {
+    export ST2_AUTH_TOKEN=`st2 auth -t -p testp testu`
+    echo $ST2_AUTH_TOKEN
+}
+
+st2token
+
