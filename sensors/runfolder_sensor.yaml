@@ -2,7 +2,7 @@
   class_name: "RunfolderSensor"
   entry_point: "runfolder_sensor.py"
   description: "Sensor which monitors runfolders"
-  poll_interval: 5
+  poll_interval: 15
   trigger_types:
     -
       name: "runfolder_ready"
@@ -10,7 +10,11 @@
       payload_schema:
         type: "object"
         properties:
-          server:
+          host:
+            type: "string"
+          runfolder:
+            type: "string"
+          link:
             type: "string"
           timestamp:
             type: "string"

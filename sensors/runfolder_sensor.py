@@ -1,9 +1,9 @@
 from st2reactor.sensor.base import PollingSensor
 import syslog
-#import arteria_services
+from runfolder_client import RunfolderClient
+import jsonpickle
+import requests
 
-# NOTE: This sensor is not in use, it is here for test purposes only.
-#       Runfolders are instead monitored by dedicated services running on the workers.
 class RunfolderSensor(PollingSensor):
 
     def __init__(self, sensor_service, config=None, poll_interval=None):
@@ -15,20 +15,27 @@ class RunfolderSensor(PollingSensor):
 
     def setup(self):
         self._infolog("setup")
-        # TODO: Get the hosts from a config file
-        #self._client = RunfolderClient("art-worker")
+        try:
+            # TODO: Config, from st2
+            self._client = RunfolderClient(["http://testtank1:10800"], self._logger)
+            self._infolog("Created client: {0}".format(self._client))
+        except Exception as ex:
+            # TODO: It seems that st2 isn't logging the entire exception, or
+            # they're not in /var/log/st2
+            self._logger.error(str(ex))
         self._infolog("setup finished")
 
     def poll(self):
-        self._infolog("poll")
+        try:
+            self._infolog("poll")
+            self._infolog("Checking for available runfolders")
+            result = self._client.next_ready()
+            self._infolog("Result from client: {0}".format(result))
 
-        self._infolog("Checking for available runfolders") 
-        #result = self._client.get_available_runfolder()
-        result = None
-        self._infolog("Result from client: " + result)
-        
-        if result:
-           self._handle_result(result) 
+            if result:
+               self._handle_result(result)
+        except Exception as ex:
+            self._logger.error(str(ex))
 
     def cleanup(self):
         self._infolog("cleanup")
@@ -44,6 +51,14 @@ class RunfolderSensor(PollingSensor):
 
     def _handle_result(self, result):
         self._infolog("_handle_result")
+        trigger = 'arteria-packs.runfolder_ready'
+        payload = {
+            'host': result['host'],
+            'runfolder': result['path'],
+            'link': result['link'],
+            'timestamp': '1234'
+        }
+        self._sensor_service.dispatch(trigger=trigger, payload=payload)
 
     def _infolog(self, msg):
-        self._logger.info("[" + self.__class__.__name__ + "] " + msg)
+        self._logger.info("[arteria-packs." + self.__class__.__name__ + "] " + msg)
