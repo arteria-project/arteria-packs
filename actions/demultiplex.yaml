@@ -1,21 +1,33 @@
 ---
-name: bcl2fastq 
-description: Run demultiplexing using bcl2fastq
+name: demultiplex 
+description: Run demultiplexing
 enabled: true
-runner_type: remote-shell-script
-entry_point: lib/bcl2fastq.py
+runner_type: mistral-v2
+entry_point: workflows/demultiplex.yaml
 pack: arteria-packs
 parameters:
   
-  input:
+  context:
+    default: {}
+    immutable: true
+    type: object
+  
+  workflow:
+    default: arteria-packs.demultiplex 
+    immutable: true
     type: string
-    required: True
-    description: "Path to the runfolder to demultiplexing."
-
-  output:
-    required: True
+  
+  host:
+    default: null
+    required: true    
     type: string
-    description: "Path to output from demultiplexing."
+    description: "Host where the runfolder is located."
+  
+  runfolder:
+    default: null
+    type: string
+    required: true
+    description: "Name of runfolder to demultiplex."
 
   barcode_mismatches:
     default: null
@@ -32,10 +44,10 @@ parameters:
     type: string
     description: "Base mask to use (see bcl2fastq manual for detailed description)."
 
-  additional_arguments:
+  bcl2fastq_additional_arguments:
     default: null
     type: string
     description: "Any additional arguments to bcl2fastq can be fed here. Note that quoutes (\") are needed around arguments for the to parse properly. E.g. \"--my-first-arg 1 --my-second-arg 2\" "
-
+ 
     
 
