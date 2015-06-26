@@ -16,7 +16,7 @@ workflows:
             std_out: <% $.std_out %>
         tasks:
             run_bcl2fastq:
-                action: arteria-packs.bcl2fastq
+                action: arteria-packs.demultiplexing
                 input:
                     host: "<% $.host %>" 
                     runfolder: "<% $.runfolder %>"
@@ -42,14 +42,13 @@ workflows:
                     - start_ngi_pipeline
 
             # TODO Split out the ngi pipeline processing stuff..
-
             start_ngi_pipeline:
                 action: core.http
                 input:
                     #url: "http://www.uu.se"
                     url: "http://localhost:9101/v1/webhooks/ngi_pipeline"
                     method: "POST"
-                    headers: "X-Auth-Token=8e776fe2d4c940f692c95af7d762a941&Content-Type=application/json"
+                    headers: "X-Auth-Token={{system.st2_auth_token}}&Content-Type=application/json"
                     body: '{ "start_ngi_pipeline": "<% $.trigger_ngi_pipeline %>" }'
                     
 

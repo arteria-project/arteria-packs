@@ -1,0 +1,39 @@
+version: "2.0" # mistral version
+name: arteria-packs.demultiplex
+description: Workflow to run demultiplexing.
+
+workflows:
+
+    main:
+        type: direct
+        input:
+            - host
+            - runfolder
+            - barcode_mismatches
+            - tiles
+            - use_bases_mask
+            - bcl2fastq_additional_arguments
+
+        tasks:
+
+            #download_samplesheet:
+                #TODO
+
+            #download_qc_config:
+                #TODO
+
+            #get_tiles_to_include:
+                #TODO
+
+            run_bcl2fastq:
+                action: arteria-packs.bcl2fastq
+                input:
+                    hosts: <% $.host %>
+                    cwd: <% $.runfolder %>
+                    input: <% $.runfolder %>
+                    output: "/data/scratch/try"
+                    barcode_mismatches: <% $.barcode_mismatches %>
+                    tiles: <% $.tiles %>
+                    use_bases_mask: <% $.use_bases_mask %>
+                    additional_arguments: <% $.bcl2fastq_additional_arguments %>
+
