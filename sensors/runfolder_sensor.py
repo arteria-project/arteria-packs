@@ -17,7 +17,7 @@ class RunfolderSensor(PollingSensor):
         self._infolog("setup")
         try:
             # TODO: Config, from st2
-            self._client = RunfolderClient(["http://testtank1:10800"], self._logger)
+            self._client = RunfolderClient(["http://testarteria1:10800"], self._logger)
             self._infolog("Created client: {0}".format(self._client))
         except Exception as ex:
             # TODO: It seems that st2 isn't logging the entire exception, or
