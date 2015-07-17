@@ -6,7 +6,15 @@ runner_type: remote-shell-script
 entry_point: lib/bcl2fastq.py
 pack: arteria-packs
 parameters:
-  
+
+#  username:
+#    type: string
+#    default: vagrant
+#
+#  password:
+#    type: string
+#    default: vagrant
+
   input:
     type: string
     required: True
