@@ -1,9 +1,12 @@
+
+# Demultiplexing
+# Setups up a runfolder for demultiplexing assuming that the samplesheet and
+#
+#
+
 version: "2.0" # mistral version
 
 arteria-packs.demultiplex:
-
-    #name: arteria-packs.demultiplex
-    #description: Workflow to run demultiplexing.
 
     type: direct
     input:
@@ -18,11 +21,19 @@ arteria-packs.demultiplex:
 
     tasks:
 
-        #download_samplesheet:
-            #TODO
-
-        #download_qc_config:
-            #TODO
+        # TODO This should be pulled from the
+        #      Hermes sever instead in the future.
+        download_samplesheet:
+            action: arteria-packs.copy_samplesheet
+            input:
+                runfolder: <% $.runfolder %>
+                # TODO Should not be hardcoded here!
+                samplesheet_location: "/srv/samplesheet/processning/"
+                username: <% $.username %>
+                password: <% $.password %>
+                hosts: <% $.host %>
+            on-success:
+                - run_bcl2fastq
 
         #get_tiles_to_include:
             #TODO

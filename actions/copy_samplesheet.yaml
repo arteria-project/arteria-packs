@@ -1,0 +1,16 @@
+---
+name: "copy_samplesheet"
+runner_type: "remote-shell-script"
+description: "Will find a samplesheet matching the provided runfolder"
+enabled: true
+entry_point: "lib/copy_samplesheet.py"
+parameters:
+    runfolder:
+        type: string
+        required: True
+        description: "Path to the runfolder to search for a samplesheet for."
+
+    samplesheet_location:
+        type: string
+        required: True
+        description: "Location where alternative samplesheets can be found."
