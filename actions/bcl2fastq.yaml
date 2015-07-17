@@ -6,7 +6,7 @@ runner_type: remote-shell-script
 entry_point: lib/bcl2fastq.py
 pack: arteria-packs
 parameters:
-  
+
   input:
     type: string
     required: True

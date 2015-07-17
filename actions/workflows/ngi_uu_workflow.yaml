@@ -16,7 +16,7 @@ workflows:
             std_out: <% $.std_out %>
         tasks:
             run_bcl2fastq:
-                action: arteria-packs.demultiplexing
+                action: arteria-packs.demultiplex
                 input:
                     host: "<% $.host %>" 
                     runfolder: "<% $.runfolder %>"
