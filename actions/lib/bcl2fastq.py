@@ -17,7 +17,8 @@ def main(argv):
 
     # Optional arguments
     parser.add_argument('--barcode_missmatches',  help='Number of missmatches to allow (0, 1 or 2)',)
-    parser.add_argument('--tiles',  help='Tiles to include.',)
+    parser.add_argument('--auto_tiles',  help='Tiles to include.',)
+    parser.add_argument('--manual_tiles',  help='Tiles to include (will override auto_tiles)',)
     parser.add_argument('--use_base_mask',  help='Base mask to use.',)
     parser.add_argument('--additional_args',  help='Additional arguments to feed to bcl2fastq',)
 
@@ -31,8 +32,12 @@ def main(argv):
     if args.barcode_missmatches:
         commandline.append("--barcode-mismatches " + args.barcode_missmatches)
 
-    if args.tiles:
-        commandline.append("--tiles " + args.tiles)
+    # Preferentially use the manually set tiles. Otherwise
+    # fallback to the automatically set tags.
+    if args.manual_tiles:
+        commandline.append("--tiles " + args.manual_tiles)
+    elif args.auto_tiles:
+        commandline.append("--tiles " + args.auto_tiles)
 
     if args.use_base_mask:
         commandline.append("--use_base_mask " + args.use_base_mask)

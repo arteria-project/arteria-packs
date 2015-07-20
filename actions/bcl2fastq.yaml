@@ -22,10 +22,15 @@ parameters:
     type: string
     description: "Number of missmatches to allow. Accepts 0, 1 or 2"
 
-  tiles:
+  auto_tiles:
     default: null
     type: string
-    description: "Regular expression for tiles to include (see bcl2fastq manual for detailed description)"
+    description: "Will be overriden by manual_tiles. Regular expression for tiles to include (see bcl2fastq manual for detailed description)"
+
+  manual_tiles:
+    default: null
+    type: string
+    description: "Used to manually override auto_tile. Regular expression for tiles to include (see bcl2fastq manual for detailed description)"
 
   use_bases_mask:
     default: null

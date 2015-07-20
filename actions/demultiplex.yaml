@@ -42,15 +42,21 @@ parameters:
     required: true
     description: "Name of runfolder to demultiplex."
 
+  samplesheet_location:
+    default: "/srv/samplesheet/processning/"
+    type: string
+    required: true
+    description: "Location where to look for samplesheets."
+
   barcode_mismatches:
     default: ""
     type: string
     description: "Number of missmatches to allow. Accepts 0, 1 or 2"
 
-  tiles:
+  manual_tiles:
     default: ""
     type: string
-    description: "Regular expression for tiles to include (see bcl2fastq manual for detailed description)"
+    description: "(Will override manual tiles). Regular expression for tiles to include (see bcl2fastq manual for detailed description)"
 
   use_bases_mask:
     default: ""
