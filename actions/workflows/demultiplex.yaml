@@ -16,7 +16,7 @@ arteria-packs.demultiplex:
         - runfolder
         - samplesheet_location
         - barcode_mismatches
-        - manual_tiles
+        - tiles
         - use_bases_mask
         - bcl2fastq_additional_arguments
 
@@ -35,20 +35,6 @@ arteria-packs.demultiplex:
             on-success:
                 - get_tiles_to_include
 
-        get_tiles_to_include:
-            action: core.remote
-            input:
-                cwd: <% $.runfolder %>
-                cmd: echo "s_1,s_2,s_3,s_4,s_5,s_6,s_7,s_8" #/srv/sisyphus/sisyphus-latest/generateIncludedTiles.pl -runfolder $PWD | awk -vORS=, '{ print $1 }' |  sed 's/,$/\n/'
-                hosts: <% $.host %>
-                username: <% $.username %>
-                password: <% $.password %>
-                hosts: <% $.host %>
-            publish:
-                auto_tiles: <% $.get_tiles_to_include.localhost.stdout %>
-            on-success:
-                - run_bcl2fastq
-
         run_bcl2fastq:
             action: arteria-packs.bcl2fastq
             input:
@@ -56,8 +42,7 @@ arteria-packs.demultiplex:
                 input: <% $.runfolder %>
                 output: "/data/scratch/<% $.runfolder %>"
                 barcode_mismatches: <% $.barcode_mismatches %>
-                auto_tiles: <% $.auto_tiles %>
-                manual_tiles: <% $.manual_tiles %>
+                tiles: <% $.tiles %>
                 use_bases_mask: <% $.use_bases_mask %>
                 additional_arguments: <% $.bcl2fastq_additional_arguments %>
                 username: <% $.username %>
