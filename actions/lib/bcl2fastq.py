@@ -6,6 +6,7 @@ Basic commandline parser to run bcl2fastq.
 
 import sys
 import argparse
+import subprocess
 
 def main(argv):
 
@@ -24,24 +25,33 @@ def main(argv):
     args = parser.parse_args()
 
 
-    commandline = ["bcl2fastq",
+    commandline_collection = ["bcl2fastq",
          "--input-dir", args.input,
          "--output-dir", args.output]
 
-    if args.barcode_missmatches:
-        commandline.append("--barcode-mismatches " + args.barcode_mismatches)
+    if args.barcode_mismatches:
+        commandline_collection.append("--barcode-mismatches " + args.barcode_mismatches)
 
     if args.tiles:
-        commandline.append("--tiles " + args.manual_tiles)
+        commandline_collection.append("--tiles " + args.manual_tiles)
 
     if args.use_base_mask:
-        commandline.append("--use_base_mask " + args.use_base_mask)
+        commandline_collection.append("--use_base_mask " + args.use_base_mask)
 
     if args.additional_args:
-        commandline.append(args.additional_args)
+        commandline_collection.append(args.additional_args)
 
     # TODO Actually run bcl2fastq!
-    print " ".join(commandline)
+    command = " ".join(commandline_collection)
+    print("Running bcl2fastq with command: " + command)
+
+    try:
+        output = subprocess.check_call(command, stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError as exc:
+        print("Failure in running bcl2fastq!")
+        print(output.stdout)
+    else:
+        print("Successfully finished running bcl2fastq!")
 
 
 if __name__ == "__main__":

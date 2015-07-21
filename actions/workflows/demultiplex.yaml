@@ -33,7 +33,7 @@ arteria-packs.demultiplex:
                 password: <% $.password %>
                 hosts: <% $.host %>
             on-success:
-                - get_tiles_to_include
+                - run_bcl2fastq
 
         run_bcl2fastq:
             action: arteria-packs.bcl2fastq

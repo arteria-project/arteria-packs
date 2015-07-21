@@ -14,11 +14,7 @@ class TestBCL2FASTQ(arteria_test.ArteriaIntegrationTest):
         process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         exitcode = process.wait()
-        json_output = json.load(process.stdout)
-
         assert(exitcode == 0)
-        assert(json_output['result']['localhost']['stdout'] ==
-               "bcl2fastq --input-dir {0} --output-dir /tmp/test".format(self.runfolder))
 
 
 if __name__ == '__main__':
