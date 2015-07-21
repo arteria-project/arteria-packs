@@ -42,6 +42,12 @@ parameters:
     required: true
     description: "Name of runfolder to demultiplex."
 
+  samplesheet_location:
+    default: "/srv/samplesheet/processning/"
+    type: string
+    required: true
+    description: "Location where to look for samplesheets."
+
   barcode_mismatches:
     default: ""
     type: string
