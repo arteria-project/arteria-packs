@@ -1,0 +1,21 @@
+---
+name: poll_status
+runner_type: "local-shell-cmd"
+description: Polls an URL until the web service says that the long process has finished
+enabled: true
+entry_point: poll_status.sh
+parameters:
+    timeout:
+        # Use a default timeout of 1 hour. "No timout" is fixed in a new version
+        # https://github.com/StackStorm/st2/issues/1654
+        default: 3600
+    url:
+        type: string
+        description: URL you want to poll for current status of long running process
+        required: true
+        position: 1
+    sleep:
+        type: integer
+        description: Number of minutes to sleep between poll retries (default 1 m)
+        required: false
+        position: 2

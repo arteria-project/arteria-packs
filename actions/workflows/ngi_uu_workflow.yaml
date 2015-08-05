@@ -13,42 +13,73 @@ workflows:
             - remote_host
             - trigger_ngi_pipeline
         output:
-            std_out: <% $.std_out %>
+            #std_out: <% $.std_out %>
+            output_the_whole_workflow_context: <% $ %>
         tasks:
-            run_bcl2fastq:
-                action: arteria-packs.demultiplex
-                input:
-                    host: "<% $.host %>" 
-                    runfolder: "<% $.runfolder %>"
-                    run_type: "<% $.run_type %>"
-                publish:
-                    status_message: "Runfolder <% $.runfolder %> run on <% $.host %>..."
-                on-success:
-                    - run_sisyphus_quick_report
-                    - run_sisyphus_local_processing
+            #            run_bcl2fastq:
+            #                action: arteria-packs.demultiplex
+            #                input:
+            #                    host: "<% $.host %>"
+            #                    runfolder: "<% $.runfolder %>"
+            #                    run_type: "<% $.run_type %>"
+            #                publish:
+            #                    status_message: "Runfolder <% $.runfolder %> run on <% $.host %>..."
+            #                on-success:
+            #                    - run_sisyphus_quick_report
+            #         - run_sisyphus_local_processing
 
             run_sisyphus_quick_report:
-                action: arteria-packs.sisyphus_quickreport 
+                action: arteria-packs.sisyphus_quickreport
                 input:
                     host:  "<% $.host %>"
                     runfolder:  "<% $.runfolder %>"
-              
-            run_sisyphus_local_processing:
-                action: arteria-packs.sisyphus_local_processing
-                input:
-                    host:  "<% $.host %>"
-                    runfolder:  "<% $.runfolder %>"
+                publish:
+                    siswrap_err: <% $.run_sisyphus_quick_report.output_the_whole_workflow_context %>
+                    #report_message: "Report generated for <% $.runfolder %> on <% $.host %>"
+                    #report_err: "<% $.run_sisyphus_quick_report.stdout $.run_sisyphus_quick_report.stderr %>"
                 on-success:
-                    - start_ngi_pipeline
+                    - run_sisyphus_quality_control
+                on-error:
+                    - print_error
+
+            run_sisyphus_quality_control:
+                action: arteria-packs.sisyphus_qc
+                input:
+                    host: "<% $.host %>"
+                    runfolder: "<% $.runfolder %>"
+                publish:
+                    qc_message: "QC and report finished for <% $.runfolder %> on <% $.host %>"
+                    siswrap_err: <% $.run_sisyphus_quality_control.output_the_whole_workflow_context %>
+                    #qc_err: <% $.run_sisyphus_quality_control.stdout $.run_sisyphus_quality_control.stderr %>
+                on-success:
+                    - notify
+                on-error:
+                    - print_error
+
+            notify:
+                action: core.local
+                input:
+                    cmd: "printf '<% $.qc_message %>'"
+
+            print_error:
+                action: core.local
+                input:
+                    cmd: "printf 'an error occurred: <% $.siswrap_err %>'"
+
+#            run_sisyphus_local_processing:
+#                action: arteria-packs.sisyphus_local_processing
+#                input:
+#                    host:  "<% $.host %>"
+#                    runfolder:  "<% $.runfolder %>"
+#                on-success:
+#                    - start_ngi_pipeline
 
             # TODO Split out the ngi pipeline processing stuff..
-            start_ngi_pipeline:
-                action: core.http
-                input:
-                    #url: "http://www.uu.se"
-                    url: "http://localhost:9101/v1/webhooks/ngi_pipeline"
-                    method: "POST"
-                    headers: "X-Auth-Token={{system.st2_auth_token}}&Content-Type=application/json"
-                    body: '{ "start_ngi_pipeline": "<% $.trigger_ngi_pipeline %>" }'
-                    
-
+            #            start_ngi_pipeline:
+            #                action: core.http
+            #                input:
+            #                    url: "http://www.uu.se"
+            #                    url: "http://localhost:9101/v1/webhooks/ngi_pipeline"
+            #                    method: "POST"
+            #                    headers: "X-Auth-Token={{system.st2_auth_token}}&Content-Type=application/json"
+            #                    body: '{ "start_ngi_pipeline": "<% $.trigger_ngi_pipeline %>" }'
