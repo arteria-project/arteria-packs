@@ -1,9 +1,9 @@
 ---
 name: poll_status
-runner_type: "local-shell-cmd"
+runner_type: run-python
 description: Polls an URL until the web service says that the long process has finished
 enabled: true
-entry_point: poll_status.sh
+entry_point: lib/poll_status.py
 parameters:
     timeout:
         # Use a default timeout of 1 hour. "No timout" is fixed in a new version
@@ -19,3 +19,10 @@ parameters:
         description: Number of minutes to sleep between poll retries (default 1 m)
         required: false
         position: 2
+        default: 1
+    log:
+        type: string
+        description: Path to log file (default /var/log/arteria/poll_status.log)
+        required: false
+        position: 3
+        default: /var/log/arteria/poll_status.log
