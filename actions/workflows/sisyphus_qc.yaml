@@ -1,6 +1,6 @@
 version: "2.0" # mistral version
-name: arteria-packs.sisyphus_quickreport
-description: Workflow to generate a Sisyphus quick report
+name: arteria-packs.sisyphus_qc
+description: Workflow to run a Sisyphus quality control
 
 workflows:
 
@@ -20,24 +20,23 @@ workflows:
                     cmd: python -c 'import sys; sys.stdout.write("<% $.runfolder %>".split("/")[-1])'
                 publish:
                     runfolder_name: <% $.get_runfolder_name.stdout %>
-                    report_err: <% $.get_runfolder_name.stdout %> <% $.get_runfolder_name.stderr %>
+                    qc_err: <% $.get_runfolder_name.stdout %> <% $.get_runfolder_name.stderr %>
                 on-success:
-                    - run_quickreport
+                    - run_qc
                 on-error:
                     - print_error
-
-            run_quickreport:
+            run_qc:
                 action: core.http
                 input:
-                    url: "http://<% $.host %>:10900/api/1.0/report/run/<% $.runfolder_name %>"
+                    url: "http://<% $.host %>:10900/api/1.0/qc/run/<% $.runfolder_name %>"
                     method: "POST"
                     headers: "Content-Type=application/json"
                     body: '{"runfolder": "<% $.runfolder_name %>"}'
                 publish:
-                    report_code: <% $.run_quickreport.status_code %>
-                    report_msg: <% $.run_quickreport.body %>
-                    report_status_url: <% $.run_quickreport.body.link %>
-                    report_err: <% $.run_quickreport.status_code %> <% $.run_quickreport.body %>
+                    qc_code: <% $.run_qc.status_code %>
+                    qc_msg: <% $.run_qc.body.msg %>
+                    qc_status_url: <% $.run_qc.body.link %>
+                    qc_err: <% $.run_quickreport.status_code %> <% $.run_quickreport.body %>
                 on-success:
                     - poll_status
                 on-error:
@@ -46,11 +45,11 @@ workflows:
             poll_status:
                 action: arteria-packs.poll_status
                 input:
-                    url: <% $.report_status_url %>
+                    url: <% $.qc_status_url %>
                 publish:
                     poll_out: <% $.poll_status.stdout %>
                     poll_err: <% $.poll_status.stderr %>
-                    report_err: <% $.poll_status.stdout %> <% $.poll_status.stderr %>
+                    qc_err: <% $.poll_status.stdout %> <% $.poll_status.stderr %>
                 on-success:
                     - notify
                 on-error:
@@ -59,8 +58,8 @@ workflows:
             print_error:
                 action: core.local
                 input:
-                    cmd: "printf 'An error occurred: <% $.report_err %>'"
-
+                    cmd: "printf 'an error occurred: <% $.qc_err %>'"
+                    
             notify:
                 action: core.local
                 input:

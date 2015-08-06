@@ -1,0 +1,23 @@
+---
+name: sisyphus_qc
+description: Do a quality control of the run using Sisyphus
+enabled: true
+runner_type: mistral-v2
+entry_point: workflows/sisyphus_qc.yaml
+pack: arteria-packs
+parameters:
+  context:
+    default: {}
+    immutable: true
+    type: object
+  workflow:
+    default: arteria-packs.sisyphus_qc 
+    immutable: true
+    type: string
+  host:
+    default: null
+    type: string
+  runfolder:
+    default: null
+    type: string
+
