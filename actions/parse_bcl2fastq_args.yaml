@@ -1,0 +1,31 @@
+---
+name: parse_bcl2fastq_args
+runner_type: python-script
+description: Parses a bcl2fastq args to json
+enabled: true
+entry_point: lib/parse_arguments_to_json.py
+parameters:
+  bcl2fastq_version:
+    default: ""
+    type: string
+    description: "bcl2fastq version to use"
+
+  barcode_mismatches:
+    default: ""
+    type: string
+    description: "Number of missmatches to allow. Accepts 0, 1 or 2"
+
+  tiles:
+    default: ""
+    type: string
+    description: "Regular expression for tiles to include (see bcl2fastq manual for detailed description)"
+
+  use_base_mask:
+    default: ""
+    type: string
+    description: "Base mask to use (see bcl2fastq manual for detailed description)."
+
+  additional_arguments:
+    default: ""
+    type: string
+    description: "Any additional arguments to bcl2fastq can be fed here. Note that quoutes (\") are needed around arguments for the to parse properly. E.g. \"--my-first-arg 1 --my-second-arg 2\" "
