@@ -1,7 +1,9 @@
 
 # Demultiplexing
-# Setups up a runfolder for demultiplexing assuming that the samplesheet and
-#
+# ==============
+# Setups up a runfolder for demultiplexing assuming that the samplesheet
+# needs to be copied from `samplesheet_location` into the runfolder.
+# Then starts bcl2fastq and waits until it's done.
 #
 
 version: "2.0" # mistral version
@@ -13,37 +15,70 @@ arteria-packs.demultiplex:
         - host
         - username
         - password
-        - runfolder
+        - runfolder_name
         - samplesheet_location
+        - bcl2fastq_version
         - barcode_mismatches
         - tiles
-        - use_bases_mask
+        - use_base_mask
         - bcl2fastq_additional_arguments
 
     tasks:
 
         # TODO This should be pulled from the
         #      Hermes sever instead in the future.
-        download_samplesheet:
-            action: arteria-packs.copy_samplesheet
+#        download_samplesheet:
+#            action: arteria-packs.copy_samplesheet
+#            input:
+#                runfolder: <% $.runfolder %>
+#                samplesheet_location: <% $.samplesheet_location %>
+#                username: <% $.username %>
+#                password: <% $.password %>
+#                hosts: <% $.host %>
+#            on-success:
+#                - construct_bcl2fastq_body
+
+        # Since we don't want to pass empty values into
+        # bcl2fastq-ws, we remove any empty keys from
+        # this body.
+        construct_bcl2fastq_body:
+            action: arteria-packs.parse_bcl2fastq_args
             input:
-                runfolder: <% $.runfolder %>
-                samplesheet_location: <% $.samplesheet_location %>
-                username: <% $.username %>
-                password: <% $.password %>
-                hosts: <% $.host %>
+                bcl2fastq_version: "<% $.bcl2fastq_version %>"
+                barcode_mismatches: "<% $.barcode_mismatches %>"
+                tiles: "<% $.tiles %>"
+                use_base_mask: "<% $.use_base_mask %>"
+                additional_arguments: "<% $.bcl2fastq_additional_arguments %>"
+            publish:
+                bcl2fastq_body: <% $.construct_bcl2fastq_body.stdout %>
             on-success:
                 - run_bcl2fastq
 
         run_bcl2fastq:
-            action: arteria-packs.bcl2fastq
+            action: core.http
             input:
-                hosts: <% $.host %>
-                input: <% $.runfolder %>
-                output: "/data/scratch/<% $.runfolder %>"
-                barcode_mismatches: <% $.barcode_mismatches %>
-                tiles: <% $.tiles %>
-                use_bases_mask: <% $.use_bases_mask %>
-                additional_arguments: <% $.bcl2fastq_additional_arguments %>
-                username: <% $.username %>
-                password: <% $.password %>
+                url: "http://<% $.host %>:8888/api/1.0/start/<% $.runfolder_name %>"
+                method: "POST"
+                headers: "Content-Type=application/json"
+                body: <% $.bcl2fastq_body %>
+            publish:
+                bcl2fastq_status_code: <% $.run_bcl2fastq.status_code %>
+                bcl2fastq_status_url: <% $.run_bcl2fastq.body.link %>
+
+#                run_qc:
+#                action: core.http
+#                input:
+#                    url: "http://<% $.host %>:10900/api/1.0/qc/run/<% $.runfolder_name %>"
+#                    method: "POST"
+#                    headers: "Content-Type=application/json"
+#                    body: '{"runfolder": "<% $.runfolder_name %>"}'
+#                publish:
+#                    qc_code: <% $.run_qc.status_code %>
+#                    qc_msg: <% $.run_qc.body.msg %>
+#                    qc_status_url: <% $.run_qc.body.link %>
+#                    qc_err: <% $.run_quickreport.status_code %> <% $.run_quickreport.body %>
+#                on-success:
+#                    - poll_status
+#                on-error:
+#                    - print_error
+

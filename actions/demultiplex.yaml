@@ -36,11 +36,16 @@ parameters:
     type: string
     description: "Password to use in remote tasks."
   
-  runfolder:
+  runfolder_name:
     default: null
     type: string
     required: true
     description: "Name of runfolder to demultiplex."
+
+  bcl2fastq_version:
+    default: ""
+    type: string
+    description: "bcl2fastq version to use"
 
   samplesheet_location:
     default: "/srv/samplesheet/processning/"
@@ -58,7 +63,7 @@ parameters:
     type: string
     description: "Regular expression for tiles to include (see bcl2fastq manual for detailed description)"
 
-  use_bases_mask:
+  use_base_mask:
     default: ""
     type: string
     description: "Base mask to use (see bcl2fastq manual for detailed description)."
