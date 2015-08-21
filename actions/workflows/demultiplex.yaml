@@ -64,21 +64,14 @@ arteria-packs.demultiplex:
             publish:
                 bcl2fastq_status_code: <% $.run_bcl2fastq.status_code %>
                 bcl2fastq_status_url: <% $.run_bcl2fastq.body.link %>
+            on-success:
+                - poll_status
 
-#                run_qc:
-#                action: core.http
-#                input:
-#                    url: "http://<% $.host %>:10900/api/1.0/qc/run/<% $.runfolder_name %>"
-#                    method: "POST"
-#                    headers: "Content-Type=application/json"
-#                    body: '{"runfolder": "<% $.runfolder_name %>"}'
-#                publish:
-#                    qc_code: <% $.run_qc.status_code %>
-#                    qc_msg: <% $.run_qc.body.msg %>
-#                    qc_status_url: <% $.run_qc.body.link %>
-#                    qc_err: <% $.run_quickreport.status_code %> <% $.run_quickreport.body %>
-#                on-success:
-#                    - poll_status
-#                on-error:
-#                    - print_error
-
+        poll_status:
+            action: arteria-packs.poll_status
+            input:
+                url: <% $.bcl2fastq_status_url %>
+            publish:
+                poll_out: <% $.poll_status.stdout %>
+                poll_err: <% $.poll_status.stderr %>
+                qc_err: <% $.poll_status.stdout %> <% $.poll_status.stderr %>
