@@ -23,19 +23,12 @@ parameters:
     type: string
     description: "Host where the runfolder is located."
 
-  username:
-    default: vagrant
+  bcl2fastq_service_port:
+    default: 10900
+    type: int
     required: true
-    type: string
-    description: "Username to use in remote tasks."
+    description: "Port on which the bcl2fastq service runs."
 
-  #TODO We should figure out how to do this using keys instead.
-  password:
-    default: vagrant
-    required: true
-    type: string
-    description: "Password to use in remote tasks."
-  
   runfolder_name:
     default: null
     type: string

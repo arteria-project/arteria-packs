@@ -9,23 +9,11 @@ workflows:
         # fixme: get port nr from somewhere?
         input:
             - host
-            - runfolder
+            - runfolder_name
         output:
 #            std_out: <% $.std_out %>
             output_the_whole_workflow_context: <% $ %>
         tasks:
-            get_runfolder_name:
-                action: core.local
-                input:
-                    cmd: python -c 'import sys; sys.stdout.write("<% $.runfolder %>".split("/")[-1])'
-                publish:
-                    runfolder_name: <% $.get_runfolder_name.stdout %>
-                    report_err: <% $.get_runfolder_name.stdout %> <% $.get_runfolder_name.stderr %>
-                on-success:
-                    - run_quickreport
-                on-error:
-                    - print_error
-
             run_quickreport:
                 action: core.http
                 input:

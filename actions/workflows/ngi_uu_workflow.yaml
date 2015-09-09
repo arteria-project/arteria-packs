@@ -13,26 +13,48 @@ workflows:
             - remote_host
             - trigger_ngi_pipeline
         output:
-            #std_out: <% $.std_out %>
             output_the_whole_workflow_context: <% $ %>
         tasks:
-            #            run_bcl2fastq:
-            #                action: arteria-packs.demultiplex
-            #                input:
-            #                    host: "<% $.host %>"
-            #                    runfolder: "<% $.runfolder %>"
-            #                    run_type: "<% $.run_type %>"
-            #                publish:
-            #                    status_message: "Runfolder <% $.runfolder %> run on <% $.host %>..."
-            #                on-success:
-            #                    - run_sisyphus_quick_report
-            #         - run_sisyphus_local_processing
+            get_runfolder_name:
+                action: core.local
+                input:
+                    cmd: python -c 'import sys; sys.stdout.write("<% $.runfolder %>".split("/")[-1])'
+                publish:
+                    runfolder_name: <% $.get_runfolder_name.stdout %>
+                    report_err: <% $.get_runfolder_name.stdout %> <% $.get_runfolder_name.stderr %>
+                on-success:
+                    - get_flowcell_name
+                on-error:
+                    - print_error
+
+            get_flowcell_name:
+                action: arteria-packs.get_flowcell_from_runfolder_name
+                input:
+                    runfolder_name: < $.runfolder_name >
+                publish:
+                    flowcell_name: <% $.get_flowcell_name.stdout %>
+                    report_err: <% $.get_flowcell_name.stdout %> <% $.get_flowcell_name.stderr %>
+                on-success:
+                    - demultiplex
+                on-error:
+                    - print_error
+
+            demultiplex:
+                action: arteria-packs.demultiplex
+                input:
+                    host: "<% $.host %>"
+                    runfolder_name: "<% $.runfolder_name %>"
+                    run_type: "<% $.run_type %>"
+                publish:
+                    status_message: "Runfolder <% $.runfolder %> run on <% $.host %>..."
+                on-success:
+                    - run_sisyphus_quick_report
 
             run_sisyphus_quick_report:
                 action: arteria-packs.sisyphus_quickreport
                 input:
                     host:  "<% $.host %>"
-                    runfolder:  "<% $.runfolder %>"
+                    runfolder:  "<% $.runfolder_name %>"
                 publish:
                     siswrap_err: <% $.run_sisyphus_quick_report.output_the_whole_workflow_context %>
                     #report_message: "Report generated for <% $.runfolder %> on <% $.host %>"
@@ -46,7 +68,7 @@ workflows:
                 action: arteria-packs.sisyphus_qc
                 input:
                     host: "<% $.host %>"
-                    runfolder: "<% $.runfolder %>"
+                    runfolder: "<% $.runfolder_name %>"
                 publish:
                     qc_message: "QC and report finished for <% $.runfolder %> on <% $.host %>"
                     siswrap_err: <% $.run_sisyphus_quality_control.output_the_whole_workflow_context %>

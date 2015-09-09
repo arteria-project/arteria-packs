@@ -9,22 +9,11 @@ workflows:
         # fixme: get port nr from somewhere?
         input:
             - host
-            - runfolder
+            - runfolder_name
         output:
 #            std_out: <% $.std_out %>
             output_the_whole_workflow_context: <% $ %>
         tasks:
-            get_runfolder_name:
-                action: core.local
-                input:
-                    cmd: python -c 'import sys; sys.stdout.write("<% $.runfolder %>".split("/")[-1])'
-                publish:
-                    runfolder_name: <% $.get_runfolder_name.stdout %>
-                    qc_err: <% $.get_runfolder_name.stdout %> <% $.get_runfolder_name.stderr %>
-                on-success:
-                    - run_qc
-                on-error:
-                    - print_error
             run_qc:
                 action: core.http
                 input:
@@ -46,10 +35,10 @@ workflows:
                 action: arteria-packs.poll_status
                 input:
                     url: <% $.qc_status_url %>
-                publish:
-                    poll_out: <% $.poll_status.stdout %>
-                    poll_err: <% $.poll_status.stderr %>
-                    qc_err: <% $.poll_status.stdout %> <% $.poll_status.stderr %>
+                #publish:
+                    #poll_out: <% $.poll_status.stdout %>
+                    #poll_err: <% $.poll_status.stderr %>
+                    #qc_err: <% $.poll_status.stdout %> <% $.poll_status.stderr %>
                 on-success:
                     - notify
                 on-error:
@@ -59,7 +48,7 @@ workflows:
                 action: core.local
                 input:
                     cmd: "printf 'an error occurred: <% $.qc_err %>'"
-                    
+
             notify:
                 action: core.local
                 input:
