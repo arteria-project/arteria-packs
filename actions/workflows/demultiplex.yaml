@@ -13,8 +13,7 @@ arteria-packs.demultiplex:
     type: direct
     input:
         - host
-        - username
-        - password
+        - bcl2fastq_service_port
         - runfolder_name
         - samplesheet_location
         - bcl2fastq_version
@@ -57,7 +56,7 @@ arteria-packs.demultiplex:
         run_bcl2fastq:
             action: core.http
             input:
-                url: "http://<% $.host %>:8888/api/1.0/start/<% $.runfolder_name %>"
+                url: "http://<% $.host %>:<% $.bcl2fastq_service_port %>/api/1.0/start/<% $.runfolder_name %>"
                 method: "POST"
                 headers: "Content-Type=application/json"
                 body: <% $.bcl2fastq_body %>
