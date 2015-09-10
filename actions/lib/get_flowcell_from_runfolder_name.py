@@ -12,18 +12,21 @@ class GetFlowcellFromRunfolderNameAction(Action):
     """
 
     def get_name(self, runfolder_name):
-        base_name = runfolder_name.split("_")[3]
+        try:
+            base_name = runfolder_name.split("_")[3]
 
-        if base_name[0] == 'A' or base_name[0] == 'B':
-            # A and B are the position of the flowcell on the
-            # instrument and should not be included.
-            flowcell_name = base_name[1:len(base_name)]
-        else:
-            flowcell_name = base_name
+            if base_name[0] == 'A' or base_name[0] == 'B':
+                # A and B are the position of the flowcell on the
+                # instrument and should not be included.
+                flowcell_name = base_name[1:len(base_name)]
+            else:
+                flowcell_name = base_name
+        except IndexError as err:
+            sys.stderr.write("The runfolder name " + runfolder_name + " doesn't look like a proper runfolder.")
+            sys.exit(1)
 
         return flowcell_name
 
     def run(self, **kwargs):
         sys.stdout.write(self.get_name(kwargs["runfolder_name"]))
         sys.exit(0)
-
