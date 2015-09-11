@@ -148,6 +148,41 @@ workflows:
                 on-success:
                     - notify_finished
 
+
+            #TODO Create list of files to rsync
+            create_md5sums_for_transferred_files:
+                action: core.remote
+                input:
+                    cmd: >
+                    rsync -vrktp --dry-run --chmod=Dg+sx,ug+w,o-rwx --prune-empty-dirs --include-from <% include_file %> <% runfolder %> /tmp |
+                     grep "<% runfolder_name %>" | grep -v "\/$" | xargs -0 -d'\n' md5sum
+                publish:
+                    md5_sums: <% $.create_md5sums_for_transferred_files.stdout %>
+
+            rsync_to_uppmax:
+                action: arteria-packs.rsync
+                input:
+                    source: <% runfolder %>
+                    dest_server: testuppmax
+                    destination: /tmp/
+                    include_file: /etc/arteria/misc/hiseq.rsync
+                    hosts: <% host %>
+
+            rsync_to_summary_host:
+                action: arteria-packs.rsync
+                input:
+                    source: <% runfolder %>
+                    dest_server: summary-host
+                    destination: /tmp/
+                    include_file: /etc/arteria/misc/summary.rsync
+                    hosts: <% host %>
+
+
+
+            notify:
+                action: core.local
+
+
 ### QUALITY CONTROL END ###
 
             notify_finished:
