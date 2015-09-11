@@ -10,6 +10,11 @@ parameters:
     type: string
     description: "bcl2fastq version to use"
 
+  samplesheet:
+    default: ""
+    type: string
+    description: "String containing the entire samplesheet (not just a path to it)."
+
   barcode_mismatches:
     default: ""
     type: string

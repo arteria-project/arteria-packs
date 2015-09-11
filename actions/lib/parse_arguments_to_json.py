@@ -14,4 +14,3 @@ class ParseArgumentsToJson(Action):
 
     def run(self, **kwargs):
         print(self._strip_null_values(kwargs))
-        sys.exit(0)
