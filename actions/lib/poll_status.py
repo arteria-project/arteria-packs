@@ -46,14 +46,14 @@ class PollStatus(Action):
         state = "started"
         self.LOG_FILENAME = log
 
-        while state == "started":
+        while state == "started" or state == "pending":
             current_time = datetime.datetime.now()
 
             try:
                 resp = requests.get(url)
                 state = resp.json()["state"]
 
-                if state == "started":
+                if state == "started" or state == "pending":
                     self.log("{0} -- {1} returned state {2}. Sleeping {3}m until retrying again...".format(current_time, url, state, sleep))
 
                     time.sleep(sleep * 60)
@@ -62,7 +62,7 @@ class PollStatus(Action):
 
                     if state == "done":
                         self.shutdown(0)
-                    elif state in ["error", "none"]:
+                    elif state in ["error", "none", "cancelled"]:
                         self.shutdown(1)
             except RequestException as err:
                 self.log("{0} -- {1} - an error was encountered: {2}".format(current_time, url, err))

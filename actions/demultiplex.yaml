@@ -25,8 +25,7 @@ parameters:
 
   bcl2fastq_service_port:
     default: 10900
-    type: int
-    required: true
+    type: integer
     description: "Port on which the bcl2fastq service runs."
 
   runfolder_name:
@@ -39,12 +38,6 @@ parameters:
     default: ""
     type: string
     description: "bcl2fastq version to use"
-
-  samplesheet_location:
-    default: "/srv/samplesheet/processning/"
-    type: string
-    required: true
-    description: "Location where to look for samplesheets."
 
   barcode_mismatches:
     default: ""

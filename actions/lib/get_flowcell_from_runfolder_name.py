@@ -24,6 +24,5 @@ class GetFlowcellFromRunfolderNameAction(Action):
         return flowcell_name
 
     def run(self, **kwargs):
-        sys.stdout.write(self.get_name(kwargs["runfolder_name"]))
-        sys.exit(0)
+        return self.get_name(kwargs["runfolder_name"])
 
