@@ -21,10 +21,9 @@ workflows:
             - siswrap_service_port
         output:
             output_the_whole_workflow_context: <% $ %>
-            stdout: < $.stdout %>
         task-defaults:
             on-error:
-                - oh_shit_error_main
+                - oh_shit_error
 
         tasks:
             get_runfolder_name:
@@ -91,7 +90,6 @@ workflows:
                     headers: "Content-Type=application/json"
                     body: <% $.bcl2fastq_body %>
                 publish:
-                    bcl2fastq_status_code: <% $.run_bcl2fastq.status_code %>
                     bcl2fastq_status_url: <% $.run_bcl2fastq.body.link %>
                 on-success:
                     - poll_demultiplex_status
@@ -100,27 +98,11 @@ workflows:
                 action: arteria-packs.poll_status
                 input:
                     url: <% $.bcl2fastq_status_url %>
-                publish:
-                    poll_out: <% $.poll_demultiplex_status.stdout %>
-                    poll_err: <% $.poll_demultiplex_status.stderr %>
                 on-success:
                     - run_sisyphus_quick_report
 
 ### DEMULTIPLEX END ###
 
-  #          demultiplex:
-  #              action: arteria-packs.demultiplex
-  #              input:
-  #                  host: "<% $.host %>"
-  #                  runfolder_name: "<% $.runfolder_name %>"
-  #                  run_type: "<% $.run_type %>"
-  #              publish:
-  #                  demultiplex_message: "Finished demultiplex for <% $.runfolder %> on <% $.host %>..."
-  #                  #error_msg: "<% $.demultiplex.output_the_whole_workflow_context %>"
-  #                  #stdout: "<% $.demultiplex.stdout %>"
-  #                  #error_msg: "<% $.demultiplex.stdout %> <% $.demultiplex.stderr %>"
-  #              on-success:
-  #                  - run_sisyphus_quick_report
 
 ### QUICK REPORT START ###
 
@@ -132,10 +114,7 @@ workflows:
                     headers: "Content-Type=application/json"
                     body: '{"runfolder": "<% $.runfolder_name %>"}'
                 publish:
-                    report_code: "<% $.run_sisyphus_quick_report.status_code %>"
-                    report_msg: "<% $.run_sisyphus_quick_report.body %>"
                     report_status_url: "<% $.run_sisyphus_quick_report.body.link %>"
-                    report_err: "<% $.run_sisyphus_quick_report.status_code %> <% $.run_quickreport.body %>"
                 on-success:
                     - poll_report_status
 
@@ -143,26 +122,10 @@ workflows:
                 action: arteria-packs.poll_status
                 input:
                     url: "<% $.report_status_url %>"
-                publish:
-                    poll_out: "<% $.poll_report_status.stdout %>"
-                    poll_err: "<% $.poll_report_status.stderr %>"
                 on-success:
                     - run_sisyphus_qc
 
 ### QUICK REPORT END ###
-
-
-#            run_sisyphus_quick_report:
-#                action: arteria-packs.sisyphus_quickreport
-#                input:
-#                    host:  "<% $.host %>"
-#                    runfolder:  "<% $.runfolder_name %>"
-#                publish:
-#                    report_message: "Report generated for <% $.runfolder %> on <% $.host %>"
-#                    #error_msg: "<% $.run_sisyphus_quick_report.output_the_whole_workflow_context %>"
-#                    #error_msg: "<% $.run_sisyphus_quick_report.stdout $.run_sisyphus_quick_report.stderr %>"
-#                on-success:
-#                    - run_sisyphus_quality_control
 
 ### QUALITY CONTROL START ###
 
@@ -174,10 +137,7 @@ workflows:
                     headers: "Content-Type=application/json"
                     body: '{"runfolder": "<% $.runfolder_name %>"}'
                 publish:
-                    qc_code: "<% $.run_sisyphus_qc.status_code %>"
-                    qc_msg: "<% $.run_sisyphus_qc.body.msg %>"
                     qc_status_url: "<% $.run_sisyphus_qc.body.link %>"
-                    qc_err: "<% $.run_sisyphus_qc.status_code %> <% $.run_sisyphus_qc.body %>"
                 on-success:
                     - poll_qc_status
 
@@ -185,26 +145,10 @@ workflows:
                 action: arteria-packs.poll_status
                 input:
                     url: <% $.qc_status_url %>
-                publish:
-                    poll_out: <% $.poll_qc_status.stdout %>
-                    poll_err: <% $.poll_qc_status.stderr %>
                 on-success:
                     - notify_finished
 
 ### QUALITY CONTROL END ###
-
-
-#            run_sisyphus_quality_control:
-#                action: arteria-packs.sisyphus_qc
-#                input:
-#                    host: "<% $.host %>"
-#                    runfolder: "<% $.runfolder_name %>"
-#                publish:
-#                    qc_message: "QC finished for <% $.runfolder %> on <% $.host %>"
-#                    #error_msg: "<% $.run_sisyphus_quality_control.output_the_whole_workflow_context %>"
-#                    #error_msg: "<% $.run_sisyphus_quality_control.stdout $.run_sisyphus_quality_control.stderr %>"
-#                on-success:
-#                    - notify_finished
 
             notify_finished:
                 action: core.sendmail
@@ -213,15 +157,11 @@ workflows:
                     subject: "'[ARTERIA] - Finished processing runfolder <% $.runfolder_name %>'"
                     body: "Finished processing on <% $.host %> for <% $.runfolder_name %>: <% $.demultiplex_message %> <% $.report_message %> <% $.qc_message %>"
 
-
-            #shit_error:
-            #  action: arteria-packs.oh_shit_error execution_id=<% $.__execution.id %> host=<% $.host %> runfolder=<% $.runfolder %>
-
-            oh_shit_error_main:
+            oh_shit_error:
                 action: core.sendmail
                 input:
                     to: <% $.send_mail_to %>
-                    subject: "'[ARTERIA] - OH SHIT ERROR MAIN occurred for runfolder <% $.runfolder_name %>'"
-                    body: "An oh shit error occurred on <% $.runfolder_name %> on <% $.host %> in main flow. Please investigate!"
+                    subject: "'[ARTERIA] - OH SHIT ERROR occurred for runfolder <% $.runfolder_name %>'"
+                    body: "An oh shit error occurred while processing <% $.runfolder_name %> on host <% $.host %>. Please investigate!"
                 on-complete:
                   - fail

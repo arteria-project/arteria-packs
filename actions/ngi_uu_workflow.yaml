@@ -27,13 +27,13 @@ parameters:
     default: hiseq_x
     type: string
   remote_host:
-    default: milou-b.uppmax.uu.se
+    default: example.remote.host.to.communicate.with
     type: string
   trigger_ngi_pipeline:
     default: false
     type: boolean
   send_mail_to:
-    default: arteria-project@googlegroups.com
+    default: example.mail.address@send.errors.to
     type: string
   bcl2fastq_service_port:
     default: 10900
@@ -46,7 +46,7 @@ parameters:
   barcode_mismatches:
     default: ""
     type: string
-    description: "Number of missmatches to allow. Accepts 0, 1 or 2"
+    description: "Number of mismatches to allow. Accepts 0, 1 or 2"
   tiles:
     default: ""
     type: string
