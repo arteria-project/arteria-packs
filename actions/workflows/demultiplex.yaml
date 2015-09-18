@@ -20,8 +20,13 @@ arteria-packs.demultiplex:
         - tiles
         - use_base_mask
         - bcl2fastq_additional_arguments
+        - send_mail_to
     output:
         test: <% $ %>
+  #  task-defaults:
+  #      on-error:
+  #          - oh_shit_error_demultiplex
+          #  - fail
 
     tasks:
         get_config:
@@ -89,4 +94,22 @@ arteria-packs.demultiplex:
             publish:
                 poll_out: <% $.poll_status.stdout %>
                 poll_err: <% $.poll_status.stderr %>
-                qc_err: <% $.poll_status.stdout %> <% $.poll_status.stderr %>
+
+        oh_shit_error_demultiplex:
+            action: core.sendmail
+            input:
+                to: <% $.send_mail_to %>
+                subject: "'[ARTERIA] - OH SHIT ERROR DEMULTIPLEX occurred for runfolder <% $.runfolder_name %>'"
+                body: "An oh shit error occurred on <% $.runfolder_name %> on <% $.host %> in demultiplex flow. Please investigate!"
+            on-complete:
+              - fail
+
+        #send_error:
+          #action: arteria-packs.send_error
+          #input:
+          #    context: <% $. %>
+          #on-error:
+#              - fail
+
+        #shit_error:
+        #  action: arteria-packs.oh_shit_error execution_id=<% $.__execution.id %> host=<% $.host %> runfolder=<% $#.runfolder %>

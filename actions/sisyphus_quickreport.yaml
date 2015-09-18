@@ -1,5 +1,5 @@
 ---
-name: sisyphus_quickreport 
+name: sisyphus_quickreport
 description: Generate a quick report using Sisyphus
 enabled: true
 runner_type: mistral-v2
@@ -11,7 +11,7 @@ parameters:
     immutable: true
     type: object
   workflow:
-    default: arteria-packs.sisyphus_quickreport 
+    default: arteria-packs.sisyphus_quickreport
     immutable: true
     type: string
   host:
@@ -20,4 +20,7 @@ parameters:
   runfolder:
     default: null
     type: string
-
+  siswrap_service_port:
+    default: 10700
+    type: integer
+    description: "Port on which the siswrap service runs."
