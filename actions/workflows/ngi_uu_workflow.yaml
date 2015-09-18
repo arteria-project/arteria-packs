@@ -41,9 +41,9 @@ workflows:
             get_demultiplex_config:
                 action: arteria-packs.get_pack_config
                 publish:
-                    hermes_base_url: <% $.get_config.result.hermes_base_url %>
-                    hermes_user: <% $.get_config.result.hermes_user %>
-                    hermes_token: <% $.get_config.result.hermes_token %>
+                    hermes_base_url: <% $.get_demultiplex_config.result.hermes_base_url %>
+                    hermes_user: <% $.get_demultiplex_config.result.hermes_user %>
+                    hermes_token: <% $.get_demultiplex_config.result.hermes_token %>
                 on-success:
                     - get_flowcell_name
 
@@ -101,8 +101,8 @@ workflows:
                 input:
                     url: <% $.bcl2fastq_status_url %>
                 publish:
-                    poll_out: <% $.poll_status.stdout %>
-                    poll_err: <% $.poll_status.stderr %>
+                    poll_out: <% $.poll_demultiplex_status.stdout %>
+                    poll_err: <% $.poll_demultiplex_status.stderr %>
                 on-success:
                     - run_sisyphus_quick_report
 
@@ -132,10 +132,10 @@ workflows:
                     headers: "Content-Type=application/json"
                     body: '{"runfolder": "<% $.runfolder_name %>"}'
                 publish:
-                    report_code: "<% $.run_quickreport.status_code %>"
-                    report_msg: "<% $.run_quickreport.body %>"
-                    report_status_url: "<% $.run_quickreport.body.link %>"
-                    report_err: "<% $.run_quickreport.status_code %> <% $.run_quickreport.body %>"
+                    report_code: "<% $.run_sisyphus_quick_report.status_code %>"
+                    report_msg: "<% $.run_sisyphus_quick_report.body %>"
+                    report_status_url: "<% $.run_sisyphus_quick_report.body.link %>"
+                    report_err: "<% $.run_sisyphus_quick_report.status_code %> <% $.run_quickreport.body %>"
                 on-success:
                     - poll_report_status
 
@@ -144,8 +144,8 @@ workflows:
                 input:
                     url: "<% $.report_status_url %>"
                 publish:
-                    poll_out: "<% $.poll_status.stdout %>"
-                    poll_err: "<% $.poll_status.stderr %>"
+                    poll_out: "<% $.poll_report_status.stdout %>"
+                    poll_err: "<% $.poll_report_status.stderr %>"
                 on-success:
                     - run_sisyphus_qc
 
@@ -174,10 +174,10 @@ workflows:
                     headers: "Content-Type=application/json"
                     body: '{"runfolder": "<% $.runfolder_name %>"}'
                 publish:
-                    qc_code: "<% $.run_qc.status_code %>"
-                    qc_msg: "<% $.run_qc.body.msg %>"
-                    qc_status_url: "<% $.run_qc.body.link %>"
-                    qc_err: "<% $.run_quickreport.status_code %> <% $.run_quickreport.body %>"
+                    qc_code: "<% $.run_sisyphus_qc.status_code %>"
+                    qc_msg: "<% $.run_sisyphus_qc.body.msg %>"
+                    qc_status_url: "<% $.run_sisyphus_qc.body.link %>"
+                    qc_err: "<% $.run_sisyphus_qc.status_code %> <% $.run_sisyphus_qc.body %>"
                 on-success:
                     - poll_qc_status
 
@@ -186,8 +186,8 @@ workflows:
                 input:
                     url: <% $.qc_status_url %>
                 publish:
-                    poll_out: <% $.poll_status.stdout %>
-                    poll_err: <% $.poll_status.stderr %>
+                    poll_out: <% $.poll_qc_status.stdout %>
+                    poll_err: <% $.poll_qc_status.stderr %>
                 on-success:
                     - notify_finished
 
