@@ -3,7 +3,6 @@ name: arteria-packs.ngi_uu_workflow
 description: The ngi workflow, from sequencer to remote system...
 
 workflows:
-
     main:
         type: direct
         input:
@@ -12,96 +11,157 @@ workflows:
             - run_type
             - remote_host
             - trigger_ngi_pipeline
+            - send_mail_to
+            - bcl2fastq_service_port
+            - bcl2fastq_version
+            - barcode_mismatches
+            - tiles
+            - use_base_mask
+            - bcl2fastq_additional_arguments
+            - siswrap_service_port
         output:
             output_the_whole_workflow_context: <% $ %>
+        task-defaults:
+            on-error:
+                - oh_shit_error
+
         tasks:
             get_runfolder_name:
                 action: core.local
                 input:
                     cmd: python -c 'import sys; sys.stdout.write("<% $.runfolder %>".split("/")[-1])'
                 publish:
-                    runfolder_name: <% $.get_runfolder_name.stdout %>
-                    report_err: <% $.get_runfolder_name.stdout %> <% $.get_runfolder_name.stderr %>
+                    runfolder_name: "<% $.get_runfolder_name.stdout %>"
+                on-success:
+                    - get_demultiplex_config
+
+### DEMULTIPLEX START ###
+
+            get_demultiplex_config:
+                action: arteria-packs.get_pack_config
+                publish:
+                    hermes_base_url: <% $.get_demultiplex_config.result.hermes_base_url %>
+                    hermes_user: <% $.get_demultiplex_config.result.hermes_user %>
+                    hermes_token: <% $.get_demultiplex_config.result.hermes_token %>
                 on-success:
                     - get_flowcell_name
-                on-error:
-                    - print_error
 
             get_flowcell_name:
                 action: arteria-packs.get_flowcell_from_runfolder_name
                 input:
-                    runfolder_name: < $.runfolder_name >
+                    runfolder_name: <% $.runfolder_name %>
                 publish:
-                    flowcell_name: <% $.get_flowcell_name.stdout %>
-                    report_err: <% $.get_flowcell_name.stdout %> <% $.get_flowcell_name.stderr %>
+                    flowcell_name: <% $.get_flowcell_name.result %>
                 on-success:
-                    - demultiplex
-                on-error:
-                    - print_error
+                    - download_samplesheet
 
-            demultiplex:
-                action: arteria-packs.demultiplex
+            download_samplesheet:
+                action: core.http
                 input:
-                    host: "<% $.host %>"
-                    runfolder_name: "<% $.runfolder_name %>"
-                    run_type: "<% $.run_type %>"
+                    url: <% $.hermes_base_url %>/<% $.flowcell_name %>/samplesheetfile
+                    headers: USER=<% $.hermes_user %>&X-XSRF-TOKEN=<% $.hermes_token %>
                 publish:
-                    status_message: "Runfolder <% $.runfolder %> run on <% $.host %>..."
+                    samplesheet_string: <% $.download_samplesheet.body.samplesheet %>
+                on-success:
+                    - construct_bcl2fastq_body
+
+            # Since we don't want to pass empty values into
+            # bcl2fastq-ws, we remove any empty keys from
+            # this body.
+            construct_bcl2fastq_body:
+                action: arteria-packs.parse_bcl2fastq_args
+                input:
+                    samplesheet: "<% $.samplesheet_string %>"
+                    bcl2fastq_version: "<% $.bcl2fastq_version %>"
+                    barcode_mismatches: "<% $.barcode_mismatches %>"
+                    tiles: "<% $.tiles %>"
+                    use_base_mask: "<% $.use_base_mask %>"
+                    additional_arguments: "<% $.bcl2fastq_additional_arguments %>"
+                publish:
+                    bcl2fastq_body: <% $.construct_bcl2fastq_body.stdout %>
+                on-success:
+                    - run_bcl2fastq
+
+            run_bcl2fastq:
+                action: core.http
+                input:
+                    url: "http://<% $.host %>:<% $.bcl2fastq_service_port %>/api/1.0/start/<% $.runfolder_name %>"
+                    method: "POST"
+                    headers: "Content-Type=application/json"
+                    body: <% $.bcl2fastq_body %>
+                publish:
+                    bcl2fastq_status_url: <% $.run_bcl2fastq.body.link %>
+                on-success:
+                    - poll_demultiplex_status
+
+            poll_demultiplex_status:
+                action: arteria-packs.poll_status
+                input:
+                    url: <% $.bcl2fastq_status_url %>
                 on-success:
                     - run_sisyphus_quick_report
 
+### DEMULTIPLEX END ###
+
+
+### QUICK REPORT START ###
+
             run_sisyphus_quick_report:
-                action: arteria-packs.sisyphus_quickreport
+                action: core.http
                 input:
-                    host:  "<% $.host %>"
-                    runfolder:  "<% $.runfolder_name %>"
+                    url: "http://<% $.host %>:<% $.siswrap_service_port %>/api/1.0/report/run/<% $.runfolder_name %>"
+                    method: "POST"
+                    headers: "Content-Type=application/json"
+                    body: '{"runfolder": "<% $.runfolder_name %>"}'
                 publish:
-                    siswrap_err: <% $.run_sisyphus_quick_report.output_the_whole_workflow_context %>
-                    #report_message: "Report generated for <% $.runfolder %> on <% $.host %>"
-                    #report_err: "<% $.run_sisyphus_quick_report.stdout $.run_sisyphus_quick_report.stderr %>"
+                    report_status_url: "<% $.run_sisyphus_quick_report.body.link %>"
                 on-success:
-                    - run_sisyphus_quality_control
-                on-error:
-                    - print_error
+                    - poll_report_status
 
-            run_sisyphus_quality_control:
-                action: arteria-packs.sisyphus_qc
+            poll_report_status:
+                action: arteria-packs.poll_status
                 input:
-                    host: "<% $.host %>"
-                    runfolder: "<% $.runfolder_name %>"
+                    url: "<% $.report_status_url %>"
+                on-success:
+                    - run_sisyphus_qc
+
+### QUICK REPORT END ###
+
+### QUALITY CONTROL START ###
+
+            run_sisyphus_qc:
+                action: core.http
+                input:
+                    url: "http://<% $.host %>:<% $.siswrap_service_port %>/api/1.0/qc/run/<% $.runfolder_name %>"
+                    method: "POST"
+                    headers: "Content-Type=application/json"
+                    body: '{"runfolder": "<% $.runfolder_name %>"}'
                 publish:
-                    qc_message: "QC and report finished for <% $.runfolder %> on <% $.host %>"
-                    siswrap_err: <% $.run_sisyphus_quality_control.output_the_whole_workflow_context %>
-                    #qc_err: <% $.run_sisyphus_quality_control.stdout $.run_sisyphus_quality_control.stderr %>
+                    qc_status_url: "<% $.run_sisyphus_qc.body.link %>"
                 on-success:
-                    - notify
-                on-error:
-                    - print_error
+                    - poll_qc_status
 
-            notify:
-                action: core.local
+            poll_qc_status:
+                action: arteria-packs.poll_status
                 input:
-                    cmd: "printf '<% $.qc_message %>'"
+                    url: <% $.qc_status_url %>
+                on-success:
+                    - notify_finished
 
-            print_error:
-                action: core.local
+### QUALITY CONTROL END ###
+
+            notify_finished:
+                action: core.sendmail
                 input:
-                    cmd: "printf 'an error occurred: <% $.siswrap_err %>'"
+                    to: <% $.send_mail_to %>
+                    subject: "'[ARTERIA] - Finished processing runfolder <% $.runfolder_name %>'"
+                    body: "Finished processing on <% $.host %> for <% $.runfolder_name %>: <% $.demultiplex_message %> <% $.report_message %> <% $.qc_message %>"
 
-#            run_sisyphus_local_processing:
-#                action: arteria-packs.sisyphus_local_processing
-#                input:
-#                    host:  "<% $.host %>"
-#                    runfolder:  "<% $.runfolder %>"
-#                on-success:
-#                    - start_ngi_pipeline
-
-            # TODO Split out the ngi pipeline processing stuff..
-            #            start_ngi_pipeline:
-            #                action: core.http
-            #                input:
-            #                    url: "http://www.uu.se"
-            #                    url: "http://localhost:9101/v1/webhooks/ngi_pipeline"
-            #                    method: "POST"
-            #                    headers: "X-Auth-Token={{system.st2_auth_token}}&Content-Type=application/json"
-            #                    body: '{ "start_ngi_pipeline": "<% $.trigger_ngi_pipeline %>" }'
+            oh_shit_error:
+                action: core.sendmail
+                input:
+                    to: <% $.send_mail_to %>
+                    subject: "'[ARTERIA] - OH SHIT ERROR occurred for runfolder <% $.runfolder_name %>'"
+                    body: "An oh shit error occurred while processing <% $.runfolder_name %> on host <% $.host %>. Please investigate!"
+                on-complete:
+                  - fail

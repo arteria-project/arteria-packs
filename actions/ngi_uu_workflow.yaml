@@ -1,9 +1,9 @@
 ---
 name: ngi_uu_workflow
 description: >
-  Run the complete NGI Uppsala workflow, taking data of the sequencing instrument 
+  Run the complete NGI Uppsala workflow, taking data of the sequencing instrument
   running bcl2fastq, collecting qc metrics using Sisyphus and delivering it to
-  a remote host. 
+  a remote host.
 enabled: true
 runner_type: mistral-v2
 entry_point: workflows/ngi_uu_workflow.yaml
@@ -27,9 +27,39 @@ parameters:
     default: hiseq_x
     type: string
   remote_host:
-    default: milou-b.uppmax.uu.se
+    default: example.remote.host.to.communicate.with
     type: string
   trigger_ngi_pipeline:
     default: false
     type: boolean
-
+  send_mail_to:
+    default: example.mail.address@send.errors.to
+    type: string
+  bcl2fastq_service_port:
+    default: 10900
+    type: integer
+    description: "Port on which the bcl2fastq service runs."
+  bcl2fastq_version:
+    default: ""
+    type: string
+    description: "bcl2fastq version to use"
+  barcode_mismatches:
+    default: ""
+    type: string
+    description: "Number of mismatches to allow. Accepts 0, 1 or 2"
+  tiles:
+    default: ""
+    type: string
+    description: "Regular expression for tiles to include (see bcl2fastq manual for detailed description)"
+  use_base_mask:
+    default: ""
+    type: string
+    description: "Base mask to use (see bcl2fastq manual for detailed description)."
+  bcl2fastq_additional_arguments:
+    default: ""
+    type: string
+    description: "Any additional arguments to bcl2fastq can be fed here. Note that quoutes (\") are needed around arguments for the to parse properly. E.g. \"--my-first-arg 1 --my-second-arg 2\" "
+  siswrap_service_port:
+    default: 10700
+    type: integer
+    description: "Port on which the siswrap service runs."
