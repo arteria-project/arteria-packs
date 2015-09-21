@@ -35,8 +35,7 @@ workflows:
                 on-success:
                     - get_demultiplex_config
 
-### DEMULTIPLEX START ###
-
+            ### DEMULTIPLEX START ###
             get_demultiplex_config:
                 action: arteria-packs.get_pack_config
                 publish:
@@ -101,11 +100,10 @@ workflows:
                 on-success:
                     - run_sisyphus_quick_report
 
-### DEMULTIPLEX END ###
+            ### DEMULTIPLEX END ###
 
 
-### QUICK REPORT START ###
-
+            ### QUICK REPORT START ###
             run_sisyphus_quick_report:
                 action: core.http
                 input:
@@ -124,11 +122,9 @@ workflows:
                     url: "<% $.report_status_url %>"
                 on-success:
                     - run_sisyphus_qc
+            ### QUICK REPORT END ###
 
-### QUICK REPORT END ###
-
-### QUALITY CONTROL START ###
-
+            ### QUALITY CONTROL START ###
             run_sisyphus_qc:
                 action: core.http
                 input:
@@ -147,8 +143,9 @@ workflows:
                     url: <% $.qc_status_url %>
                 on-success:
                     - notify_finished
+            ### QUALITY CONTROL END ###
 
-
+            ### TRANSFER FILES TO UPPMAX START ###
             #TODO Create list of files to rsync
             create_md5sums_for_transferred_files:
                 action: core.remote
@@ -176,15 +173,10 @@ workflows:
                     destination: /tmp/
                     include_file: /etc/arteria/misc/summary.rsync
                     hosts: <% host %>
+            ### TRANSFER FILES TO UPPMAX END ###
 
 
-
-            notify:
-                action: core.local
-
-
-### QUALITY CONTROL END ###
-
+            ### NOTIFIER START ###
             notify_finished:
                 action: core.sendmail
                 input:
@@ -200,3 +192,4 @@ workflows:
                     body: "An oh shit error occurred while processing <% $.runfolder_name %> on host <% $.host %>. Please investigate!"
                 on-complete:
                   - fail
+                  ### NOTIFIER END ###
