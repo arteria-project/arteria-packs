@@ -3,3 +3,10 @@
 hermes_base_url: http://130.238.178.239:9000/api/0.1
 hermes_user: dummy_user
 hermes_token: my_token
+
+
+summary_host: testuppmax
+summary_destination: /tmp/summaries/
+
+remote_host: testuppmax
+remote_destination: /tmp/runfolders/

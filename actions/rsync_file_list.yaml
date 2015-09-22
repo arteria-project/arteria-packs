@@ -1,14 +1,10 @@
 ---
-    name: 'rsync'
+    name: 'rsync_file_list'
     runner_type: 'run-remote'
-    description: 'Copy file(s) from one place to another w/ rsync. The major difference from linux.rsync is that this requires an include-file.'
+    description: 'Create a list of files which will be rsynced based on the include file.'
     enabled: true
     entry_point: ''
     parameters:
-        timeout:
-        # Use a default timeout of 10 hour. "No timout" is fixed in a new version
-        # https://github.com/StackStorm/st2/issues/1654
-            default: 36000
         source:
             type: 'string'
             description: 'List of files/directories to to be copied'
@@ -31,12 +27,9 @@
             position: 4
         cmd:
             immutable: true
-            default: 'rsync {{args}} --include-from {{include_file}} {{source}} {{dest_server}}:{{destination}}'
+            default: 'export FOLDER={{ source }}; export FOLDER_NAME=$(basename $FOLDER); pushd $FOLDER/..; rsync -vrktp --dry-run --chmod=Dg+sx,ug+w,o-rwx --prune-empty-dirs --include-from {{include_file}} ${FOLDER} /tmp | grep $FOLDER_NAME | grep -v "\/$" | xargs -0 -d"\n" md5sum > rsync.md5; popd'
             position: 0
         connect_timeout:
             type: 'integer'
             description: 'SSH connect timeout in seconds'
             default: 86400 # 24 h
-        args:
-            description: 'Command line arguments passed to rysnc'
-            default: '-vrktp --chmod=Dg+sx,ug+w,o-rwx --prune-empty-dirs -e "ssh -o ConnectTimeout={{connect_timeout}}"'
