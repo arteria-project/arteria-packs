@@ -18,16 +18,10 @@ parameters:
     immutable: true
     type: string
   host:
-    default: test
+    required: true
     type: string
   runfolder:
-    default: test
-    type: string
-  run_type:
-    default: hiseq_x
-    type: string
-  remote_host:
-    default: example.remote.host.to.communicate.with
+    required: true
     type: string
   trigger_ngi_pipeline:
     default: false
