@@ -9,14 +9,11 @@ workflows:
             - host
             - runfolder
             - trigger_ngi_pipeline
-            - send_mail_to
-            - bcl2fastq_service_port
             - bcl2fastq_version
             - barcode_mismatches
             - tiles
             - use_base_mask
             - bcl2fastq_additional_arguments
-            - siswrap_service_port
         output:
             output_the_whole_workflow_context: <% $ %>
         task-defaults:
@@ -25,15 +22,6 @@ workflows:
 
         tasks:
             ### GENERAL TASKS START ###
-            get_runfolder_name:
-                action: core.local
-                input:
-                    cmd: python -c 'import sys; sys.stdout.write("<% $.runfolder %>".split("/")[-1])'
-                publish:
-                    runfolder_name: "<% $.get_runfolder_name.stdout %>"
-                on-success:
-                    - get_config
-
             get_config:
                 action: arteria-packs.get_pack_config
                 publish:
@@ -44,6 +32,18 @@ workflows:
                     remote_destination: <% $.get_config.result.remote_destination %>
                     summary_host: <% $.get_config.result.summary_host %>
                     summary_destination: <% $.get_config.result.summary_destination %>
+                    siswrap_service_port: <% $.get_config.result.siswrap_service_port %>
+                    bcl2fastq_service_port: <% $.get_config.result.bcl2fastq_service_port %>
+                    send_mail_to: <% $.get_config.result.send_mail_to %>
+                on-success:
+                    - get_runfolder_name
+
+            get_runfolder_name:
+                action: core.local
+                input:
+                    cmd: python -c 'import sys; sys.stdout.write("<% $.runfolder %>".split("/")[-1])'
+                publish:
+                    runfolder_name: "<% $.get_runfolder_name.stdout %>"
                 on-success:
                     - get_flowcell_name
 
