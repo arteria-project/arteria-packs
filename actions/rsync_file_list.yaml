@@ -5,6 +5,10 @@
     enabled: true
     entry_point: ''
     parameters:
+        timeout:
+        # Use a default timeout of 10 hour. "No timout" is fixed in a new version
+        # https://github.com/StackStorm/st2/issues/1654
+            default: 36000
         source:
             type: 'string'
             description: 'List of files/directories to to be copied'
@@ -27,7 +31,7 @@
             position: 4
         cmd:
             immutable: true
-            default: 'export FOLDER={{ source }}; export FOLDER_NAME=$(basename $FOLDER); pushd $FOLDER/..; rsync -vrktp --dry-run --chmod=Dg+sx,ug+w,o-rwx --prune-empty-dirs --include-from {{include_file}} ${FOLDER} /tmp | grep $FOLDER_NAME | grep -v "\/$" | xargs -0 -d"\n" md5sum > rsync.md5; popd'
+            default: 'export FOLDER={{ source }}; export FOLDER_NAME=$(basename $FOLDER); pushd $FOLDER/.. > /dev/null; rsync -vrktp --dry-run --chmod=Dg+sx,ug+w,o-rwx --prune-empty-dirs --include-from {{include_file}} ${FOLDER} /tmp | grep $FOLDER_NAME | grep -v "\/$" | xargs -0 -d"\n" md5sum > rsync.md5; popd > /dev/null'
             position: 0
         connect_timeout:
             type: 'integer'
