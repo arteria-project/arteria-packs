@@ -8,17 +8,12 @@ workflows:
         input:
             - host
             - runfolder
-            - run_type
-            - remote_host
             - trigger_ngi_pipeline
-            - send_mail_to
-            - bcl2fastq_service_port
             - bcl2fastq_version
             - barcode_mismatches
             - tiles
             - use_base_mask
             - bcl2fastq_additional_arguments
-            - siswrap_service_port
         output:
             output_the_whole_workflow_context: <% $ %>
         task-defaults:
@@ -26,23 +21,29 @@ workflows:
                 - oh_shit_error
 
         tasks:
+            ### GENERAL TASKS START ###
+            get_config:
+                action: arteria-packs.get_pack_config
+                publish:
+                    hermes_base_url: <% $.get_config.result.hermes_base_url %>
+                    hermes_user: <% $.get_config.result.hermes_user %>
+                    hermes_token: <% $.get_config.result.hermes_token %>
+                    remote_host: <% $.get_config.result.remote_host %>
+                    remote_destination: <% $.get_config.result.remote_destination %>
+                    summary_host: <% $.get_config.result.summary_host %>
+                    summary_destination: <% $.get_config.result.summary_destination %>
+                    siswrap_service_port: <% $.get_config.result.siswrap_service_port %>
+                    bcl2fastq_service_port: <% $.get_config.result.bcl2fastq_service_port %>
+                    send_mail_to: <% $.get_config.result.send_mail_to %>
+                on-success:
+                    - get_runfolder_name
+
             get_runfolder_name:
                 action: core.local
                 input:
                     cmd: python -c 'import sys; sys.stdout.write("<% $.runfolder %>".split("/")[-1])'
                 publish:
                     runfolder_name: "<% $.get_runfolder_name.stdout %>"
-                on-success:
-                    - get_demultiplex_config
-
-### DEMULTIPLEX START ###
-
-            get_demultiplex_config:
-                action: arteria-packs.get_pack_config
-                publish:
-                    hermes_base_url: <% $.get_demultiplex_config.result.hermes_base_url %>
-                    hermes_user: <% $.get_demultiplex_config.result.hermes_user %>
-                    hermes_token: <% $.get_demultiplex_config.result.hermes_token %>
                 on-success:
                     - get_flowcell_name
 
@@ -54,7 +55,9 @@ workflows:
                     flowcell_name: <% $.get_flowcell_name.result %>
                 on-success:
                     - download_samplesheet
+            ### GENERAL TASKS END ###
 
+            ### DEMULTIPLEX START ###
             download_samplesheet:
                 action: core.http
                 input:
@@ -100,12 +103,9 @@ workflows:
                     url: <% $.bcl2fastq_status_url %>
                 on-success:
                     - download_sisyphus_config
+            ### DEMULTIPLEX END ###
 
-### DEMULTIPLEX END ###
-
-
-### QUICK REPORT START ###
-
+            ### QUICK REPORT START ###
             download_sisyphus_config:
                 action: core.http
                 input:
@@ -144,11 +144,9 @@ workflows:
                     url: "<% $.report_status_url %>"
                 on-success:
                     - download_qc_config
+            ### QUICK REPORT END ###
 
-### QUICK REPORT END ###
-
-### QUALITY CONTROL START ###
-
+            ### QUALITY CONTROL START ###
             download_qc_config:
                 action: core.http
                 input:
@@ -186,10 +184,46 @@ workflows:
                 input:
                     url: <% $.qc_status_url %>
                 on-success:
+                    - create_md5sums_for_files_to_transfer
+            ### QUALITY CONTROL END ###
+
+            ### TRANSFER FILES TO UPPMAX START ###
+            create_md5sums_for_files_to_transfer:
+                action: arteria-packs.rsync_file_list
+                input:
+                    source: <% $.runfolder %>
+                    hosts: <% $.host %>
+                    destination: /tmp/
+                    dest_server: <% $.host %>
+                    include_file: /etc/arteria/misc/hiseq.rsync
+                publish:
+                    md5_sums: <% $.create_md5sums_for_files_to_transfer.stdout %>
+                on-success:
+                    - rsync_to_uppmax
+                    - rsync_to_summary_host
+
+            rsync_to_uppmax:
+                action: arteria-packs.rsync
+                input:
+                    source: <% $.runfolder %>
+                    dest_server: <% $.remote_host %>
+                    destination: <% $.remote_destination %>
+                    include_file: /etc/arteria/misc/hiseq.rsync
+                    hosts: <% $.host %>
+                on-success:
                     - notify_finished
 
-### QUALITY CONTROL END ###
+            rsync_to_summary_host:
+                action: arteria-packs.rsync
+                input:
+                    source: <% $.runfolder %>
+                    dest_server: <% $.summary_host %>
+                    destination: <% $.summary_destination %>
+                    include_file: /etc/arteria/misc/summary.rsync
+                    hosts: <% $.host %>
+            ### TRANSFER FILES TO UPPMAX END ###
 
+            ### NOTIFIER START ###
             notify_finished:
                 action: core.sendmail
                 input:
@@ -205,3 +239,4 @@ workflows:
                     body: "An oh shit error occurred while processing <% $.runfolder_name %> on host <% $.host %>. Please investigate!"
                 on-complete:
                   - fail
+            ### NOTIFIER END ###
