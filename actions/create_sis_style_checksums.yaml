@@ -1,7 +1,7 @@
 ---
-    name: 'rsync_file_list'
+    name: 'create_sis_style_checksums'
     runner_type: 'run-remote'
-    description: 'Create a list of files which will be rsynced based on the include file.'
+    description: 'Create a list of files and their md5sums based on a file list created by rsync, in the style that they have been created by Sisyphus.'
     enabled: true
     entry_point: ''
     parameters:
@@ -31,7 +31,7 @@
             position: 4
         cmd:
             immutable: true
-            default: 'export FOLDER={{ source }}; export FOLDER_NAME=$(basename $FOLDER); pushd $FOLDER/.. > /dev/null; rsync -vrktp --dry-run --chmod=Dg+sx,ug+w,o-rwx --prune-empty-dirs --include-from {{include_file}} ${FOLDER} /tmp | grep $FOLDER_NAME | grep -v "\/$" | xargs -0 -d"\n" md5sum > rsync.md5; popd > /dev/null'
+            default: 'export FOLDER={{ source }}; export FOLDER_NAME=$(basename $FOLDER); pushd $FOLDER/.. > /dev/null; if [ ! -e "$FOLDER/MD5" ]; then mkdir $FOLDER/MD5; fi; rsync -vrktp --dry-run --chmod=Dg+sx,ug+w,o-rwx --prune-empty-dirs --include-from {{include_file}} ${FOLDER} /tmp | grep $FOLDER_NAME | grep -v "\/$" | xargs -0 -d"\n" md5sum > $FOLDER/MD5/checksums.md5; popd > /dev/null'
             position: 0
         connect_timeout:
             type: 'integer'
