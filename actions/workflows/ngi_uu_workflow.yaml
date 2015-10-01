@@ -20,7 +20,6 @@ workflows:
             on-error:
                 - oh_shit_error
                 - mark_as_failed
-                # TODO Change state to ERROR in runfolder as a default.
 
         tasks:
             ### GENERAL TASKS START ###
