@@ -14,5 +14,7 @@ remote_sisyphus_location: /opt/arteria/arteria-siswrap-env/deps/sisyphus/sisyphu
 
 send_mail_to: example.mail.address@send.errors.to
 
+runfolder_service_port: 10800
 bcl2fastq_service_port: 10900
 siswrap_service_port: 10700
+

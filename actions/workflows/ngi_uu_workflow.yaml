@@ -19,34 +19,45 @@ workflows:
         task-defaults:
             on-error:
                 - oh_shit_error
+                - mark_as_failed
 
         tasks:
             ### GENERAL TASKS START ###
             get_config:
-                action: arteria-packs.get_pack_config
-                publish:
-                    hermes_base_url: <% $.get_config.result.hermes_base_url %>
-                    hermes_user: <% $.get_config.result.hermes_user %>
-                    hermes_token: <% $.get_config.result.hermes_token %>
-                    remote_host: <% $.get_config.result.remote_host %>
-                    remote_destination: <% $.get_config.result.remote_destination %>
-                    summary_host: <% $.get_config.result.summary_host %>
-                    summary_destination: <% $.get_config.result.summary_destination %>
-                    siswrap_service_port: <% $.get_config.result.siswrap_service_port %>
-                    bcl2fastq_service_port: <% $.get_config.result.bcl2fastq_service_port %>
-                    send_mail_to: <% $.get_config.result.send_mail_to %>
-                    remote_sisyphus_location: <% $.get_config.result.remote_sisyphus_location %>
-                on-success:
-                    - get_runfolder_name
+              action: arteria-packs.get_pack_config
+              publish:
+                hermes_base_url: <% $.get_config.result.hermes_base_url %>
+                hermes_user: <% $.get_config.result.hermes_user %>
+                hermes_token: <% $.get_config.result.hermes_token %>
+                remote_host: <% $.get_config.result.remote_host %>
+                remote_destination: <% $.get_config.result.remote_destination %>
+                summary_host: <% $.get_config.result.summary_host %>
+                summary_destination: <% $.get_config.result.summary_destination %>
+                siswrap_service_port: <% $.get_config.result.siswrap_service_port %>
+                bcl2fastq_service_port: <% $.get_config.result.bcl2fastq_service_port %>
+                runfolder_service_port: <% $.get_config.result.runfolder_service_port %>
+                send_mail_to: <% $.get_config.result.send_mail_to %>
+                remote_sisyphus_location: <% $.get_config.result.remote_sisyphus_location %>
+              on-success:
+                 - mark_as_started
+
+            mark_as_started:
+              action: core.http
+              input:               
+                url: http://<% $.host %>:<% $.runfolder_service_port %>/api/1.0/runfolders/path<% $.runfolder %>
+                body: '{"state": "STARTED"}'
+                method: "POST"
+              on-success:
+                - get_runfolder_name
 
             get_runfolder_name:
-                action: core.local
-                input:
-                    cmd: python -c 'import sys; sys.stdout.write("<% $.runfolder %>".split("/")[-1])'
-                publish:
-                    runfolder_name: "<% $.get_runfolder_name.stdout %>"
-                on-success:
-                    - get_flowcell_name
+              action: core.local
+              input:
+                cmd: python -c 'import sys; sys.stdout.write("<% $.runfolder %>".split("/")[-1])'
+              publish:
+                runfolder_name: "<% $.get_runfolder_name.stdout %>"
+              on-success:
+                - get_flowcell_name
 
             get_flowcell_name:
                 action: arteria-packs.get_flowcell_from_runfolder_name
@@ -201,6 +212,15 @@ workflows:
                     - rsync_to_uppmax
                     - rsync_to_summary_host
 
+            rsync_to_summary_host:
+                action: arteria-packs.rsync
+                input:
+                    source: <% $.runfolder %>
+                    dest_server: <% $.summary_host %>
+                    destination: <% $.summary_destination %>
+                    include_file: /etc/arteria/misc/summary.rsync
+                    hosts: <% $.host %>
+
             rsync_to_uppmax:
                 action: arteria-packs.rsync
                 input:
@@ -231,6 +251,9 @@ workflows:
                 on-success:
                     - start_aeacus_stats
 
+            ### TRANSFER FILES TO UPPMAX END ###
+
+            ### START AEACUS REPORT STEPS ###
             start_aeacus_stats:
                 action: core.remote
                 input:
@@ -248,18 +271,9 @@ workflows:
                     cmd: <% $.remote_sisyphus_location %>/aeacus-reports.pl -runfolder <% $.remote_destination %>/<% $.runfolder_name %>
                 on-success:
                     - notify_finished
+            ## START AEACUS REPORT STEPS END ###
 
-#            rsync_to_summary_host:
-#                action: arteria-packs.rsync
-#                input:
-#                    source: <% $.runfolder %>
-#                    dest_server: <% $.summary_host %>
-#                    destination: <% $.summary_destination %>
-#                    include_file: /etc/arteria/misc/summary.rsync
-#                    hosts: <% $.host %>
-            ### TRANSFER FILES TO UPPMAX END ###
-
-            ### NOTIFIER START ###
+            ## NOTIFIER START ###
             notify_finished:
                 action: core.sendmail
                 input:
@@ -275,4 +289,11 @@ workflows:
                     body: "An oh shit error occurred while processing <% $.runfolder_name %> on host <% $.host %>. Please investigate!"
                 on-complete:
                   - fail
+
+            mark_as_failed:
+              action: core.http
+              input:
+                url: http://<% $.host %>:<% $.runfolder_service_port %>/api/1.0/runfolders/path<% $.runfolder %>
+                body: '{"state": "ERROR"}'
+                method: "POST"
             ### NOTIFIER END ###
