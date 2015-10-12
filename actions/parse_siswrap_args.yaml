@@ -11,7 +11,7 @@ parameters:
     type: string
     description: "String containing the entire config file for Sisyphus (not just a path to it)."
 
-  qc_conf:
+  qc_config:
     default: ""
     type: string
     description: "String containing the entire QC criteria config file (not just a path to it)."
