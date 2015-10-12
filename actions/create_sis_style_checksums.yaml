@@ -31,7 +31,7 @@
             position: 4
         cmd:
             immutable: true
-            default: 'export FOLDER={{ source }}; export FOLDER_NAME=$(basename $FOLDER); pushd $FOLDER/.. > /dev/null; if [ ! -e "$FOLDER/MD5" ]; then mkdir $FOLDER/MD5; fi; rsync -vrktp --dry-run --chmod=Dg+sx,ug+w,o-rwx --prune-empty-dirs --include-from {{include_file}} ${FOLDER} /tmp | grep $FOLDER_NAME | grep -v "\/$" | xargs -0 -d"\n" md5sum > $FOLDER/MD5/checksums.md5; popd > /dev/null'
+            default: 'set -o errexit; export FOLDER={{ source }}; export FOLDER_NAME=$(basename $FOLDER); pushd $FOLDER/.. > /dev/null; if [ ! -e "$FOLDER/MD5" ]; then mkdir $FOLDER/MD5; fi; rsync -vrktp --dry-run --chmod=Dg+sx,ug+w,o-rwx --prune-empty-dirs --include-from {{include_file}} ${FOLDER} /tmp | grep $FOLDER_NAME | grep -v "\/$" | xargs -0 -d"\n" md5sum > $FOLDER/MD5/checksums.md5; popd > /dev/null'
             position: 0
         connect_timeout:
             type: 'integer'
