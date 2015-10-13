@@ -46,6 +46,19 @@ Now you can search for the trace-tag using:
 
     st2 trace list --trace-tag 150605_M00485_0183_000000000-ABGT6_testbio14
     
-This will list all executions and triggers associated with the tag.
+To find more information about a particular trace, use:
+
+    st2 trace get <trace id>
     
-For automatic triggering the trace tagcan be injected via the sensor. For more info on traces, see: http://docs.stackstorm.com/traces.html
+From there you can go to getting more information on the executions using:
+
+    st2 execution get <execution id>
+       
+This will list all executions and triggers associated with the tag.
+
+All of this has been wrapped by `scripts/trace_runfolder.py`, which allows you to get all excutions of a workflow
+associated with a tag, e.g.:
+
+    python scripts/trace_runfolder.py --tag 150605_M00485_0183_000000000-ABGT6_testbio14 | xargs -n1 st2 execution get
+    
+For automatic triggering the trace tag can be injected via the sensor. For more info on traces, see: http://docs.stackstorm.com/traces.html
