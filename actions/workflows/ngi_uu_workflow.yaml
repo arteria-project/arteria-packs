@@ -23,6 +23,14 @@ workflows:
 
         tasks:
             ### GENERAL TASKS START ###
+            note_workflow_repo_version:
+              action: core.local
+              input:
+                cmd: git rev-parse HEAD
+                cwd: /opt/stackstorm/packs/arteria-packs/
+              on-success:
+                 - get_config
+
             get_config:
               action: arteria-packs.get_pack_config
               publish:
