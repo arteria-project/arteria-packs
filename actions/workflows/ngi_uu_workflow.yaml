@@ -23,7 +23,7 @@ workflows:
 
         tasks:
             ### GENERAL TASKS START ###
-            note_workflow_hash:
+            note_workflow_repo_version:
               action: core.local
               input:
                 cmd: git rev-parse HEAD
