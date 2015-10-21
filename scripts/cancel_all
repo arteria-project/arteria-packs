@@ -1,0 +1,3 @@
+# Cancel every running task currently listed by st2 execution list
+st2 execution list | grep running | awk '{ print $2 }' | xargs -I{} st2 execution cancel {}
+
