@@ -1,8 +1,8 @@
 from st2reactor.sensor.base import PollingSensor
-import syslog
 from runfolder_client import RunfolderClient
-import jsonpickle
-import requests
+from datetime import datetime
+import yaml
+import os
 
 class RunfolderSensor(PollingSensor):
 
@@ -12,12 +12,14 @@ class RunfolderSensor(PollingSensor):
                                               poll_interval=poll_interval)
         self._logger = self._sensor_service.get_logger(__name__)
         self._infolog("__init__")
+        self._client = None
 
     def setup(self):
         self._infolog("setup")
         try:
-            # TODO: Config, from st2
-            self._client = RunfolderClient(["http://testarteria1:10800"], self._logger)
+            self._load_config()
+            client_urls = self.config["runfolder_svc_urls"]
+            self._client = RunfolderClient(client_urls, self._logger)
             self._infolog("Created client: {0}".format(self._client))
         except Exception as ex:
             # TODO: It seems that st2 isn't logging the entire exception, or
@@ -33,7 +35,7 @@ class RunfolderSensor(PollingSensor):
             self._infolog("Result from client: {0}".format(result))
 
             if result:
-               self._handle_result(result)
+                self._handle_result(result)
         except Exception as ex:
             self._logger.error(str(ex))
 
@@ -52,13 +54,22 @@ class RunfolderSensor(PollingSensor):
     def _handle_result(self, result):
         self._infolog("_handle_result")
         trigger = 'arteria-packs.runfolder_ready'
+        runfolder_path = result['path']
+        runfolder_name = os.path.split(runfolder_path)[1]
         payload = {
             'host': result['host'],
-            'runfolder': result['path'],
+            'runfolder': runfolder_path,
+            'runfolder_name': runfolder_name,
             'link': result['link'],
-            'timestamp': '1234'
+            'timestamp': datetime.utcnow().isoformat()
         }
-        self._sensor_service.dispatch(trigger=trigger, payload=payload)
+        self._sensor_service.dispatch(trigger=trigger, payload=payload, trace_tag=runfolder_name)
+
+    def _load_config(self):
+        config_path = "/opt/stackstorm/packs/arteria-packs/config.yaml"
+        with open(config_path) as stream:
+            self.config = yaml.load(stream)
+            self._infolog("Loaded configuration from {}".format(config_path))
 
     def _infolog(self, msg):
         self._logger.info("[arteria-packs." + self.__class__.__name__ + "] " + msg)
