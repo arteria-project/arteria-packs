@@ -1,0 +1,24 @@
+---
+name: template_workflow
+description: >
+  Run the Arteria template workflow. Provide a string to the web service, which
+  will ecoh it back to you.   
+enabled: true
+runner_type: mistral-v2
+entry_point: workflows/template.yaml
+pack: arteria-packs
+parameters:
+  context:
+    default: {}
+    immutable: true
+    type: object
+  workflow:
+    default: arteria-packs.template_workflow
+    immutable: true
+    type: string
+  host:
+    default: "testarteria"
+    type: string
+  echostring:
+    required: false
+    type: string
