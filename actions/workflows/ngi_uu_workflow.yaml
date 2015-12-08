@@ -38,8 +38,10 @@ workflows:
                 hermes_user: <% $.get_config.result.hermes_user %>
                 hermes_token: <% $.get_config.result.hermes_token %>
                 remote_host: <% $.get_config.result.remote_host %>
+                remote_user: <% $.get_config.result.remote_user%>
                 remote_destination: <% $.get_config.result.remote_destination %>
                 summary_host: <% $.get_config.result.summary_host %>
+                summary_user: <% $.get_config.result.summary_user %>
                 summary_destination: <% $.get_config.result.summary_destination %>
                 siswrap_service_port: <% $.get_config.result.siswrap_service_port %>
                 bcl2fastq_service_port: <% $.get_config.result.bcl2fastq_service_port %>
@@ -225,6 +227,7 @@ workflows:
                 input:
                     source: <% $.runfolder %>
                     dest_server: <% $.summary_host %>
+                    username: <% $.summary_user %>
                     destination: <% $.summary_destination %>
                     include_file: /etc/arteria/misc/summary.rsync
                     hosts: <% $.host %>
@@ -234,6 +237,7 @@ workflows:
                 input:
                     source: <% $.runfolder %>
                     dest_server: <% $.remote_host %>
+                    username: <% $.remote_user %>
                     destination: <% $.remote_destination %>
                     include_file: /etc/arteria/misc/hiseq.rsync
                     hosts: <% $.host %>
@@ -245,6 +249,7 @@ workflows:
                 input:
                     source: <% $.runfolder %>/MD5
                     dest_server: <% $.remote_host %>
+                    username: <% $.remote_user %>
                     destination: <% $.remote_destination %>/<% $.runfolder_name %>/
                     hosts: <% $.host %>
                 on-success:
@@ -254,6 +259,7 @@ workflows:
                 action: core.remote
                 input:
                     hosts: <% $.remote_host %>
+                    username: <% $.remote_user %>
                     cwd: <% $.remote_destination %>
                     cmd: md5sum -c <% $.remote_destination %>/<% $.runfolder_name %>/MD5/checksums.md5
                     timeout: 36000 # 10 h timeout
@@ -267,6 +273,7 @@ workflows:
                 action: core.remote
                 input:
                     hosts: <% $.remote_host %>
+                    username: <% $.remote_user %>
                     cwd: <% $.remote_destination %>/<% $.runfolder_name %>
                     cmd: <% $.remote_sisyphus_location %>/aeacus-stats.pl -runfolder <% $.remote_destination %>/<% $.runfolder_name %>
                 on-success:
@@ -276,6 +283,7 @@ workflows:
                 action: core.remote
                 input:
                     hosts: <% $.remote_host %>
+                    username: <% $.remote_user %>
                     cwd: <% $.remote_destination %>/<% $.runfolder_name %>
                     cmd: <% $.remote_sisyphus_location %>/aeacus-reports.pl -runfolder <% $.remote_destination %>/<% $.runfolder_name %>
                 on-success:
