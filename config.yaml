@@ -5,9 +5,11 @@ hermes_user: dummy_user
 hermes_token: my_token
 
 summary_host: testuppmax
+summary_user: arteria
 summary_destination: /tmp/summaries/
 
 remote_host: testuppmax
+remote_user: arteria
 remote_destination: /tmp/runfolders/
 remote_sisyphus_location: /opt/arteria/arteria-siswrap-env/deps/sisyphus/sisyphus-latest
 
