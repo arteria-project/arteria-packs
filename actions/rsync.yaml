@@ -1,6 +1,6 @@
 ---
     name: 'rsync'
-    runner_type: 'run-remote'
+    runner_type: 'run-local'
     description: 'Copy file(s) from one place to another w/ rsync. The major difference from linux.rsync is that this requires an include-file.'
     enabled: true
     entry_point: ''
@@ -13,30 +13,42 @@
             type: 'string'
             description: 'List of files/directories to to be copied'
             required: true
-            position: 1
         dest_server:
             type: 'string'
             description: "Destination server for rsync'd files"
             required: true
-            position: 2
+        dest_user:
+            type: 'string'
+            description: "User on destination server."
         destination:
             type: 'string'
             description: 'Destination of files/directories on target server'
             required: true
-            position: 3
         include_file:
             type: 'string'
             description: 'File with include instruction for rsync.'
+            required: false
+        source_host:
+            type: 'string'
+            description: 'Host on which to run rsync'
             required: true
-            position: 4
-        cmd:
-            immutable: true
-            default: 'rsync {{args}} --include-from {{include_file}} {{source}} {{dest_server}}:{{destination}}'
-            position: 0
+        source_host_user:
+            type: 'string'
+            description: 'User on source_host on which to run rsync'
+            required: true
         connect_timeout:
             type: 'integer'
             description: 'SSH connect timeout in seconds'
             default: 86400 # 24 h
+        dest_server_private_key:
+            type: 'string'
+            description: 'private key to dest server'
+            default: '/home/arteria/.ssh/biotank_key'
         args:
             description: 'Command line arguments passed to rysnc'
-            default: '-vrktp --chmod=Dg+sx,ug+w,o-rwx --prune-empty-dirs -e "ssh -o ConnectTimeout={{connect_timeout}}"'
+            default: '-vrktp --chmod=Dg+sx,ug+w,o-rwx --prune-empty-dirs -e \"ssh -o ConnectTimeout={{connect_timeout}}\" -i {{ dest_server_private_key }}'
+        cmd:
+            immutable: true
+            default: 'ssh -v {{ source_host_user }}@{{ source_host }} rsync {{args}} {% if include_file %} --include-from {{ include_file }}  {% endif %}{{source}} {{dest_user}}@{{dest_server}}:{{destination}}/'
+            position: 0
+
