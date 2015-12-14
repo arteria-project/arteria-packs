@@ -6,7 +6,7 @@ enabled: true
 entry_point: lib/parse_arguments_to_json.py
 parameters:
 
-  sisyphus_conf:
+  sisyphus_config:
     default: ""
     type: string
     description: "String containing the entire config file for Sisyphus (not just a path to it)."

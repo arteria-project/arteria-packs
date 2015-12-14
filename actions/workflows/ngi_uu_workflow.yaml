@@ -125,7 +125,7 @@ workflows:
                     url: <% $.bcl2fastq_status_url %>
                 on-success:
                     - download_sisyphus_config
-            ### DEMULTIPLEX END ###
+            ## DEMULTIPLEX END ###
 
             ### QUICK REPORT START ###
             download_sisyphus_config:
@@ -142,7 +142,7 @@ workflows:
                 action: arteria-packs.parse_siswrap_args
                 input:
                     runfolder: "<% $.runfolder_name %>"
-                    sisyphus_conf: "<% $.sisyphus_conf_string %>"
+                    sisyphus_config: "<% $.sisyphus_conf_string %>"
                 publish:
                     report_body: <% $.construct_report_body.stdout %>
                 on-success:
@@ -214,7 +214,7 @@ workflows:
                 action: arteria-packs.create_sis_style_checksums
                 input:
                     source: <% $.runfolder %>
-                    hosts: <% $.host %>
+                    host: <% $.host %>
                     destination: /tmp/
                     dest_server: <% $.host %>
                     include_file: /etc/arteria/misc/hiseq.rsync
@@ -226,32 +226,35 @@ workflows:
                 action: arteria-packs.rsync
                 input:
                     source: <% $.runfolder %>
+                    source_host: <% $.host %>
+                    source_host_user: "arteria"
                     dest_server: <% $.summary_host %>
-                    username: <% $.summary_user %>
+                    dest_user: <% $.summary_user %>
                     destination: <% $.summary_destination %>
                     include_file: /etc/arteria/misc/summary.rsync
-                    hosts: <% $.host %>
 
             rsync_to_uppmax:
                 action: arteria-packs.rsync
                 input:
                     source: <% $.runfolder %>
+                    source_host: <% $.host %>
+                    source_host_user: "arteria"
                     dest_server: <% $.remote_host %>
-                    username: <% $.remote_user %>
+                    dest_user: <% $.remote_user %>
                     destination: <% $.remote_destination %>
                     include_file: /etc/arteria/misc/hiseq.rsync
-                    hosts: <% $.host %>
                 on-success:
                     - rsync_md5sums_to_uppmax
 
             rsync_md5sums_to_uppmax:
-                action: linux.rsync
+                action: arteria-packs.rsync
                 input:
                     source: <% $.runfolder %>/MD5
+                    source_host: <% $.host %>
+                    source_host_user: "arteria"
                     dest_server: <% $.remote_host %>
-                    username: <% $.remote_user %>
+                    dest_user: <% $.remote_user %>
                     destination: <% $.remote_destination %>/<% $.runfolder_name %>/
-                    hosts: <% $.host %>
                 on-success:
                     - check_md5sums
 
@@ -276,6 +279,8 @@ workflows:
                     username: <% $.remote_user %>
                     cwd: <% $.remote_destination %>/<% $.runfolder_name %>
                     cmd: <% $.remote_sisyphus_location %>/aeacus-stats.pl -runfolder <% $.remote_destination %>/<% $.runfolder_name %>
+                    env: 
+                        PERL5LIB: /proj/a2009002/perl/lib/perl5/
                 on-success:
                     - start_aeacus_report
 
@@ -286,6 +291,8 @@ workflows:
                     username: <% $.remote_user %>
                     cwd: <% $.remote_destination %>/<% $.runfolder_name %>
                     cmd: <% $.remote_sisyphus_location %>/aeacus-reports.pl -runfolder <% $.remote_destination %>/<% $.runfolder_name %>
+                    env:
+                        PERL5LIB: /proj/a2009002/perl/lib/perl5/
                 on-success:
                     - notify_finished
             ## START AEACUS REPORT STEPS END ###
