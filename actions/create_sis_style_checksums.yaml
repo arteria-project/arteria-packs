@@ -1,6 +1,6 @@
 ---
     name: 'create_sis_style_checksums'
-    runner_type: 'run-remote'
+    runner_type: 'run-local'
     description: 'Create a list of files and their md5sums based on a file list created by rsync, in the style that they have been created by Sisyphus.'
     enabled: true
     entry_point: ''
@@ -29,9 +29,14 @@
             description: 'File with include instruction for rsync.'
             required: true
             position: 4
+        host:
+            type: 'string'
+            description: 'Host where files to checksum are located.'
+            required: true
+            position: 5
         cmd:
             immutable: true
-            default: 'set -o errexit; export FOLDER={{ source }}; export FOLDER_NAME=$(basename $FOLDER); pushd $FOLDER/.. > /dev/null; if [ ! -e "$FOLDER/MD5" ]; then mkdir $FOLDER/MD5; fi; rsync -vrktp --dry-run --chmod=Dg+sx,ug+w,o-rwx --prune-empty-dirs --include-from {{include_file}} ${FOLDER} /tmp | grep $FOLDER_NAME | grep -v "\/$" | xargs -0 -d"\n" md5sum > $FOLDER/MD5/checksums.md5; popd > /dev/null'
+            default: 'ssh -v {{host}} "bash -s" < /opt/stackstorm/packs/arteria-packs/actions/lib/create_sis_style_checksums.sh {{ source }} {{ include_file }}'
             position: 0
         connect_timeout:
             type: 'integer'
