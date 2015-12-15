@@ -123,6 +123,7 @@ workflows:
                 action: arteria-packs.poll_status
                 input:
                     url: <% $.bcl2fastq_status_url %>
+                    timeout: 86400 # Wait for 24 h before timing out.
                 on-success:
                     - download_sisyphus_config
             ## DEMULTIPLEX END ###
