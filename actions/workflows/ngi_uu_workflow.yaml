@@ -295,6 +295,7 @@ workflows:
                         PERL5LIB: /proj/a2009002/perl/lib/perl5/
                 on-success:
                     - notify_finished
+                    - mark_as_finished
             ## START AEACUS REPORT STEPS END ###
 
             ## NOTIFIER START ###
@@ -313,6 +314,13 @@ workflows:
                     body: "An oh shit error occurred while processing <% $.runfolder_name %> on host <% $.host %>. Please investigate!"
                 on-complete:
                   - fail
+
+            mark_as_finished:
+              action: core.http
+              input:
+                url: http://<% $.host %>:<% $.runfolder_service_port %>/api/1.0/runfolders/path<% $.runfolder %>
+                body: '{"state": "DONE"}'
+                method: "POST"
 
             mark_as_failed:
               action: core.http
