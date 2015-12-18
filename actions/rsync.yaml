@@ -46,7 +46,7 @@
             default: '/home/arteria/.ssh/biotank_key'
         args:
             description: 'Command line arguments passed to rysnc'
-            default: '-vrktp --chmod=Dg+sx,ug+w,o-rwx --prune-empty-dirs -e \"ssh -o ConnectTimeout={{connect_timeout}}\" -i {{ dest_server_private_key }}'
+            default: '-vrktp --chmod=Dg+sx,ug+w,o-rwx --prune-empty-dirs -e \"ssh -o ConnectTimeout={{connect_timeout}} -i {{ dest_server_private_key }}\"'
         cmd:
             immutable: true
             default: 'ssh -v {{ source_host_user }}@{{ source_host }} rsync {{args}} {% if include_file %} --include-from {{ include_file }}  {% endif %}{{source}} {{dest_user}}@{{dest_server}}:{{destination}}/'
