@@ -37,7 +37,6 @@ class PollStatus(Action):
         logging.shutdown()
         sys.exit(returncode)
 
-
     def run(self, url, sleep, log):
         """ Our polling function that either gets called from the CLI via Click,
             or directly from Stackstorm.
@@ -63,7 +62,7 @@ class PollStatus(Action):
                     if state == "done":
                         self.shutdown(0)
                     elif state in ["error", "none", "cancelled"]:
-                        self.log(resp)
+                        self.log(resp.json())
                         self.shutdown(1)
             except RequestException as err:
                 self.log("{0} -- {1} - an error was encountered: {2}".format(current_time, url, err))
