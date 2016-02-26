@@ -78,7 +78,6 @@ workflows:
                 on-success:
                     - download_samplesheet
             ### GENERAL TASKS END ###
-
             ### DEMULTIPLEX START ###
             download_samplesheet:
                 action: core.http
@@ -127,7 +126,6 @@ workflows:
                 on-success:
                     - download_sisyphus_config
             ## DEMULTIPLEX END ###
-
             ### QUICK REPORT START ###
             download_sisyphus_config:
                 action: core.http
@@ -207,22 +205,10 @@ workflows:
                 input:
                     url: <% $.qc_status_url %>
                 on-success:
-                    - create_md5sums_for_files_to_transfer
+                    - rsync_to_summary_host
             ### QUALITY CONTROL END ###
 
             ### TRANSFER FILES TO UPPMAX START ###
-            create_md5sums_for_files_to_transfer:
-                action: arteria-packs.create_sis_style_checksums
-                input:
-                    source: <% $.runfolder %>
-                    host: <% $.host %>
-                    destination: /tmp/
-                    dest_server: <% $.host %>
-                    include_file: /etc/arteria/misc/hiseq.rsync
-                on-success:
-                    - rsync_to_uppmax
-                    - rsync_to_summary_host
-
             rsync_to_summary_host:
                 action: arteria-packs.rsync
                 input:
@@ -233,42 +219,45 @@ workflows:
                     dest_user: <% $.summary_user %>
                     destination: <% $.summary_destination %>
                     include_file: /etc/arteria/misc/summary.rsync
+                on-success:
+                    - check_hosts_to_rsync_to
+
+            check_hosts_to_rsync_to:
+               action: core.http
+               input:
+                    url: <% $.hermes_base_url %>/<% $.flowcell_name %>/flowcell/analysishostinfo
+                    headers: USER=<% $.hermes_user %>&X-XSRF-TOKEN=<% $.hermes_token %>
+               on-success:
+                    - rsync_to_uppmax
+                    - rsync_to_nestor: <% 'nestor.uppmax.uu.se' in $.check_hosts_to_rsync_to.body.remote_hosts %>
 
             rsync_to_uppmax:
-                action: arteria-packs.rsync
+                action: arteria-packs.sync_workflow
                 input:
-                    source: <% $.runfolder %>
+                    runfolder: <% $.runfolder %>
+                    runfolder_name: <% $.runfolder_name %>
                     source_host: <% $.host %>
-                    source_host_user: "arteria"
-                    dest_server: <% $.remote_host %>
-                    dest_user: <% $.remote_user %>
-                    destination: <% $.remote_destination %>
-                    include_file: /etc/arteria/misc/hiseq.rsync
-                on-success:
-                    - rsync_md5sums_to_uppmax
-
-            rsync_md5sums_to_uppmax:
-                action: arteria-packs.rsync
-                input:
-                    source: <% $.runfolder %>/MD5
-                    source_host: <% $.host %>
-                    source_host_user: "arteria"
-                    dest_server: <% $.remote_host %>
-                    dest_user: <% $.remote_user %>
-                    destination: <% $.remote_destination %>/<% $.runfolder_name %>/
-                on-success:
-                    - check_md5sums
-
-            check_md5sums:
-                action: core.remote
-                input:
-                    hosts: <% $.remote_host %>
-                    username: <% $.remote_user %>
-                    cwd: <% $.remote_destination %>
-                    cmd: md5sum -c <% $.remote_destination %>/<% $.runfolder_name %>/MD5/checksums.md5
-                    timeout: 36000 # 10 h timeout
+                    source_user: "arteria"
+                    destination_host: <% $.remote_host %>
+                    destination_user: <% $.remote_user %>
+                    destination_path: <% $.remote_destination %>
+                    rsync_include_file: /etc/arteria/misc/hiseq.rsync
+                    md5_output_file: "checksums.md5"
                 on-success:
                     - start_aeacus_stats
+
+            rsync_to_nestor:
+                action: arteria-packs.sync_workflow
+                input:
+                    runfolder: <% $.runfolder %>
+                    runfolder_name: <% $.runfolder_name %>
+                    source_host: <% $.host %>
+                    source_user: "arteria"
+                    destination_host: "nestor.uppmax.uu.se"
+                    destination_user: <% $.remote_user %>
+                    destination_path: "/home/joda8933/test_runfolders"
+                    rsync_include_file: /etc/arteria/misc/ngi.rsync
+                    md5_output_file: "ngi.md5"
 
             ### TRANSFER FILES TO UPPMAX END ###
 
