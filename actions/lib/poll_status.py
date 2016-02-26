@@ -63,7 +63,7 @@ class PollStatus(Action):
                     if state == "done":
                         self.shutdown(0)
                     elif state in ["error", "none", "cancelled"]:
-                        print(resp)
+                        self.log(resp)
                         self.shutdown(1)
             except RequestException as err:
                 self.log("{0} -- {1} - an error was encountered: {2}".format(current_time, url, err))
