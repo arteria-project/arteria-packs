@@ -1,0 +1,25 @@
+version: "2.0" # mistral version
+name: arteria-packs.test_switch_workflow
+description: Testing if it's possible to switch depending on input
+
+workflows:
+    main:
+        type: direct
+        tasks:
+            switch:
+              action: core.local
+              input:
+                cmd: echo hostname
+              on-success:
+                 - whoami: <% $.switch.stdout = 'whoami' %>
+                 - hostname: <% $.switch.stdout = 'hostname' %>
+
+            whoami:
+                action: core.local
+                input:
+                    cmd: "whoami"
+
+            hostname:
+                action: core.local
+                input:
+                    cmd: "hostname"
