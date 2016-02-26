@@ -76,140 +76,138 @@ workflows:
                 publish:
                     flowcell_name: <% $.get_flowcell_name.result %>
                 on-success:
-                    - rsync_to_summary_host
-                    #- download_samplesheet
+                    - download_samplesheet
             ### GENERAL TASKS END ###
-# TODO Put this back again!
-#            ### DEMULTIPLEX START ###
-#            download_samplesheet:
-#                action: core.http
-#                input:
-#                    url: <% $.hermes_base_url %>/<% $.flowcell_name %>/samplesheetfile
-#                    headers: USER=<% $.hermes_user %>&X-XSRF-TOKEN=<% $.hermes_token %>
-#                publish:
-#                    samplesheet_string: <% $.download_samplesheet.body.samplesheet %>
-#                on-success:
-#                    - construct_bcl2fastq_body
-#
-#            # Since we don't want to pass empty values into
-#            # bcl2fastq-ws, we remove any empty keys from
-#            # this body.
-#            construct_bcl2fastq_body:
-#                action: arteria-packs.parse_bcl2fastq_args
-#                input:
-#                    samplesheet: "<% $.samplesheet_string %>"
-#                    bcl2fastq_version: "<% $.bcl2fastq_version %>"
-#                    barcode_mismatches: "<% $.barcode_mismatches %>"
-#                    tiles: "<% $.tiles %>"
-#                    use_base_mask: "<% $.use_base_mask %>"
-#                    additional_arguments: "<% $.bcl2fastq_additional_arguments %>"
-#                publish:
-#                    bcl2fastq_body: <% $.construct_bcl2fastq_body.stdout %>
-#                on-success:
-#                    - run_bcl2fastq
-#
-#            run_bcl2fastq:
-#                action: core.http
-#                input:
-#                    url: "http://<% $.host %>:<% $.bcl2fastq_service_port %>/api/1.0/start/<% $.runfolder_name %>"
-#                    method: "POST"
-#                    headers: "Content-Type=application/json"
-#                    body: <% $.bcl2fastq_body %>
-#                publish:
-#                    bcl2fastq_status_url: <% $.run_bcl2fastq.body.link %>
-#                on-success:
-#                    - poll_demultiplex_status
-#
-#            poll_demultiplex_status:
-#                action: arteria-packs.poll_status
-#                input:
-#                    url: <% $.bcl2fastq_status_url %>
-#                    timeout: 86400 # Wait for 24 h before timing out.
-#                on-success:
-#                    - download_sisyphus_config
-#            ## DEMULTIPLEX END ###
-#
-#            ### QUICK REPORT START ###
-#            download_sisyphus_config:
-#                action: core.http
-#                input:
-#                    url: <% $.hermes_base_url %>/<% $.flowcell_name %>/configfile
-#                    headers: USER=<% $.hermes_user %>&X-XSRF-TOKEN=<% $.hermes_token %>
-#                publish:
-#                    sisyphus_conf_string: <% $.download_sisyphus_config.body.config %>
-#                on-success:
-#                    - construct_report_body
-#
-#            construct_report_body:
-#                action: arteria-packs.parse_siswrap_args
-#                input:
-#                    runfolder: "<% $.runfolder_name %>"
-#                    sisyphus_config: "<% $.sisyphus_conf_string %>"
-#                publish:
-#                    report_body: <% $.construct_report_body.stdout %>
-#                on-success:
-#                    - run_sisyphus_quick_report
-#
-#            run_sisyphus_quick_report:
-#                action: core.http
-#                input:
-#                    url: "http://<% $.host %>:<% $.siswrap_service_port %>/api/1.0/report/run/<% $.runfolder_name %>"
-#                    method: "POST"
-#                    headers: "Content-Type=application/json"
-#                    body: <% $.report_body %>
-#                publish:
-#                    report_status_url: "<% $.run_sisyphus_quick_report.body.link %>"
-#                on-success:
-#                    - poll_report_status
-#
-#            poll_report_status:
-#                action: arteria-packs.poll_status
-#                input:
-#                    url: "<% $.report_status_url %>"
-#                on-success:
-#                    - download_qc_config
-#            ### QUICK REPORT END ###
-#
-#            ### QUALITY CONTROL START ###
-#            download_qc_config:
-#                action: core.http
-#                input:
-#                    url: <% $.hermes_base_url %>/<% $.flowcell_name %>/qcfile
-#                    headers: USER=<% $.hermes_user %>&X-XSRF-TOKEN=<% $.hermes_token %>
-#                publish:
-#                    qc_conf_string: <% $.download_qc_config.body.qc %>
-#                on-success:
-#                    - construct_qc_body
-#
-#            construct_qc_body:
-#                action: arteria-packs.parse_siswrap_args
-#                input:
-#                    runfolder: "<% $.runfolder_name %>"
-#                    qc_config: "<% $.qc_conf_string %>"
-#                publish:
-#                    qc_body: <% $.construct_qc_body.stdout %>
-#                on-success:
-#                    - run_sisyphus_qc
-#
-#            run_sisyphus_qc:
-#                action: core.http
-#                input:
-#                    url: "http://<% $.host %>:<% $.siswrap_service_port %>/api/1.0/qc/run/<% $.runfolder_name %>"
-#                    method: "POST"
-#                    headers: "Content-Type=application/json"
-#                    body: <% $.qc_body %>
-#                publish:
-#                    qc_status_url: "<% $.run_sisyphus_qc.body.link %>"
-#                on-success:
-#                    - poll_qc_status
-#
-#            poll_qc_status:
-#                action: arteria-packs.poll_status
-#                input:
-#                    url: <% $.qc_status_url %>
-#                on-success:
-#                    - create_md5sums_for_files_to_transfer
-#            ### QUALITY CONTROL END ###
+            ### DEMULTIPLEX START ###
+            download_samplesheet:
+                action: core.http
+                input:
+                    url: <% $.hermes_base_url %>/<% $.flowcell_name %>/samplesheetfile
+                    headers: USER=<% $.hermes_user %>&X-XSRF-TOKEN=<% $.hermes_token %>
+                publish:
+                    samplesheet_string: <% $.download_samplesheet.body.samplesheet %>
+                on-success:
+                    - construct_bcl2fastq_body
+
+            # Since we don't want to pass empty values into
+            # bcl2fastq-ws, we remove any empty keys from
+            # this body.
+            construct_bcl2fastq_body:
+                action: arteria-packs.parse_bcl2fastq_args
+                input:
+                    samplesheet: "<% $.samplesheet_string %>"
+                    bcl2fastq_version: "<% $.bcl2fastq_version %>"
+                    barcode_mismatches: "<% $.barcode_mismatches %>"
+                    tiles: "<% $.tiles %>"
+                    use_base_mask: "<% $.use_base_mask %>"
+                    additional_arguments: "<% $.bcl2fastq_additional_arguments %>"
+                publish:
+                    bcl2fastq_body: <% $.construct_bcl2fastq_body.stdout %>
+                on-success:
+                    - run_bcl2fastq
+
+            run_bcl2fastq:
+                action: core.http
+                input:
+                    url: "http://<% $.host %>:<% $.bcl2fastq_service_port %>/api/1.0/start/<% $.runfolder_name %>"
+                    method: "POST"
+                    headers: "Content-Type=application/json"
+                    body: <% $.bcl2fastq_body %>
+                publish:
+                    bcl2fastq_status_url: <% $.run_bcl2fastq.body.link %>
+                on-success:
+                    - poll_demultiplex_status
+
+            poll_demultiplex_status:
+                action: arteria-packs.poll_status
+                input:
+                    url: <% $.bcl2fastq_status_url %>
+                    timeout: 86400 # Wait for 24 h before timing out.
+                on-success:
+                    - download_sisyphus_config
+            ## DEMULTIPLEX END ###
+
+            ### QUICK REPORT START ###
+            download_sisyphus_config:
+                action: core.http
+                input:
+                    url: <% $.hermes_base_url %>/<% $.flowcell_name %>/configfile
+                    headers: USER=<% $.hermes_user %>&X-XSRF-TOKEN=<% $.hermes_token %>
+                publish:
+                    sisyphus_conf_string: <% $.download_sisyphus_config.body.config %>
+                on-success:
+                    - construct_report_body
+
+            construct_report_body:
+                action: arteria-packs.parse_siswrap_args
+                input:
+                    runfolder: "<% $.runfolder_name %>"
+                    sisyphus_config: "<% $.sisyphus_conf_string %>"
+                publish:
+                    report_body: <% $.construct_report_body.stdout %>
+                on-success:
+                    - run_sisyphus_quick_report
+
+            run_sisyphus_quick_report:
+                action: core.http
+                input:
+                    url: "http://<% $.host %>:<% $.siswrap_service_port %>/api/1.0/report/run/<% $.runfolder_name %>"
+                    method: "POST"
+                    headers: "Content-Type=application/json"
+                    body: <% $.report_body %>
+                publish:
+                    report_status_url: "<% $.run_sisyphus_quick_report.body.link %>"
+                on-success:
+                    - poll_report_status
+
+            poll_report_status:
+                action: arteria-packs.poll_status
+                input:
+                    url: "<% $.report_status_url %>"
+                on-success:
+                    - download_qc_config
+            ### QUICK REPORT END ###
+
+            ### QUALITY CONTROL START ###
+            download_qc_config:
+                action: core.http
+                input:
+                    url: <% $.hermes_base_url %>/<% $.flowcell_name %>/qcfile
+                    headers: USER=<% $.hermes_user %>&X-XSRF-TOKEN=<% $.hermes_token %>
+                publish:
+                    qc_conf_string: <% $.download_qc_config.body.qc %>
+                on-success:
+                    - construct_qc_body
+
+            construct_qc_body:
+                action: arteria-packs.parse_siswrap_args
+                input:
+                    runfolder: "<% $.runfolder_name %>"
+                    qc_config: "<% $.qc_conf_string %>"
+                publish:
+                    qc_body: <% $.construct_qc_body.stdout %>
+                on-success:
+                    - run_sisyphus_qc
+
+            run_sisyphus_qc:
+                action: core.http
+                input:
+                    url: "http://<% $.host %>:<% $.siswrap_service_port %>/api/1.0/qc/run/<% $.runfolder_name %>"
+                    method: "POST"
+                    headers: "Content-Type=application/json"
+                    body: <% $.qc_body %>
+                publish:
+                    qc_status_url: "<% $.run_sisyphus_qc.body.link %>"
+                on-success:
+                    - poll_qc_status
+
+            poll_qc_status:
+                action: arteria-packs.poll_status
+                input:
+                    url: <% $.qc_status_url %>
+                on-success:
+                    - rsync_to_summary_host
+            ### QUALITY CONTROL END ###
 
             ### TRANSFER FILES TO UPPMAX START ###
             rsync_to_summary_host:
