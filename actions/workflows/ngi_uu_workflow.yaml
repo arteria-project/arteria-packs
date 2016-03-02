@@ -124,89 +124,90 @@ workflows:
                     url: <% $.bcl2fastq_status_url %>
                     timeout: 86400 # Wait for 24 h before timing out.
                 on-success:
-                    - download_sisyphus_config
-            ## DEMULTIPLEX END ###
-
-            ### QUICK REPORT START ###
-            download_sisyphus_config:
-                action: core.http
-                input:
-                    url: <% $.hermes_base_url %>/<% $.flowcell_name %>/configfile
-                    headers: USER=<% $.hermes_user %>&X-XSRF-TOKEN=<% $.hermes_token %>
-                publish:
-                    sisyphus_conf_string: <% $.download_sisyphus_config.body.config %>
-                on-success:
-                    - construct_report_body
-
-            construct_report_body:
-                action: arteria-packs.parse_siswrap_args
-                input:
-                    runfolder: "<% $.runfolder_name %>"
-                    sisyphus_config: "<% $.sisyphus_conf_string %>"
-                publish:
-                    report_body: <% $.construct_report_body.stdout %>
-                on-success:
-                    - run_sisyphus_quick_report
-
-            run_sisyphus_quick_report:
-                action: core.http
-                input:
-                    url: "http://<% $.host %>:<% $.siswrap_service_port %>/api/1.0/report/run/<% $.runfolder_name %>"
-                    method: "POST"
-                    headers: "Content-Type=application/json"
-                    body: <% $.report_body %>
-                publish:
-                    report_status_url: "<% $.run_sisyphus_quick_report.body.link %>"
-                on-success:
-                    - poll_report_status
-
-            poll_report_status:
-                action: arteria-packs.poll_status
-                input:
-                    url: "<% $.report_status_url %>"
-                on-success:
-                    - download_qc_config
-            ### QUICK REPORT END ###
-
-            ### QUALITY CONTROL START ###
-            download_qc_config:
-                action: core.http
-                input:
-                    url: <% $.hermes_base_url %>/<% $.flowcell_name %>/qcfile
-                    headers: USER=<% $.hermes_user %>&X-XSRF-TOKEN=<% $.hermes_token %>
-                publish:
-                    qc_conf_string: <% $.download_qc_config.body.qc %>
-                on-success:
-                    - construct_qc_body
-
-            construct_qc_body:
-                action: arteria-packs.parse_siswrap_args
-                input:
-                    runfolder: "<% $.runfolder_name %>"
-                    qc_config: "<% $.qc_conf_string %>"
-                publish:
-                    qc_body: <% $.construct_qc_body.stdout %>
-                on-success:
-                    - run_sisyphus_qc
-
-            run_sisyphus_qc:
-                action: core.http
-                input:
-                    url: "http://<% $.host %>:<% $.siswrap_service_port %>/api/1.0/qc/run/<% $.runfolder_name %>"
-                    method: "POST"
-                    headers: "Content-Type=application/json"
-                    body: <% $.qc_body %>
-                publish:
-                    qc_status_url: "<% $.run_sisyphus_qc.body.link %>"
-                on-success:
-                    - poll_qc_status
-
-            poll_qc_status:
-                action: arteria-packs.poll_status
-                input:
-                    url: <% $.qc_status_url %>
-                on-success:
+                    #- download_sisyphus_config
                     - rsync_to_summary_host
+            ## DEMULTIPLEX END ###
+# TODO Re-enable!
+#            ### QUICK REPORT START ###
+#            download_sisyphus_config:
+#                action: core.http
+#                input:
+#                    url: <% $.hermes_base_url %>/<% $.flowcell_name %>/configfile
+#                    headers: USER=<% $.hermes_user %>&X-XSRF-TOKEN=<% $.hermes_token %>
+#                publish:
+#                    sisyphus_conf_string: <% $.download_sisyphus_config.body.config %>
+#                on-success:
+#                    - construct_report_body
+#
+#            construct_report_body:
+#                action: arteria-packs.parse_siswrap_args
+#                input:
+#                    runfolder: "<% $.runfolder_name %>"
+#                    sisyphus_config: "<% $.sisyphus_conf_string %>"
+#                publish:
+#                    report_body: <% $.construct_report_body.stdout %>
+#                on-success:
+#                    - run_sisyphus_quick_report
+#
+#            run_sisyphus_quick_report:
+#                action: core.http
+#                input:
+#                    url: "http://<% $.host %>:<% $.siswrap_service_port %>/api/1.0/report/run/<% $.runfolder_name %>"
+#                    method: "POST"
+#                    headers: "Content-Type=application/json"
+#                    body: <% $.report_body %>
+#                publish:
+#                    report_status_url: "<% $.run_sisyphus_quick_report.body.link %>"
+#                on-success:
+#                    - poll_report_status
+#
+#            poll_report_status:
+#                action: arteria-packs.poll_status
+#                input:
+#                    url: "<% $.report_status_url %>"
+#                on-success:
+#                    - download_qc_config
+#            ### QUICK REPORT END ###
+#
+#            ### QUALITY CONTROL START ###
+#            download_qc_config:
+#                action: core.http
+#                input:
+#                    url: <% $.hermes_base_url %>/<% $.flowcell_name %>/qcfile
+#                    headers: USER=<% $.hermes_user %>&X-XSRF-TOKEN=<% $.hermes_token %>
+#                publish:
+#                    qc_conf_string: <% $.download_qc_config.body.qc %>
+#                on-success:
+#                    - construct_qc_body
+#
+#            construct_qc_body:
+#                action: arteria-packs.parse_siswrap_args
+#                input:
+#                    runfolder: "<% $.runfolder_name %>"
+#                    qc_config: "<% $.qc_conf_string %>"
+#                publish:
+#                    qc_body: <% $.construct_qc_body.stdout %>
+#                on-success:
+#                    - run_sisyphus_qc
+#
+#            run_sisyphus_qc:
+#                action: core.http
+#                input:
+#                    url: "http://<% $.host %>:<% $.siswrap_service_port %>/api/1.0/qc/run/<% $.runfolder_name %>"
+#                    method: "POST"
+#                    headers: "Content-Type=application/json"
+#                    body: <% $.qc_body %>
+#                publish:
+#                    qc_status_url: "<% $.run_sisyphus_qc.body.link %>"
+#                on-success:
+#                    - poll_qc_status
+#
+#            poll_qc_status:
+#                action: arteria-packs.poll_status
+#                input:
+#                    url: <% $.qc_status_url %>
+#                on-success:
+#                    - rsync_to_summary_host
             ### QUALITY CONTROL END ###
 
             ### TRANSFER FILES TO UPPMAX START ###
@@ -221,6 +222,15 @@ workflows:
                     destination: <% $.summary_destination %>
                     include_file: /etc/arteria/misc/summary.rsync
                 on-success:
+                    - check_hosts_to_rsync_to
+
+            check_hosts_to_rsync_to:
+               action: core.http
+                input:
+                    url: <% $.hermes_base_url %>/<% $.flowcell_name %>/flowcell/analysishostinfo
+                    headers: USER=<% $.hermes_user %>&X-XSRF-TOKEN=<% $.hermes_token %>
+                on-success:
+                    - rsync_to_nestor: <% $.check_hosts_to_rsync_to.body.remote_hosts.contains("nestor.uppmax.uu.se") %>
                     - rsync_to_uppmax
 
             rsync_to_uppmax:
@@ -236,6 +246,18 @@ workflows:
                     rsync_include_file: /etc/arteria/misc/hiseq.rsync
                 on-success:
                     - start_aeacus_stats
+
+            rsync_to_nestor:
+                action: arteria-packs.sync_workflow
+                input:
+                    runfolder: <% $.runfolder %>
+                    runfolder_name: <% $.runfolder_name %>
+                    source_host: <% $.host %>
+                    source_user: "arteria"
+                    destination_host: "nestor.uppmax.uu.se"
+                    destination_user: <% $.remote_user %>
+                    destination_path: "/home/joda8933/test_runfolders"
+                    rsync_include_file: /etc/arteria/misc/ngi.rsync
 
             ### TRANSFER FILES TO UPPMAX END ###
 
