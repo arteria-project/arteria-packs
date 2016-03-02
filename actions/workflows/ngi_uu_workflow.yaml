@@ -230,7 +230,7 @@ workflows:
                     url: <% $.hermes_base_url %>/<% $.flowcell_name %>/flowcell/analysishostinfo
                     headers: USER=<% $.hermes_user %>&X-XSRF-TOKEN=<% $.hermes_token %>
                on-success:
-                    - rsync_to_uppmax: True
+                    - rsync_to_uppmax: <% $.check_hosts_to_rsync_to.body.remote_hosts.contains('milou-b.uppmax.uu.se') %>
                     - rsync_to_nestor: <% $.check_hosts_to_rsync_to.body.remote_hosts.contains('nestor.uppmax.uu.se') %>
 
             rsync_to_uppmax:
