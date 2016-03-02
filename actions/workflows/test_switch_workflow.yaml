@@ -9,10 +9,10 @@ workflows:
             switch:
               action: core.local
               input:
-                cmd: echo '{"test_list": ["a", "b", "c"]}'
+                cmd: echo hello world
               on-success:
-                 - whoami: <% $.switch.stdout.contains(a) %>
-                 - hostname: <% $.switch.stdout.contains(d) %>
+                 - whoami: <% a in list(a, b) %>
+                 - hostname: <% c in list(a, b) %>
 
             whoami:
                 action: core.local
