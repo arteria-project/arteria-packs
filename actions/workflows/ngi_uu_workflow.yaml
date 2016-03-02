@@ -248,17 +248,17 @@ workflows:
                 on-success:
                     - start_aeacus_stats
 
-#            rsync_to_nestor:
-#                action: arteria-packs.sync_workflow
-#                input:
-#                    runfolder: <% $.runfolder %>
-#                    runfolder_name: <% $.runfolder_name %>
-#                    source_host: <% $.host %>
-#                    source_user: "arteria"
-#                    destination_host: "nestor.uppmax.uu.se"
-#                    destination_user: <% $.remote_user %>
-#                    destination_path: "/home/joda8933/test_runfolders"
-#                    rsync_include_file: /etc/arteria/misc/ngi.rsync
+            rsync_to_nestor:
+                action: arteria-packs.sync_workflow
+                input:
+                    runfolder: <% $.runfolder %>
+                    runfolder_name: <% $.runfolder_name %>
+                    source_host: <% $.host %>
+                    source_user: "arteria"
+                    destination_host: "nestor.uppmax.uu.se"
+                    destination_user: <% $.remote_user %>
+                    destination_path: "/home/joda8933/test_runfolders"
+                    rsync_include_file: /etc/arteria/misc/ngi.rsync
 
             ### TRANSFER FILES TO UPPMAX END ###
 
