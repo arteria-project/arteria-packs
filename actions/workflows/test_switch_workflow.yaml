@@ -12,7 +12,7 @@ workflows:
                 cmd: echo hello world
               on-success:
                  - whoami: <% a in list(a, b) %>
-                 - hostname: <% c in list(a, b) %>
+                 - hostname: <% b in list(a, b) %>
 
             whoami:
                 action: core.local
