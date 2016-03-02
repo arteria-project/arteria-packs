@@ -34,9 +34,14 @@
             description: 'Host where files to checksum are located.'
             required: true
             position: 5
+        output_file:
+            type: 'string'
+            description: 'Name of the output file'
+            required: true
+            position: 6
         cmd:
             immutable: true
-            default: 'ssh -v {{host}} "bash -s" < /opt/stackstorm/packs/arteria-packs/actions/lib/create_sis_style_checksums.sh {{ source }} {{ include_file }}'
+            default: 'ssh -v {{host}} "bash -s" < /opt/stackstorm/packs/arteria-packs/actions/lib/create_sis_style_checksums.sh {{ source }} {{ include_file }} {{ output_file }}'
             position: 0
         connect_timeout:
             type: 'integer'
