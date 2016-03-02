@@ -231,7 +231,7 @@ workflows:
                     headers: USER=<% $.hermes_user %>&X-XSRF-TOKEN=<% $.hermes_token %>
                on-success:
                     - rsync_to_uppmax
-                    - rsync_to_nestor: <% nestor.uppmax.uu.se in $.check_hosts_to_rsync_to.body.remote_hosts %>
+                    - rsync_to_nestor: <% "nestor.uppmax.uu.se" in $.check_hosts_to_rsync_to.body.remote_hosts %>
 
             rsync_to_uppmax:
                 action: arteria-packs.sync_workflow
