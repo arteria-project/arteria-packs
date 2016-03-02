@@ -36,6 +36,9 @@ parameters:
   destination_path:
     required: true
     type: string
+  md5_output_file:
+    required: true
+    type: string
   rsync_include_file:
     required: true
     type: string

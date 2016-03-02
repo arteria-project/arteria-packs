@@ -245,6 +245,7 @@ workflows:
                     destination_user: <% $.remote_user %>
                     destination_path: <% $.remote_destination %>
                     rsync_include_file: /etc/arteria/misc/hiseq.rsync
+                    md5_output_file: "checksums.md5"
                 on-success:
                     - start_aeacus_stats
 
@@ -259,6 +260,7 @@ workflows:
                     destination_user: <% $.remote_user %>
                     destination_path: "/home/joda8933/test_runfolders"
                     rsync_include_file: /etc/arteria/misc/ngi.rsync
+                    md5_output_file: "ngi.md5"
 
             ### TRANSFER FILES TO UPPMAX END ###
 
