@@ -295,7 +295,8 @@ workflows:
             ## START NGI_PIPELINE IF NECESSARY ##
             start_ngi_pipeline:
               action: core.http
-              url: <% $.ngi_pipeline_url %>/<% $.runfolder_name %>
+              input:
+                url: <% $.ngi_pipeline_url %>/<% $.runfolder_name %>
             ## END START NGI_PIPELINE ##
 
             ## NOTIFIER START ###
