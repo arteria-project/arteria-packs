@@ -48,6 +48,8 @@ workflows:
                 runfolder_service_port: <% $.get_config.result.runfolder_service_port %>
                 send_mail_to: <% $.get_config.result.send_mail_to %>
                 remote_sisyphus_location: <% $.get_config.result.remote_sisyphus_location %>
+                nestor_remote_path: <% $.get_config.result.nestor_remote_path %>
+                ngi_pipeline_url: <% $.get_config.result.ngi_pipeline_url %>
               on-success:
                  - mark_as_started
 
@@ -255,9 +257,11 @@ workflows:
                     source_user: "arteria"
                     destination_host: "nestor.uppmax.uu.se"
                     destination_user: <% $.remote_user %>
-                    destination_path: "/home/joda8933/test_runfolders"
+                    destination_path: <% $.nestor_remote_path %>
                     rsync_include_file: /etc/arteria/misc/ngi.rsync
                     md5_output_file: "ngi.md5"
+                on-success:
+                  - start_ngi_pipeline
 
             ### TRANSFER FILES TO UPPMAX END ###
 
@@ -287,6 +291,12 @@ workflows:
                     - notify_finished
                     - mark_as_finished
             ## START AEACUS REPORT STEPS END ###
+
+            ## START NGI_PIPELINE IF NECESSARY ##
+            start_ngi_pipeline:
+              action: core.http
+              url: <% $.ngi_pipeline_url %>/<% $.runfolder_name %>
+            ## END START NGI_PIPELINE ##
 
             ## NOTIFIER START ###
             notify_finished:
