@@ -1,0 +1,79 @@
+version: "2.0" # mistral version
+name: arteria-packs.sync_workflow
+description: Syncs a run for the source host to the remote_host.
+
+workflows:
+    main:
+        type: direct
+        input:
+            - runfolder
+            - runfolder_name
+            - source_host
+            - source_user
+            - destination_host
+            - destination_user
+            - destination_path
+            - rsync_include_file
+            - md5_output_file
+        output:
+            output_the_whole_workflow_context: <% $ %>
+
+        tasks:
+            ### GENERAL TASKS START ###
+            note_workflow_repo_version:
+              action: core.local
+              input:
+                cmd: git rev-parse HEAD
+                cwd: /opt/stackstorm/packs/arteria-packs/
+              on-success:
+                 - create_md5sums_for_files_to_transfer
+            ### GENERAL TASKS END ###
+
+            ### TRANSFER FILES START ###
+            create_md5sums_for_files_to_transfer:
+                action: arteria-packs.create_sis_style_checksums
+                input:
+                    source: <% $.runfolder %>
+                    host: <% $.source_host %>
+                    destination: /tmp/
+                    dest_server: <% $.source_host %>
+                    include_file: <% $.rsync_include_file %>
+                    output_file: <% $.md5_output_file %>
+                on-success:
+                    - rsync_to_destination
+
+            rsync_to_destination:
+                action: arteria-packs.rsync
+                input:
+                    source: <% $.runfolder %>
+                    source_host: <% $.source_host %>
+                    source_host_user: "arteria"
+                    dest_server: <% $.destination_host %>
+                    dest_user: <% $.destination_user %>
+                    destination: <% $.destination_path %>
+                    include_file: <% $.rsync_include_file %>
+                on-success:
+                    - rsync_md5sums
+
+            rsync_md5sums:
+                action: arteria-packs.rsync
+                input:
+                    source: <% $.runfolder %>/MD5
+                    source_host: <% $.source_host %>
+                    source_host_user: <% $.source_user%>
+                    dest_server: <% $.destination_host %>
+                    dest_user: <% $.destination_user %>
+                    destination: <% $.destination_path %>/<% $.runfolder_name %>/
+                on-success:
+                    - check_md5sums
+
+            check_md5sums:
+                action: core.remote
+                input:
+                    hosts: <% $.destination_host %>
+                    username: <% $.destination_user %>
+                    cwd: <% $.destination_path %>
+                    cmd: md5sum -c <% $.destination_path %>/<% $.runfolder_name %>/MD5/<% $.md5_output_file %>
+                    timeout: 36000 # 10 h timeout
+
+            ### TRANSFER FILES END ###
