@@ -23,9 +23,10 @@ parameters:
   runfolder:
     required: true
     type: string
-  trigger_ngi_pipeline:
+  ignore_sisyphus_qc_result:
     default: false
     type: boolean
+    description: "ignore the sisyphus check qc results"
   bcl2fastq_version:
     default: ""
     type: string
