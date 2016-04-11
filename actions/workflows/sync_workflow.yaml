@@ -74,6 +74,6 @@ workflows:
                     username: <% $.destination_user %>
                     cwd: <% $.destination_path %>
                     cmd: md5sum -c <% $.destination_path %>/<% $.runfolder_name %>/MD5/<% $.md5_output_file %>
-                    timeout: 36000 # 10 h timeout
+                    timeout: 86400 # 24 h timeout
 
             ### TRANSFER FILES END ###
