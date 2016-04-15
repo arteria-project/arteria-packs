@@ -49,6 +49,7 @@ workflows:
                 send_mail_to: <% $.get_config.result.send_mail_to %>
                 remote_sisyphus_location: <% $.get_config.result.remote_sisyphus_location %>
                 nestor_remote_path: <% $.get_config.result.nestor_remote_path %>
+                irma_remote_path: <% $.get_config.result.irma_remote_path %>
                 ngi_pipeline_url: <% $.get_config.result.ngi_pipeline_url %>
               on-success:
                  - mark_as_started
@@ -236,10 +237,10 @@ workflows:
                     url: <% $.hermes_base_url %>/<% $.flowcell_name %>/flowcell/analysishostinfo
                     headers: USER=<% $.hermes_user %>&X-XSRF-TOKEN=<% $.hermes_token %>
                on-success:
-                    - rsync_to_uppmax
-                    - rsync_to_nestor: <% 'nestor.uppmax.uu.se' in $.check_hosts_to_rsync_to.body.remote_hosts %>
+                    - rsync_to_milou: <% 'milou-b.uppmax.uu.se' in $.check_hosts_to_rsync_to.body.remote_hosts %>
+                    - rsync_to_irma: <% 'irma.uppmax.uu.se' in $.check_hosts_to_rsync_to.body.remote_hosts %>
 
-            rsync_to_uppmax:
+            rsync_to_milou:
                 action: arteria-packs.sync_workflow
                 input:
                     runfolder: <% $.runfolder %>
@@ -252,39 +253,54 @@ workflows:
                     rsync_include_file: /etc/arteria/misc/hiseq.rsync
                     md5_output_file: "checksums.md5"
                 on-success:
-                    - start_aeacus_stats
+                    - milou_check_md5sums
 
-            rsync_to_nestor:
+            milou_check_md5sums:
+                action: core.remote
+                input:
+                    hosts: <% $.remote_host %>
+                    username: <% $.remote_user %>
+                    cwd: <% $.remote_destination %>
+                    cmd: md5sum -c  <% $.remote_destination %>/<% $.runfolder_name %>/MD5/checksums.md5
+                    timeout: 86400 # 24 h timeout
+                on-success:
+                    - milou_start_aeacus_stats
+
+            rsync_to_irma:
                 action: arteria-packs.sync_workflow
                 input:
                     runfolder: <% $.runfolder %>
                     runfolder_name: <% $.runfolder_name %>
                     source_host: <% $.host %>
-                    source_user: "arteria"
-                    destination_host: "nestor.uppmax.uu.se"
+                    source_user: "funk_901"
+                    destination_host: "irma.uppmax.uu.se"
                     destination_user: <% $.remote_user %>
-                    destination_path: <% $.nestor_remote_path %>
-                    rsync_include_file: /etc/arteria/misc/ngi.rsync
+                    destination_path: <% $.irma_remote_path %>
+                    rsync_include_file: /etc/arteria/misc/hiseq.rsync
                     md5_output_file: "ngi.md5"
                 on-success:
-                  - start_ngi_pipeline
+                  - mark_as_finished
+                  - notify_finished
+
+            # TODO Need to add checksum verification on irma
+            # TODO Need to add starting the ngi pipeline on irma
 
             ### TRANSFER FILES TO UPPMAX END ###
 
             ### START AEACUS REPORT STEPS ###
-            start_aeacus_stats:
+            milou_start_aeacus_stats:
                 action: core.remote
                 input:
                     hosts: <% $.remote_host %>
                     username: <% $.remote_user %>
                     cwd: <% $.remote_destination %>/<% $.runfolder_name %>
                     cmd: <% $.remote_sisyphus_location %>/aeacus-stats.pl -runfolder <% $.remote_destination %>/<% $.runfolder_name %>
-                    env: 
+                    env:
                         PERL5LIB: /proj/a2009002/perl/lib/perl5/
                 on-success:
-                    - start_aeacus_report
+                    - milou_start_aeacus_report
 
-            start_aeacus_report:
+            milou_start_aeacus_report:
                 action: core.remote
                 input:
                     hosts: <% $.remote_host %>
@@ -299,10 +315,11 @@ workflows:
             ## START AEACUS REPORT STEPS END ###
 
             ## START NGI_PIPELINE IF NECESSARY ##
-            start_ngi_pipeline:
-              action: core.http
-              input:
-                url: <% $.ngi_pipeline_url %>/<% $.runfolder_name %>
+            # TODO Make sure to setup new URL for ngi_pipeline
+            #start_ngi_pipeline:
+            #  action: core.http
+            #  input:
+            #    url: <% $.ngi_pipeline_url %>/<% $.runfolder_name %>
             ## END START NGI_PIPELINE ##
 
             ## NOTIFIER START ###
