@@ -37,35 +37,63 @@ class PollStatus(Action):
         logging.shutdown()
         sys.exit(returncode)
 
-    def run(self, url, sleep, log):
-        """ Our polling function that either gets called from the CLI via Click,
-            or directly from Stackstorm.
-        """
+    def query(self, url):
+        try:
+            resp = requests.get(url)
+            state = resp.json()["state"]
+            return state, resp
+        except RequestException as err:
+            current_time = datetime.datetime.now()
+            self.log("{0} -- {1} - an error was encountered: {2}".format(current_time, url, err))
+            return None, None
 
+    def run(self, url, sleep, log, max_retries = 3):
+        """
+        Query the url end-point. Can be called directly from StackStorm, or via the script cli
+        :param url: to call
+        :param sleep: minutes to sleep between attempts
+        :param log: file name to write log to
+        :param max_retries: maximum number of retries
+        :return: None
+        """
+        retry_attempts = 0
         state = "started"
         self.LOG_FILENAME = log
 
         while state == "started" or state == "pending":
             current_time = datetime.datetime.now()
 
-            try:
-                resp = requests.get(url)
-                state = resp.json()["state"]
+            state, resp = self.query(url)
 
-                if state == "started" or state == "pending":
-                    self.log("{0} -- {1} returned state {2}. Sleeping {3}m until retrying again...".format(current_time, url, state, sleep))
-
-                    time.sleep(sleep * 60)
-                else:
-                    self.log("{0} -- {1} returned state {2}. Will now stop polling the status.".format(current_time, url, state))
-
-                    if state == "done":
-                        self.shutdown(0)
-                    elif state in ["error", "none", "cancelled"]:
-                        self.log(resp.json())
-                        self.shutdown(1)
-            except RequestException as err:
-                self.log("{0} -- {1} - an error was encountered: {2}".format(current_time, url, err))
+            if state == "started" or state == "pending":
+                self.log("{0} -- {1} returned state {2}. Sleeping {3}m until retrying again...".format(current_time,
+                                                                                                       url,
+                                                                                                       state,
+                                                                                                       sleep))
+                time.sleep(sleep * 60)
+            elif state == "done":
+                self.log("{0} -- {1} returned state {2}. Will now stop polling the status.".format(current_time,
+                                                                                                   url,
+                                                                                                   state))
+                self.shutdown(0)
+            elif state in ["error", "none", "cancelled"]:
+                self.log("{0} -- {1} returned state {2}. Will now stop polling the status.".format(current_time,
+                                                                                                   url,
+                                                                                                   state))
+                self.log(resp.json())
+                self.shutdown(1)
+            elif not state and retry_attempts < max_retries:
+                retry_attempts += 1
+                self.log("{0} -- {1} did not report state. "
+                         "Probably due to a connection error, will retry. Attempt {3} of {4}.".format(current_time,
+                                                                                                      url,
+                                                                                                      retry_attempts,
+                                                                                                      retries))
+                time.sleep(sleep * 60)
+            else:
+                self.log("{0} -- {1} returned state unknown state {2}. "
+                         "Will now stop polling the status.".format(current_time, url, state))
+                self.log(resp.json())
                 self.shutdown(1)
 
 @click.command()
