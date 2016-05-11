@@ -47,7 +47,7 @@ workflows:
                 input:
                     source: <% $.runfolder %>
                     source_host: <% $.source_host %>
-                    source_host_user: "arteria"
+                    source_host_user: <% $.source_user %>
                     dest_server: <% $.destination_host %>
                     dest_user: <% $.destination_user %>
                     destination: <% $.destination_path %>
