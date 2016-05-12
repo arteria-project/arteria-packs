@@ -40,13 +40,9 @@
             type: 'integer'
             description: 'SSH connect timeout in seconds'
             default: 86400 # 24 h
-        dest_server_private_key:
-            type: 'string'
-            description: 'private key to dest server'
-            default: '/home/arteria/.ssh/biotank_key'
         args:
-            description: 'Command line arguments passed to rysnc'
-            default: '-vrktp --chmod=Dg+sx,ug+w,o-rwx --prune-empty-dirs -e \"ssh -o ConnectTimeout={{connect_timeout}} -i {{ dest_server_private_key }}\"'
+            description: 'Command line arguments passed to rsync'
+            default: '-vrktp --chmod=Dg+sx,ug+w,o-rwx --prune-empty-dirs -e \"ssh -o ConnectTimeout={{connect_timeout}} \"'
         cmd:
             immutable: true
             default: 'ssh -v {{ source_host_user }}@{{ source_host }} rsync {{args}} {% if include_file %} --include-from {{ include_file }}  {% endif %}{{source}} {{dest_user}}@{{dest_server}}:{{destination}}/'

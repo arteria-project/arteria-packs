@@ -47,7 +47,7 @@ workflows:
                 input:
                     source: <% $.runfolder %>
                     source_host: <% $.source_host %>
-                    source_host_user: "arteria"
+                    source_host_user: <% $.source_user %>
                     dest_server: <% $.destination_host %>
                     dest_user: <% $.destination_user %>
                     destination: <% $.destination_path %>
@@ -64,16 +64,5 @@ workflows:
                     dest_server: <% $.destination_host %>
                     dest_user: <% $.destination_user %>
                     destination: <% $.destination_path %>/<% $.runfolder_name %>/
-                on-success:
-                    - check_md5sums
-
-            check_md5sums:
-                action: core.remote
-                input:
-                    hosts: <% $.destination_host %>
-                    username: <% $.destination_user %>
-                    cwd: <% $.destination_path %>
-                    cmd: md5sum -c <% $.destination_path %>/<% $.runfolder_name %>/MD5/<% $.md5_output_file %>
-                    timeout: 86400 # 24 h timeout
 
             ### TRANSFER FILES END ###

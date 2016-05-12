@@ -14,7 +14,7 @@ remote_destination: /tmp/runfolders/
 remote_sisyphus_location: /opt/arteria/arteria-siswrap-env/deps/sisyphus/sisyphus-latest
 
 ngi_pipeline_url: http://nestor1.uppmax.uu.se:6666/test_flowcell_analysis
-nestor_remote_path: /home/joda8933/test_runfolders
+irma_remote_path: ./staging/
 
 send_mail_to: example.mail.address@send.errors.to
 
