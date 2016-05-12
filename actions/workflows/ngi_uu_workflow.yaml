@@ -28,8 +28,8 @@ workflows:
               input:
                 cmd: git rev-parse HEAD
                 cwd: /opt/stackstorm/packs/arteria-packs/
-            on-success:
-              - get_config
+              on-success:
+                - get_config
 
             get_config:
               action: arteria-packs.get_pack_config
@@ -208,7 +208,7 @@ workflows:
                 action: arteria-packs.poll_status
                 input:
                     url: <% $.qc_status_url %>
-               on-success:
+                on-success:
                     - rsync_to_summary_host
                 on-error:
                     # When we choose to ignore the sisphus qc rsults, just move on
