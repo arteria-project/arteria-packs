@@ -68,7 +68,7 @@ workflows:
               input:
                 cmd: python -c 'import sys; sys.stdout.write("<% $.runfolder %>".split("/")[-1])'
               publish:
-                runfolder_name: "<% $.get_runfolder_name.stdout %>"
+                runfolder_name: "<% task(get_runfolder_name).result.stdout %>"
               on-success:
                 - get_flowcell_name
 
@@ -77,7 +77,7 @@ workflows:
                 input:
                     runfolder_name: <% $.runfolder_name %>
                 publish:
-                    flowcell_name: <% $.get_flowcell_name.result %>
+                    flowcell_name: <% task(get_flowcell_name).result.result %>
                 on-success:
                     - download_samplesheet
 
@@ -89,7 +89,7 @@ workflows:
                     url: <% $.hermes_base_url %>/<% $.flowcell_name %>/samplesheetfile
                     headers: USER=<% $.hermes_user %>&X-XSRF-TOKEN=<% $.hermes_token %>
                 publish:
-                    samplesheet_string: <% $.download_samplesheet.body.samplesheet %>
+                    samplesheet_string: <% task(download_samplesheet).result.body.samplesheet %>
                 on-success:
                     - construct_bcl2fastq_body
 
@@ -106,7 +106,7 @@ workflows:
                     use_base_mask: "<% $.use_base_mask %>"
                     additional_arguments: "<% $.bcl2fastq_additional_arguments %>"
                 publish:
-                    bcl2fastq_body: <% $.construct_bcl2fastq_body.stdout %>
+                    bcl2fastq_body: <% task(construct_bcl2fastq_body).result.stdout %>
                 on-success:
                     - run_bcl2fastq
 
@@ -118,7 +118,7 @@ workflows:
                     headers: "Content-Type=application/json"
                     body: <% $.bcl2fastq_body %>
                 publish:
-                    bcl2fastq_status_url: <% $.run_bcl2fastq.body.link %>
+                    bcl2fastq_status_url: <% task(run_bcl2fastq).result.body.link %>
                 on-success:
                     - poll_demultiplex_status
 
@@ -137,7 +137,7 @@ workflows:
                     url: <% $.hermes_base_url %>/<% $.flowcell_name %>/configfile
                     headers: USER=<% $.hermes_user %>&X-XSRF-TOKEN=<% $.hermes_token %>
                 publish:
-                    sisyphus_conf_string: <% $.download_sisyphus_config.body.config %>
+                    sisyphus_conf_string: <% task(download_sisyphus_config).result.body.config %>
                 on-success:
                     - construct_report_body
 
@@ -147,7 +147,7 @@ workflows:
                     runfolder: "<% $.runfolder_name %>"
                     sisyphus_config: "<% $.sisyphus_conf_string %>"
                 publish:
-                    report_body: <% $.construct_report_body.stdout %>
+                    report_body: <% task(construct_report_body).result.stdout %>
                 on-success:
                     - run_sisyphus_quick_report
 
@@ -159,7 +159,7 @@ workflows:
                     headers: "Content-Type=application/json"
                     body: <% $.report_body %>
                 publish:
-                    report_status_url: "<% $.run_sisyphus_quick_report.body.link %>"
+                    report_status_url: <% task(run_sisyphus_quick_report).result.body.link %>
                 on-success:
                     - poll_report_status
 
@@ -178,7 +178,7 @@ workflows:
                     url: <% $.hermes_base_url %>/<% $.flowcell_name %>/qcfile
                     headers: USER=<% $.hermes_user %>&X-XSRF-TOKEN=<% $.hermes_token %>
                 publish:
-                    qc_conf_string: <% $.download_qc_config.body.qc %>
+                    qc_conf_string: <% task(download_qc_config).result.body.qc %>
                 on-success:
                     - construct_qc_body
 
@@ -188,7 +188,7 @@ workflows:
                     runfolder: "<% $.runfolder_name %>"
                     qc_config: "<% $.qc_conf_string %>"
                 publish:
-                    qc_body: <% $.construct_qc_body.stdout %>
+                    qc_body: <% task(construct_qc_body).result.stdout %>
                 on-success:
                     - run_sisyphus_qc
 
@@ -200,7 +200,7 @@ workflows:
                     headers: "Content-Type=application/json"
                     body: <% $.qc_body %>
                 publish:
-                    qc_status_url: "<% $.run_sisyphus_qc.body.link %>"
+                    qc_status_url: "<% task(run_sisyphus_qc).result.body.link %>"
                 on-success:
                     - poll_qc_status
 
@@ -238,8 +238,8 @@ workflows:
                     url: <% $.hermes_base_url %>/<% $.flowcell_name %>/flowcell/analysishostinfo
                     headers: USER=<% $.hermes_user %>&X-XSRF-TOKEN=<% $.hermes_token %>
                on-success:
-                    - rsync_to_milou: <% 'milou-b.uppmax.uu.se' in $.check_hosts_to_rsync_to.body.remote_hosts %>
-                    - rsync_to_irma: <% 'irma.uppmax.uu.se' in $.check_hosts_to_rsync_to.body.remote_hosts %>
+                    - rsync_to_milou: <% 'milou-b.uppmax.uu.se' in task(check_hosts_to_rsync_to).result.body.remote_hosts %>
+                    - rsync_to_irma: <% 'irma.uppmax.uu.se' in task(check_hosts_to_rsync_to).result.body.remote_hosts %>
 
             rsync_to_milou:
                 action: arteria-packs.sync_workflow
