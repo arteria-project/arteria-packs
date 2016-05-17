@@ -34,23 +34,23 @@ workflows:
             get_config:
               action: arteria-packs.get_pack_config
               publish:
-                hermes_base_url: <% $.get_config.result.hermes_base_url %>
-                hermes_user: <% $.get_config.result.hermes_user %>
-                hermes_token: <% $.get_config.result.hermes_token %>
-                remote_host: <% $.get_config.result.remote_host %>
-                remote_user: <% $.get_config.result.remote_user%>
-                remote_destination: <% $.get_config.result.remote_destination %>
-                summary_host: <% $.get_config.result.summary_host %>
-                summary_user: <% $.get_config.result.summary_user %>
-                summary_destination: <% $.get_config.result.summary_destination %>
-                siswrap_service_port: <% $.get_config.result.siswrap_service_port %>
-                bcl2fastq_service_port: <% $.get_config.result.bcl2fastq_service_port %>
-                runfolder_service_port: <% $.get_config.result.runfolder_service_port %>
-                send_mail_to: <% $.get_config.result.send_mail_to %>
-                remote_sisyphus_location: <% $.get_config.result.remote_sisyphus_location %>
-                nestor_remote_path: <% $.get_config.result.nestor_remote_path %>
-                irma_remote_path: <% $.get_config.result.irma_remote_path %>
-                ngi_pipeline_url: <% $.get_config.result.ngi_pipeline_url %>
+                hermes_base_url: <% task(get_config).result.result.hermes_base_url %>
+                hermes_user: <% task(get_config).result.result.hermes_user %>
+                hermes_token: <% task(get_config).result.result.hermes_token %>
+                remote_host: <% task(get_config).result.result.remote_host %>
+                remote_user: <% task(get_config).result.result.remote_user%>
+                remote_destination: <% task(get_config).result.result.remote_destination %>
+                summary_host: <% task(get_config).result.result.summary_host %>
+                summary_user: <% task(get_config).result.result.summary_user %>
+                summary_destination: <% task(get_config).result.result.summary_destination %>
+                siswrap_service_port: <% task(get_config).result.result.siswrap_service_port %>
+                bcl2fastq_service_port: <% task(get_config).result.result.bcl2fastq_service_port %>
+                runfolder_service_port: <% task(get_config).result.result.runfolder_service_port %>
+                send_mail_to: <% task(get_config).result.result.send_mail_to %>
+                remote_sisyphus_location: <% task(get_config).result.result.remote_sisyphus_location %>
+                nestor_remote_path: <% task(get_config).result.result.nestor_remote_path %>
+                irma_remote_path: <% task(get_config).result.result.irma_remote_path %>
+                ngi_pipeline_url: <% task(get_config).result.result.ngi_pipeline_url %>
               on-success:
                  - mark_as_started
 
