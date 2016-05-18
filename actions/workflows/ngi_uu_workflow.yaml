@@ -87,7 +87,9 @@ workflows:
                 action: core.http
                 input:
                     url: <% $.hermes_base_url %>/<% $.flowcell_name %>/samplesheetfile
-                    headers: "USER=<% $.hermes_user %>&X-XSRF-TOKEN=<% $.hermes_token %>"
+                    headers: 
+                        USER: <% $.hermes_user %>
+                        X-XSRF-TOKEN: <% $.hermes_token %>
                 publish:
                     samplesheet_string: <% task(download_samplesheet).result.body.samplesheet %>
                 on-success:
