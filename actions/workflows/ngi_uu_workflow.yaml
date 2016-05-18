@@ -117,7 +117,8 @@ workflows:
                 input:
                     url: "http://<% $.host %>:<% $.bcl2fastq_service_port %>/api/1.0/start/<% $.runfolder_name %>"
                     method: "POST"
-                    headers: "Content-Type=application/json"
+                    headers:
+                        Content-Type: application/json
                     body: <% $.bcl2fastq_body %>
                 publish:
                     bcl2fastq_status_url: <% task(run_bcl2fastq).result.body.link %>
@@ -137,7 +138,9 @@ workflows:
                 action: core.http
                 input:
                     url: <% $.hermes_base_url %>/<% $.flowcell_name %>/configfile
-                    headers: USER=<% $.hermes_user %>&X-XSRF-TOKEN=<% $.hermes_token %>
+                    headers:
+                      USER: <% $.hermes_user %>
+                      X-XSRF-TOKEN: <% $.hermes_token %>
                 publish:
                     sisyphus_conf_string: <% task(download_sisyphus_config).result.body.config %>
                 on-success:
@@ -158,7 +161,8 @@ workflows:
                 input:
                     url: "http://<% $.host %>:<% $.siswrap_service_port %>/api/1.0/report/run/<% $.runfolder_name %>"
                     method: "POST"
-                    headers: "Content-Type=application/json"
+                    headers:
+                      Content-Type: application/json
                     body: <% $.report_body %>
                 publish:
                     report_status_url: <% task(run_sisyphus_quick_report).result.body.link %>
@@ -178,7 +182,9 @@ workflows:
                 action: core.http
                 input:
                     url: <% $.hermes_base_url %>/<% $.flowcell_name %>/qcfile
-                    headers: USER=<% $.hermes_user %>&X-XSRF-TOKEN=<% $.hermes_token %>
+                    headers:
+                      USER: <% $.hermes_user %>
+                      X-XSRF-TOKEN: <% $.hermes_token %>
                 publish:
                     qc_conf_string: <% task(download_qc_config).result.body.qc %>
                 on-success:
@@ -199,7 +205,8 @@ workflows:
                 input:
                     url: "http://<% $.host %>:<% $.siswrap_service_port %>/api/1.0/qc/run/<% $.runfolder_name %>"
                     method: "POST"
-                    headers: "Content-Type=application/json"
+                    headers:
+                      Content-Type: application/json
                     body: <% $.qc_body %>
                 publish:
                     qc_status_url: "<% task(run_sisyphus_qc).result.body.link %>"
@@ -238,7 +245,9 @@ workflows:
                action: core.http
                input:
                     url: <% $.hermes_base_url %>/<% $.flowcell_name %>/flowcell/analysishostinfo
-                    headers: USER=<% $.hermes_user %>&X-XSRF-TOKEN=<% $.hermes_token %>
+                    headers: 
+                      USER: <% $.hermes_user %>
+                      X-XSRF-TOKEN: <% $.hermes_token %>
                on-success:
                     - rsync_to_milou: <% 'milou-b.uppmax.uu.se' in task(check_hosts_to_rsync_to).result.body.remote_hosts %>
                     - rsync_to_irma: <% 'irma.uppmax.uu.se' in task(check_hosts_to_rsync_to).result.body.remote_hosts %>
