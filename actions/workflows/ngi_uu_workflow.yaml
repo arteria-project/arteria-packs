@@ -217,14 +217,9 @@ workflows:
                 action: arteria-packs.poll_status
                 input:
                     url: <% $.qc_status_url %>
+                    ignore_result: <% $.ignore_sisyphus_qc_result %>
                 on-success:
                     - rsync_to_summary_host
-                on-error:
-                    # When we choose to ignore the sisphus qc rsults, just move on
-                    # otherwise mark as failed and notify.
-                    - rsync_to_summary_host: <% $.ignore_sisyphus_qc_result %>
-                    - mark_as_failed: <% not $.ignore_sisyphus_qc_result %>
-                    - oh_shit_error: <% not $.ignore_sisyphus_qc_result %>
             ### QUALITY CONTROL END ###
 
             ### TRANSFER FILES TO UPPMAX START ###
