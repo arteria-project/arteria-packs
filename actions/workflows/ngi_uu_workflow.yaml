@@ -335,7 +335,7 @@ workflows:
                 input:
                     to: <% $.send_mail_to %>
                     subject: "'[ARTERIA] - Finished processing runfolder <% $.runfolder_name %>'"
-                    body: "Finished processing on <% $.host %> for <% $.runfolder_name %>: <% $.demultiplex_message %> <% $.report_message %> <% $.qc_message %>"
+                    body: "Finished processing on <% $.host %> for <% $.runfolder_name %>"
 
             oh_shit_error:
                 action: core.sendmail
