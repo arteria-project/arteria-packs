@@ -13,8 +13,16 @@ remote_user: arteria
 remote_destination: /tmp/runfolders/
 remote_sisyphus_location: /opt/arteria/arteria-siswrap-env/deps/sisyphus/sisyphus-latest
 
-ngi_pipeline_url: http://nestor1.uppmax.uu.se:6666/test_flowcell_analysis
+ngi_pipeline_url: https://irma1.uppmax.uu.se:4444/ngi_pipeline_upps
+
+irma_api_key: aaaaaaaaaaaaaaaaaaaaaaaaaaaaa 
 irma_remote_path: ./staging/
+irma_checksum_base_url: https://irma1.uppmax.uu.se:4444/arteria_checksum_staging/api/1.0
+irma_siswrap_base_url: https://irma1.uppmax.uu.se:4444/arteria_siswrap_staging/api/1.0
+
+irma_replace_expressions:
+ - 's/UPPNEX_PROJECT: a2009002/UPPNEX_PROJECT: ngi2016001/'
+ - 's/UPPNEX_QOS: seqver/#UPPNEX_QOS: seqver/'
 
 send_mail_to: example.mail.address@send.errors.to
 

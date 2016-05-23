@@ -1,0 +1,20 @@
+---
+name: test_irma_services
+description: >
+  Irma tests
+enabled: true
+runner_type: mistral-v2
+entry_point: workflows/test_irma_services.yaml
+pack: arteria-packs
+parameters:
+  context:
+    default: {}
+    immutable: true
+    type: object
+  workflow:
+    default: arteria-packs.test_irma_services
+    immutable: true
+    type: string
+  runfolder_name:
+    required: true
+    type: string

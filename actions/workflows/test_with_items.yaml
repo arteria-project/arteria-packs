@@ -1,0 +1,53 @@
+version: "2.0" # mistral version
+name: arteria-packs.test_with_items
+description: Test.
+
+workflows:
+    main:
+        type: direct
+        input:
+            - host
+            - runfolder
+
+        tasks:
+
+            get_config:
+              action: arteria-packs.get_pack_config
+              publish:
+                hermes_base_url: <% task(get_config).result.result.hermes_base_url %>
+                hermes_user: <% task(get_config).result.result.hermes_user %>
+                hermes_token: <% task(get_config).result.result.hermes_token %>
+                remote_host: <% task(get_config).result.result.remote_host %>
+                remote_user: <% task(get_config).result.result.remote_user%>
+                remote_destination: <% task(get_config).result.result.remote_destination %>
+                summary_host: <% task(get_config).result.result.summary_host %>
+                summary_user: <% task(get_config).result.result.summary_user %>
+                summary_destination: <% task(get_config).result.result.summary_destination %>
+                siswrap_service_port: <% task(get_config).result.result.siswrap_service_port %>
+                bcl2fastq_service_port: <% task(get_config).result.result.bcl2fastq_service_port %>
+                runfolder_service_port: <% task(get_config).result.result.runfolder_service_port %>
+                send_mail_to: <% task(get_config).result.result.send_mail_to %>
+                remote_sisyphus_location: <% task(get_config).result.result.remote_sisyphus_location %>
+                nestor_remote_path: <% task(get_config).result.result.nestor_remote_path %>
+                irma_remote_path: <% task(get_config).result.result.irma_remote_path %>
+                irma_api_key: <% task(get_config).result.result.irma_api_key %>
+                irma_checksum_base_url: <% task(get_config).result.result.irma_checksum_base_url %>
+                irma_siswrap_base_url: <% task(get_config).result.result.irma_siswrap_base_url %>
+                ngi_pipeline_url: <% task(get_config).result.result.ngi_pipeline_url %>
+                irma_replace_expressions: <% task(get_config).result.result.irma_replace_expressions %>
+              on-success:
+                 - make_irma_samplesheet_changes
+
+
+             # Irma requies specific values in the sisyphus.yml to work.
+             # This is a hack to replace those specific values for runs
+             # which are to be synced to irma.
+            make_irma_samplesheet_changes:
+               with-items: expression in <% $.irma_replace_expressions %>
+               action: core.local
+               input:
+                 cmd: ssh <% $.host %> sed -i -e \'<% $.expression %>\' <% $.runfolder %>/sisyphus.yml
+
+      # TODO Use these to rewrite parts or sisyphus.yml
+      #165  st2 run core.local cmd="ssh mm-xart002 cat /data/mm-xart002/runfolders/150925_M00485_0227_000000000-AHMWG/sisyphus.yml | sed -e 's/UPPNEX_PROJECT: a2009002/UPPNEX_PROJECT: myproject/'"
+      #166  st2 run core.local cmd="ssh mm-xart002 cat /data/mm-xart002/runfolders/150925_M00485_0227_000000000-AHMWG/sisyphus.yml | sed -e 's/UPPNEX_QOS: seqver/#UPPNEX_QOS: seqver/'"

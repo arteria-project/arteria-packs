@@ -1,0 +1,24 @@
+---
+name: test_with_items
+description: >
+  Test
+enabled: true
+runner_type: mistral-v2
+entry_point: workflows/test_with_items.yaml
+pack: arteria-packs
+parameters:
+  context:
+    default: {}
+    immutable: true
+    type: object
+  workflow:
+    default: arteria-packs.test_with_items
+    immutable: true
+    type: string
+  host:
+    required: true
+    type: string
+  runfolder:
+    required: true
+    type: string
+

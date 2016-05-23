@@ -37,9 +37,9 @@ class PollStatus(Action):
         logging.shutdown()
         sys.exit(returncode)
 
-    def query(self, url):
-        try:
-            resp = requests.get(url)
+    def query(self, url, verify_ssl_cert):
+        try:            
+            resp = requests.get(url, verify=verify_ssl_cert)
             state = resp.json()["state"]
             return state, resp
         except RequestException as err:
@@ -47,13 +47,14 @@ class PollStatus(Action):
             self.log("{0} -- {1} - an error was encountered: {2}".format(current_time, url, err))
             return None, None
 
-    def run(self, url, sleep, log, ignore_result, max_retries = 3):
+    def run(self, url, sleep, log, ignore_result, verify_ssl_cert , max_retries = 3):
         """
         Query the url end-point. Can be called directly from StackStorm, or via the script cli
         :param url: to call
         :param sleep: minutes to sleep between attempts
         :param log: file name to write log to
         :param ignore_result: return 0 exit status even if polling failed (for known errors).
+        :param verify_ssl_cert: Set to False to skip verifying the ssl cert when making requests
         :param max_retries: maximum number of retries
         :return: None
         """
@@ -64,7 +65,7 @@ class PollStatus(Action):
         while state == "started" or state == "pending":
             current_time = datetime.datetime.now()
 
-            state, resp = self.query(url)
+            state, resp = self.query(url, verify_ssl_cert)
 
             if state == "started" or state == "pending":
                 self.log("{0} -- {1} returned state {2}. Sleeping {3}m until retrying again...".format(current_time,
@@ -111,7 +112,10 @@ class PollStatus(Action):
 @click.option("--ignore_result", required = False,
               default = False,
               help = "Return 0 exit status even if polling failed.")
-def start(url, sleep, log, ignore_result):
+@click.option("--verify_ssl_cert/--skip_ssl_cert", required = False,
+              default = True,
+              help = "Verify SSL cert. Default is true.")
+def start(url, sleep, log, ignore_result, verify_ssl_cert):
     """ Accepts an URL to poll (e.g. http://testarteria1:10900/api/1.0/qc/status/4224)
         and sleeps a number of minutes between every poll (default 1 minute).
 
@@ -119,7 +123,7 @@ def start(url, sleep, log, ignore_result):
         Exits with an error if 'error' or 'none' is received, and with success if 'done'
         is received.
     """
-    PollStatus().run(url, sleep, log, ignore_result)
+    PollStatus().run(url, sleep, log, ignore_result, verify_ssl_cert)
 
 if __name__ == "__main__":
     start()
