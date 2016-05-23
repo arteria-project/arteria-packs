@@ -93,7 +93,7 @@ class PollStatus(Action):
                          "Probably due to a connection error, will retry. Attempt {3} of {4}.".format(current_time,
                                                                                                       url,
                                                                                                       retry_attempts,
-                                                                                                      retries))
+                                                                                                      max_retries))
                 time.sleep(sleep * 60)
             else:
                 self.log("{0} -- {1} returned state unknown state {2}. "
