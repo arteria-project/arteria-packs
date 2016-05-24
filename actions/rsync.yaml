@@ -46,5 +46,4 @@
         cmd:
             immutable: true
             default: 'ssh -v {{ source_host_user }}@{{ source_host }} rsync {{args}} {% if include_file %} --include-from {{ include_file }}  {% endif %}{{source}} {{dest_user}}@{{dest_server}}:{{destination}}/'
-            position: 0
 

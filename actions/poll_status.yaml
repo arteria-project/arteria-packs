@@ -20,6 +20,12 @@ parameters:
         required: false
         position: 2
         default: 1
+    ignore_result:
+        type: boolean
+        description: Allows manually overriding the result, e.g. even script will return 0 exit status even if polling failed. Useful for e.g. overriding qc result checking.
+        required: false
+        position: 2
+        default: false
     log:
         type: string
         description: Path to log file (default /var/log/arteria/poll_status.log)
