@@ -15,7 +15,7 @@ remote_sisyphus_location: /opt/arteria/arteria-siswrap-env/deps/sisyphus/sisyphu
 
 ngi_pipeline_url: https://irma1.uppmax.uu.se:4444/ngi_pipeline_upps
 
-irma_api_key: aaaaaaaaaaaaaaaaaaaaaaaaaaaaa 
+irma_api_key: aaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 irma_remote_path: ./staging/
 irma_checksum_base_url: https://irma1.uppmax.uu.se:4444/arteria_checksum_staging/api/1.0
 irma_siswrap_base_url: https://irma1.uppmax.uu.se:4444/arteria_siswrap_staging/api/1.0

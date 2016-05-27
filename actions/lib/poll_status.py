@@ -38,7 +38,7 @@ class PollStatus(Action):
         sys.exit(returncode)
 
     def query(self, url, verify_ssl_cert):
-        try:            
+        try:
             resp = requests.get(url, verify=verify_ssl_cert)
             state = resp.json()["state"]
             return state, resp
