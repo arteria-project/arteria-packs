@@ -223,10 +223,19 @@ workflows:
                     url: <% $.qc_status_url %>
                     ignore_result: <% $.ignore_sisyphus_qc_result %>
                 on-success:
-                    - rsync_to_summary_host
+                    - get_year
             ### QUALITY CONTROL END ###
 
             ### TRANSFER FILES TO UPPMAX START ###
+            get_year:
+              action: core.local
+              input:
+                cmd: echo 20$(echo <% $.runfolder_name %> | cut -c1-2)
+              publish:
+                current_year: <% task(get_year).result.stdout %>
+              on-success:
+                - rsync_to_summary_host
+
             rsync_to_summary_host:
                 action: arteria-packs.rsync
                 input:
@@ -235,7 +244,7 @@ workflows:
                     source_host_user: "arteria"
                     dest_server: <% $.summary_host %>
                     dest_user: <% $.summary_user %>
-                    destination: <% $.summary_destination %>
+                    destination: <% $.summary_destination %>/<% $.current_year %>
                     include_file: /etc/arteria/misc/summary.rsync
                 on-success:
                     - check_hosts_to_rsync_to
