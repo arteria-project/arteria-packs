@@ -53,12 +53,13 @@ def main():
     # Required arguments
     parser.add_argument('--directory', required=True, help='Root directory to search for runfolders in.')
     parser.add_argument('--modtime', required=True, help='The summary file needs to be older than this')
-    parser.add_argument('--debug', required=False, action='store_true', help='Set to debug mode, possible value 0 or 1.')
+    parser.add_argument('--debug', required=False, action='store_true', help='Set to debug mode, possible value 0 :wor 1.')
     parser.set_defaults(debug=False)
     try:
         args = parser.parse_args()
     except Exception as e:
-        print sys.argv[0]
+        parser.print_help()
+        sys.exit(1)
 
     path_to_search = args.directory
     minimum_summary_report_age = int(args.modtime)
@@ -70,7 +71,7 @@ def main():
         logger.setLevel(logging.INFO)
 
     logger.debug("minimum file age: {0}".format(minimum_summary_report_age))
-    runfolder_list = [name for name in os.listdir(path_to_search) if os.path.isdir(os.path.join(path_to_search, name))]
+    runfolder_list = (name for name in os.listdir(path_to_search) if os.path.isdir(os.path.join(path_to_search, name)))
     old_enough_runfolders = list(get_old_enough_runfolders(path_to_search, minimum_summary_report_age, runfolder_list))
     print(json.dumps(old_enough_runfolders))
 
