@@ -13,7 +13,7 @@ parameters:
     required: true
   modtime:
     type: integer
-    description: 'Minumum modtime in seconds for the summary report file'
+    description: 'Minimum modtime in seconds for the summary report file'
     required: true
   debug:
     type: boolean
