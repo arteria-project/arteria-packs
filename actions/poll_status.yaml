@@ -26,6 +26,12 @@ parameters:
         required: false
         position: 2
         default: false
+    verify_ssl_cert:
+        type: boolean
+        description: Verify the ssl cert if using https, default is true.
+        required: false
+        position: 3
+        default: true
     log:
         type: string
         description: Path to log file (default /var/log/arteria/poll_status.log)
