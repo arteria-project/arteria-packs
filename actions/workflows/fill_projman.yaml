@@ -1,0 +1,93 @@
+version: "2.0" # mistral version
+name: arteria-packs.fill_projman
+description: Downloads summary statistics data from irma and fills the projman database.
+
+workflows:
+    main:
+        type: direct
+        input:
+          - year
+
+        tasks:
+            note_workflow_version:
+              action: core.local
+              input:
+                cmd: git rev-parse HEAD
+                cwd: /opt/stackstorm/packs/arteria-packs/
+              on-success:
+                  - get_config
+
+            get_config:
+              action: arteria-packs.get_pack_config
+              publish:
+                summary_host: <% task(get_config).result.result.summary_host %>
+                summary_user: <% task(get_config).result.result.summary_user %>
+                summary_destination: <% task(get_config).result.result.summary_destination %>
+                irma_remote_path: <% task(get_config).result.result.irma_remote_path %>
+              on-success:
+                 - get_year
+
+            get_year:
+              action: core.local
+              input:
+                # -1 is the default value of year - indicating that the current year should be used
+                cmd: if [ -1 -eq <% $.year %> ]; then date +%Y; else echo <% $.year %>; fi
+              publish:
+                current_year: <% task(get_year).result.stdout %>
+              on-success:
+                - check_for_runfolders
+
+            check_for_runfolders:
+              action: arteria-packs.get_remote_folder_list
+              input:
+                directory: <% $.summary_destination %>/<% $.current_year %>/
+                username: <% $.summary_user %>
+                hosts: <% $.summary_host %>
+              publish:
+                runfolders: <% task(check_for_runfolders).result.get($.summary_host).stdout %>
+              on-success:
+                - rsync_from_irma
+
+            rsync_from_irma:
+              action: core.remote
+              with-items: runfolder in <% $.runfolders %>
+              input:
+                # Note:
+                # - that modtimes are preserved here so that we can check downstream
+                #   that required files are old enough.
+                # - that this will always return 0 exit status and that this is a potential source or problems.
+                #   Since we cannot know before hand if a report directory exists or not, we will attempt to transfer
+                #   regardless of this. If this fails (and rsync returns code 23) we will ignore this, and this might
+                #   potentially leading to us missing real errors.
+                # - Filtering for downstream insertion into the database is carried out by the check_reports_old_enough
+                #   which will only return the runfolders with valid summary reports for processing.
+                cmd: rsync -e "ssh -i /home/seqsum/.ssh/mm-xlas002" -r --times funk_901@irma1.uppmax.uu.se:<% $.irma_remote_path %>/<% $.runfolder %>/Summary <% $.summary_destination %>/<% $.current_year %>/<% $.runfolder %>/; if (( $? == 0 || $? == 23 )) ; then true; else false; fi
+                hosts: <% $.summary_host %>
+                username: <% $.summary_user %>
+              on-complete:
+                - check_reports_old_enough
+
+            check_reports_old_enough:
+              action: arteria-packs.check_summary_report_modtime
+              input:
+                directory: <% $.summary_destination %>/<% $.current_year %>/
+                username: <% $.summary_user %>
+                hosts: <% $.summary_host %>
+                # Require the summary report file to be at least 20 min old.
+                # This avoids trying to read a report into the db
+                # for which the report job has not yet been finished.
+                modtime: 1200
+              publish:
+                filtered_runfolders: <% task(check_reports_old_enough).result.get($.summary_host).stdout %>
+              on-success:
+                - load_data_into_projman
+
+            load_data_into_projman:
+              action: core.remote
+              with-items: ready_runfolder in <% $.filtered_runfolders %>
+              input:
+                cmd: /home/seqsum/ProjMan/readResults.pl <% $.summary_destination %>/<% $.current_year %>/<% $.ready_runfolder %>/
+                cwd: /home/seqsum
+                username: <% $.summary_user %>
+                hosts: <% $.summary_host %>
+
