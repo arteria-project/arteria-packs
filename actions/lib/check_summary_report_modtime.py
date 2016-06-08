@@ -53,7 +53,7 @@ def main():
     # Required arguments
     parser.add_argument('--directory', required=True, help='Root directory to search for runfolders in.')
     parser.add_argument('--modtime', required=True, help='The summary file needs to be older than this')
-    parser.add_argument('--debug', required=False, action='store_true', help='Set to debug mode, possible value 0 :wor 1.')
+    parser.add_argument('--debug', required=False, action='store_true', help='Set to debug mode, possible value 0 or 1.')
     parser.set_defaults(debug=False)
     try:
         args = parser.parse_args()
