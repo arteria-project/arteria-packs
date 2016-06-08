@@ -55,9 +55,12 @@ workflows:
                 # Note:
                 # - that modtimes are preserved here so that we can check downstream
                 #   that required files are old enough.
-                # - that this will always return 0 exit status. Since we cannot know before hand if a
-                #   report directory exists or not. the check_reports_old_enough will only return the
-                #   runfolders with valid summary reports for processing.
+                # - that this will always return 0 exit status and that this is a potential source or problems.
+                #   Since we cannot know before hand if a report directory exists or not, we will attempt to transfer
+                #   regardless of this. If this fails (and rsync returns code 23) we will ignore this, and this might
+                #   potentially leading to us missing real errors.
+                # - Filtering for downstream insertion into the database is carried out by the check_reports_old_enough
+                #   which will only return the runfolders with valid summary reports for processing.
                 cmd: rsync -e "ssh -i /home/seqsum/.ssh/mm-xlas002" -r --times funk_901@irma1.uppmax.uu.se:<% $.irma_remote_path %>/<% $.runfolder %>/Summary <% $.summary_destination %>/<% $.current_year %>/<% $.runfolder %>/; if (( $? == 0 || $? == 23 )) ; then true; else false; fi
                 hosts: <% $.summary_host %>
                 username: <% $.summary_user %>
