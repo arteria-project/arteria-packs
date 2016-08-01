@@ -1,0 +1,23 @@
+language: python
+python: 2.7
+sudo: false
+os:
+  - linux
+services:
+  # Note: MongoDB and RabbitMQ is needed for packs-resource-register check
+  - mongodb
+  - rabbitmq
+addons:
+  apt:
+    packages:
+      - git
+install:
+  - virtualenv venv
+  - source venv/bin/activate && pip install --upgrade pip
+  - source venv/bin/activate && pip install -r requirements.txt
+  - source venv/bin/activate && pip install -r requirements-test.txt
+  - "source venv/bin/activate && pip install --no-cache-dir --no-binary :all: --upgrade --force-reinstall greenlet"
+  - ./utils/prepare_test_env.sh
+script:
+  - ./utils/run_tests.sh /home/travis/build/arteria-project/arteria-packs/
+  - ./utils/st2-check-register-pack-resources utils/st2.travis.tests.conf /home/travis/build/arteria-project/arteria-packs/

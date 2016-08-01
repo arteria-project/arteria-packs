@@ -3,7 +3,7 @@ name: poll_status
 runner_type: run-python
 description: Polls an URL until the web service says that the long process has finished
 enabled: true
-entry_point: lib/poll_status.py
+entry_point: poll_status.py
 parameters:
     timeout:
         # Use a default timeout of 24 hour. "No timout" is fixed in a new version
