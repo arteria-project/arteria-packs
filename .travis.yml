@@ -1,0 +1,22 @@
+language: python
+python: 2.7
+sudo: false
+os:
+  - linux
+services:
+  # Note: MongoDB and RabbitMQ is needed for packs-resource-register check
+  - mongodb
+  - rabbitmq
+addons:
+  apt:
+    packages:
+      - git
+install:
+  - pip install --upgrade pip
+  - curl -sSL https://stackstorm.com/packages/install.sh | bash -s -- stable
+  - pip install -r requirements.txt
+  - pip install -r requirements-test.txt
+  - git clone https://github.com/StackStorm/st2.git --depth 1 --single-branch --branch v1.5.1 /tmp/st2  
+script:
+  - /tmp/st2/st2common/bin/st2-run-pack-tests -p $PWD
+  - st2-check-register-pack-resources $PWD
