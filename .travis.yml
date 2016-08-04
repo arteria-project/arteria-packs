@@ -13,7 +13,6 @@ addons:
       - git
 install:
   - pip install --upgrade pip
-  - curl -sSL https://stackstorm.com/packages/install.sh | bash -s -- stable
   - pip install -r requirements.txt
   - pip install -r requirements-test.txt
   - git clone https://github.com/StackStorm/st2.git --depth 1 --single-branch --branch v1.5.1 /tmp/st2  
