@@ -17,7 +17,7 @@ install:
   - pip install -r requirements-test.txt
   - git clone https://github.com/StackStorm/st2.git --depth 1 --single-branch --branch v1.5.1 /tmp/st2 
   # Super hacky work-around for the problem of the st2.tests.conf having a hard-coded path to the packs in it
-  - sed -e 's/packs_base_paths = packs\//packs_base_paths = $(dirname $PWD)/'g $(find $(dirname which st2-check-register-pack-resources) -name st2.tests.conf | head -1)
+  - sed -i -e 's/packs_base_paths = packs\//packs_base_paths = $(dirname $PWD)/'g $(find $(dirname $(which st2-check-register-pack-resources)) -name st2.tests.conf | head -1)
 script:
   - /tmp/st2/st2common/bin/st2-run-pack-tests -p $PWD
   - st2-check-register-pack-resources $PWD
