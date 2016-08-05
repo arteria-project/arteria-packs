@@ -8,6 +8,31 @@ StackStorm pack to setup automation workflow taking data from the sequencer to d
 If you are using the `arteria-provisioning` this directory should be mounted under the `/opt/stackstorm/packs/arteria-packs` 
 (make sure to set the path in the Vagrant file). To load all actions, rules, etc, run `st2 run packs.load register=all`.
 
+Testing
+-------
+# Setup virtualenv
+virtualenv venv
+source venv/bin/activate
+
+# Ensure you have the latest version of pip
+pip install --upgrade pip
+
+# Install packs requirements
+pip install -r requirements.txt
+pip install -r requirements-test.txt
+
+# Checkout and install st2 requirements
+git clone https://github.com/StackStorm/st2.git --depth 1 --single-branch --branch v1.5.1 /tmp/st2
+pip install -r /tmp/st2/requirements.txt
+pip install -r /tmp/st2/test-requirements.txt
+
+# Run the tests
+./utils/run_tests.sh -p /arteria-packs/
+
+
+
+
+
 Getting an authentication token
 -------------------------------
 
