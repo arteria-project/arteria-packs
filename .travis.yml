@@ -19,5 +19,4 @@ install:
   # Super hacky work-around for the problem of the st2.tests.conf having a hard-coded path to the packs in it
   - mkdir packs && ln -s $PWD packs/arteria-packs
 script:
-  - /tmp/st2/st2common/bin/st2-run-pack-tests -p $PWD
-  - st2-check-register-pack-resources $PWD
+  - make all
