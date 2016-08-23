@@ -5,9 +5,6 @@ NOTE: This is very much a work in progress, mostly containing dummy workflows so
 
 StackStorm pack to setup automation workflow taking data from the sequencer to delivery on the remote host...
 
-If you are using the `arteria-provisioning` this directory should be mounted under the `/opt/stackstorm/packs/arteria-packs` 
-(make sure to set the path in the Vagrant file). To load all actions, rules, etc, run `st2 run packs.load register=all`.
-
 Development and testing
 -----------------------
 To make development and testing of arteria-packs simpler, we provide a Vagrant environment (this requires that VirtualBox is installed on your system).
@@ -20,7 +17,7 @@ vagrant up
 vagrant ssh
 
 # Then go to the vagrant synced folder which contains this code
-cd /arteria-packs
+cd /vagrant
 
 # Now you can start developing on the packs
 
@@ -39,7 +36,7 @@ cd /arteria-packs
 ./utils/run_tests.sh
 
 # To test registering all pack components run
-./utils/st2-check-register-pack-resources
+./utils/st2-check-register-pack-resources utils/st2.tests.conf
 ```
 
 Getting an authentication token
