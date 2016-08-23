@@ -30,47 +30,10 @@ function join { local IFS="$1"; shift; echo "$*"; }
 # Script beings here
 ####################
 
-function usage() {
-    echo "Usage: $0 [-x] -p <path to pack>" >&2
-}
+PACK_PATH=$PWD
+ST2_REPO_PATH="./st2/"
 
-while getopts ":p:xv" o; do
-    case "${o}" in
-        p)
-            PACK_PATH=${OPTARG}
-            ;;
-        \?)
-            echo "Invalid option: -$OPTARG" >&2
-            usage
-            exit 2
-            ;;
-        :)
-            echo "Option -$OPTARG requires an argument." >&2
-            usage
-            exit 2
-            ;;
-    esac
-done
-
-# TODO Fix this as parameter
-ST2_REPO_PATH="/tmp/st2/"
-
-if [ ! ${PACK_PATH} ]; then
-    # Missing required argument
-    usage
-    exit 2
-fi
-
-PACK_PATH=$(readlink -f ${PACK_PATH})
-if [ ! ${PACK_PATH} ]; then
-    echo "Usage: $0 -p <pack path> [-x]"
-    exit 2
-fi
-
-if [ ! -d ${PACK_PATH} ]; then
-    echo "Invalid pack path: ${PACK_PATH}"
-    exit 3
-fi
+source venv/bin/activate
 
 SCRIPT_PATH=$(readlink -f $0)
 DIRECTORY_PATH=$(dirname ${SCRIPT_PATH})
@@ -96,9 +59,6 @@ fi
 
 ST2_REPO_PATH=${ST2_REPO_PATH}
 
-PACK_REQUIREMENTS_FILE="${PACK_PATH}/requirements.txt"
-PACK_TESTS_REQUIREMENTS_FILE="${PACK_PATH}/requirements-tests.txt"
-
 echo "Running tests for pack: ${PACK_NAME}"
 
 # Note: If we are running outside of st2, we need to add all the st2 components
@@ -115,9 +75,6 @@ fi
 
 # Set PYTHONPATH, make sure it contains st2 components in PATH
 export PYTHONPATH="${PYTHONPATH}:${PACK_PYTHONPATH}"
-
-echo "PYTHONPATH"
-echo $PYTHONPATH
 
 echo "Running tests..."
 nosetests -s -v ${PACK_TESTS_PATH}
