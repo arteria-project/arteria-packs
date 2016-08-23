@@ -16,7 +16,6 @@ install:
   - pip install -r requirements.txt
   - pip install -r requirements-test.txt
   - pip install --no-cache-dir --no-binary :all: --upgrade --force-reinstall greenlet
-  - git clone https://github.com/StackStorm/st2.git --depth 1 --single-branch --branch v1.5.1 /tmp/st2
   - ./utils/prepare_test_env.sh
 script:
   - ./utils/run_tests.sh
