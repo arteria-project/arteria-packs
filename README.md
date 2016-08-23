@@ -22,11 +22,18 @@ vagrant ssh
 # Then go to the vagrant synced folder which contains this code
 cd /arteria-packs
 
-# No you can start developing on the packs
+# Now you can start developing on the packs
+
+# Note that all the scripts run below this point assume that your current
+# working directory is the packs directory i.e. /arteria-packs in
+# the vagrant environment
 
 # Prepare the test environment environment (this only needs to be
 # done when setting up for the first time), run this:
 ./utils/prepare_test_env.sh
+
+# Note that this will checkout the st2 repo and create a virtual env called
+# venv in the working directory
 
 # Run the tests
 ./utils/run_tests.sh
