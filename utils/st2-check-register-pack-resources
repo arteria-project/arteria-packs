@@ -14,8 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# DOCS
+# This script has been adopted from st2-check-register-pack-resources
+# provided by StackStorm, but has been modified to work more easily
+# in the arteria-packs environment.
 #
-# Script which tries to register all the resources from a particular pack and
+# The script which tries to register all the resources from a particular pack and
 # fails (exits with non-zero) if registering a particular resource fails.
 #
 
