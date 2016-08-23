@@ -30,7 +30,7 @@ function join { local IFS="$1"; shift; echo "$*"; }
 # Script beings here
 ####################
 
-PACK_PATH=$PWD
+PACK_PATH=/opt/stackstorm/packs/arteria-packs
 ST2_REPO_PATH="./st2/"
 
 source venv/bin/activate

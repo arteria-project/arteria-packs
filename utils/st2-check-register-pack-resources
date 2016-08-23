@@ -30,11 +30,11 @@ else
 fi
 
 
-CONFIG_FILE=${1:-/st2.tests.conf}
+CONFIG_FILE=$1
 
 source ${SCRIPT_PATH}/common.sh
 
-PACK_PATH=$PWD
+PACK_PATH="/opt/stackstorm/packs/arteria-packs"
 PACK_NAME=$(basename ${PACK_PATH})
 
 ST2_REPO_PATH="st2/"

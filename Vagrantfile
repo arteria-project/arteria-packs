@@ -3,6 +3,7 @@
 
 arteriauser    = ENV['ST2USER'] ? ENV['ST2USER']: 'arteriaadmin'
 arteriapasswd  = ENV['ST2PASSWORD'] ? ENV['ST2PASSWORD'] : 'arteriarulz'
+st2version     = File.read('utils/st2.version.txt')
 
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
 VAGRANTFILE_API_VERSION = "2"
@@ -19,22 +20,18 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       vb.cpus = 2
     end
 
-    # NFS-synced directory for pack development
-    # Change "/path/to/directory/on/host" to point to existing directory on your laptop/host and uncomment:
-    config.vm.synced_folder "~/workspace/arteria/arteria-packs", "/arteria-packs", :nfs => true, :mount_options => ['nfsvers=3']
-    
     # Configure a private network
     arteria.vm.network :private_network, ip: "192.168.16.20"
 
     # Start shell provisioning.
     arteria.vm.provision "shell", 
-      inline: "sudo apt-get install -y curl python-virtualenv vim"
+      inline: "sudo apt-get update && sudo apt-get install -y curl python-virtualenv vim"
 
     arteria.vm.provision "shell", 
-      inline: "curl -sSL https://stackstorm.com/packages/install.sh | bash -s -- --user=#{arteriauser} --password=#{arteriapasswd} stable"
+      inline: "curl -sSL https://stackstorm.com/packages/install.sh | bash -s -- --user=#{arteriauser} --password=#{arteriapasswd} --version=#{st2version}"
 
     arteria.vm.provision "shell", 
-      inline: "ln -s /arteria-packs /opt/stackstorm/packs/arteria-packs"
+      inline: "ln -s /vagrant /opt/stackstorm/packs/arteria-packs"
 
   end
 
