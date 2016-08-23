@@ -25,9 +25,12 @@ else
     SCRIPT_PATH=$(dirname "$(readlink -f "$0")")
 fi
 
+
+CONFIG_FILE=${1:-/st2.tests.conf}
+
 source ${SCRIPT_PATH}/common.sh
 
-PACK_PATH="/arteria-packs"
+PACK_PATH=$PWD
 PACK_NAME=$(basename ${PACK_PATH})
 
 ST2_REPO_PATH="st2/"
@@ -36,7 +39,7 @@ PACK_PYTHONPATH=$(join ":" ${ST2_COMPONENTS})
 
 REGISTER_SCRIPT_PATH="${ST2_REPO_PATH}/st2common/bin/st2-register-content"
 # Note: -v verbose flag has been removed to work around Travis log size limits
-REGISTER_SCRIPT_COMMON_FLAGS="--register-fail-on-failure --config-file=${SCRIPT_PATH}/st2.tests.conf"
+REGISTER_SCRIPT_COMMON_FLAGS="--register-fail-on-failure --config-file=${CONFIG_FILE}"
 
 REGISTER_SCRIPT_REGISTER_FLAGS="--register-all"
 

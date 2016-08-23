@@ -20,4 +20,4 @@ install:
   - ./utils/prepare_test_env.sh
 script:
   - ./utils/run_tests.sh
-  - ./utils/st2-check-register-pack-resources
+  - ./utils/st2-check-register-pack-resources utils/st2.travis.tests.conf
