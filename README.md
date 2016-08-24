@@ -36,7 +36,8 @@ cd /vagrant
 ./utils/run_tests.sh /opt/stackstorm/packs/arteria-packs
 
 # To test registering all pack components run
-./utils/st2-check-register-pack-resources utils/st2.tests.conf
+./utils/st2-check-register-pack-resources utils/st2.tests.conf /opt/stackstorm/packs/arteria-packs
+
 ```
 
 Getting an authentication token
