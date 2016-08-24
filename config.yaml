@@ -34,3 +34,8 @@ siswrap_service_port: 10700
 runfolder_svc_urls:
   - http://testarteria1:10800
 
+charon_api_token: dummy_token
+charon_base_url: http://charon.url
+slack_webhook_url: https://slack.webhook.url
+charon_status_report_slack_channel: "#bottest"
+
