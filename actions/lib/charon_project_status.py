@@ -48,10 +48,11 @@ class CharonProjects(object):
 
 class SlackNotifier():
 
-    def __init__(self, base_url):
+    def __init__(self, base_url, channel):
         self.session = requests.Session()
         self.headers = {'content-type': 'application/json'}
         self.base_url = base_url
+        self.channel = channel
 
     def post_message(self, message):
         attachments = [{
@@ -63,7 +64,7 @@ class SlackNotifier():
                         "icon_emoji": ":see_no_evil:",
                         "attachments": attachments,
                         "mrkdwn": "true",
-                        "channel": "#bottest"}
+                        "channel": self.channel}
         response = self.session.post(self.base_url, json=json_message)
         return response.status_code
 
@@ -79,7 +80,8 @@ class CharonProjectStatus(Action):
         chcon.pretty_print(open_projects, output_handle)
         message = output_handle.getvalue()
         try:
-            sn = SlackNotifier(base_url=self.config["slack_webhook_url"])
+            sn = SlackNotifier(base_url=self.config["slack_webhook_url"],
+                               channel=self.config["charon_status_report_slack_channel"])
             sn.post_message(message)
         except Exception as e:
             print("Could not post to Slack:")
