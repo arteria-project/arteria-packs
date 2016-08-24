@@ -18,6 +18,8 @@ install:
   - source venv/bin/activate && pip install -r requirements-test.txt
   - "source venv/bin/activate && pip install --no-cache-dir --no-binary :all: --upgrade --force-reinstall greenlet"
   - ./utils/prepare_test_env.sh
+  # Ensure we get a correct value in the config on the travis build
+  - sed -i "s,packs_base_paths = /opt/stackstorm/packs,packs_base_paths = $TRAVIS_BUILD_DIR," utils/st2.tests.conf
 script:
   - ./utils/run_tests.sh $TRAVIS_BUILD_DIR/
-  - ./utils/st2-check-register-pack-resources utils/st2.travis.tests.conf $TRAVIS_BUILD_DIR/
+  - ./utils/st2-check-register-pack-resources utils/st2.tests.conf $TRAVIS_BUILD_DIR/
