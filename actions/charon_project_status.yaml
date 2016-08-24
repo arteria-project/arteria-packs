@@ -1,0 +1,7 @@
+---
+name: charon_project_status
+description: Check the general Charon project status and post it to slack
+enabled: true
+runner_type: run-python
+entry_point: lib/charon_project_status.py
+pack: arteria-packs

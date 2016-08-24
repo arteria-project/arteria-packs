@@ -1,0 +1,19 @@
+---
+name: "arteria-packs.charon_project_status"
+pack: "arteria-packs"
+description: "Attempts to get the status OPEN projects in Charon and posts them to a Slack channel"
+enabled: true
+
+trigger:
+    type: "core.st2.CronTimer"
+    parameters:
+      timezone: "UTC"
+      day_of_week: "mon"
+      hour: 7
+      minute: 0
+      second: 0
+
+action:
+    ref: "arteria-packs.charon_project_status"
+
+
