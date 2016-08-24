@@ -45,14 +45,6 @@ SENSORS_PATH="${PACK_PATH}/sensors/"
 ACTIONS_PATH="${PACK_PATH}/actions/"
 ETC_PATH="${PACK_PATH}/etc/"
 
-# Bail early if no tests are found, this way we don't need to wait for
-# environment set up.
-if [  ! -d ${PACK_TESTS_PATH} ]; then
-    echo "Running tests for pack: ${PACK_NAME}"
-    echo "No tests found."
-    exit 0
-fi
-
 ###################
 # Environment setup
 ###################
