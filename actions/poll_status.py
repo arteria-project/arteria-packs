@@ -47,7 +47,7 @@ class PollStatus(Action):
             self.log("{0} -- {1} - an error was encountered: {2}".format(current_time, url, err))
             return None, None
 
-    def run(self, url, sleep, log, ignore_result, verify_ssl_cert , max_retries = 3):
+    def run(self, url, sleep, log, ignore_result, verify_ssl_cert, max_retries = 3):
         """
         Query the url end-point. Can be called directly from StackStorm, or via the script cli
         :param url: to call
@@ -62,7 +62,7 @@ class PollStatus(Action):
         state = "started"
         self.LOG_FILENAME = log
 
-        while state == "started" or state == "pending":
+        while state == "started" or state == "pending" or not state:
             current_time = datetime.datetime.now()
 
             state, resp = self.query(url, verify_ssl_cert)
@@ -91,7 +91,7 @@ class PollStatus(Action):
             elif not state and retry_attempts < max_retries:
                 retry_attempts += 1
                 self.log("{0} -- {1} did not report state. "
-                         "Probably due to a connection error, will retry. Attempt {3} of {4}.".format(current_time,
+                         "Probably due to a connection error, will retry. Attempt {2} of {3}.".format(current_time,
                                                                                                       url,
                                                                                                       retry_attempts,
                                                                                                       max_retries))
