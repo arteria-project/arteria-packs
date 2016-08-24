@@ -33,7 +33,7 @@ cd /vagrant
 # venv in the working directory
 
 # Run the tests
-./utils/run_tests.sh
+./utils/run_tests.sh /opt/stackstorm/packs/arteria-packs
 
 # To test registering all pack components run
 ./utils/st2-check-register-pack-resources utils/st2.tests.conf
