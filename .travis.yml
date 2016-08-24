@@ -19,5 +19,5 @@ install:
   - "source venv/bin/activate && pip install --no-cache-dir --no-binary :all: --upgrade --force-reinstall greenlet"
   - ./utils/prepare_test_env.sh
 script:
-  - ./utils/run_tests.sh /home/travis/build/arteria-project/arteria-packs/
-  - ./utils/st2-check-register-pack-resources utils/st2.travis.tests.conf /home/travis/build/arteria-project/arteria-packs/
+  - ./utils/run_tests.sh $TRAVIS_BUILD_DIR
+  - ./utils/st2-check-register-pack-resources utils/st2.travis.tests.conf $TRAVIS_BUILD_DIR
