@@ -167,8 +167,7 @@ workflows:
                     method: "POST"
                     headers:
                       Content-Type: application/json
-                    body:
-                      runfolder: <% $.runfolder_name %>
+                    body: <% $.report_body %>
                 publish:
                     report_status_url: <% task(run_sisyphus_quick_report).result.body.link %>
                 on-success:
@@ -190,7 +189,8 @@ workflows:
                     method: "POST"
                     headers:
                       Content-Type: application/json
-                    body: <% $.report_body %>
+                    body:
+                      runfolder: <% $.runfolder_name %>
                 publish:
                     sisyphus_check_indicies_status_url: <% task(run_sisyphus_check_indicies).result.body.link %>
                 on-success:
