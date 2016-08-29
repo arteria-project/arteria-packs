@@ -167,7 +167,8 @@ workflows:
                     method: "POST"
                     headers:
                       Content-Type: application/json
-                    body: <% $.report_body %>
+                    body:
+                      runfolder: <% $.runfolder_name %>
                 publish:
                     report_status_url: <% task(run_sisyphus_quick_report).result.body.link %>
                 on-success:
@@ -187,6 +188,9 @@ workflows:
                 input:
                     url: "http://<% $.host %>:<% $.siswrap_service_port %>/api/1.0/checkindices/run/<% $.runfolder_name %>"
                     method: "POST"
+                    headers:
+                      Content-Type: application/json
+                    body: <% $.report_body %>
                 publish:
                     sisyphus_check_indicies_status_url: <% task(run_sisyphus_check_indicies).result.body.link %>
                 on-success:
