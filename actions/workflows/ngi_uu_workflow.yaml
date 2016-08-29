@@ -196,6 +196,7 @@ workflows:
                 action: arteria-packs.poll_status
                 input:
                     url: "<% $.sisyphus_check_indicies_status_url %>"
+                    ignore_result: <% $.ignore_sisyphus_qc_result %>
                 on-success:
                     - download_qc_config
             ### CHECK INDICIES END###
