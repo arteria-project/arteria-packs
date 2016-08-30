@@ -77,6 +77,7 @@ class PollStatus(Action):
                 self.log("{0} -- {1} returned state {2}. Will now stop polling the status.".format(current_time,
                                                                                                    url,
                                                                                                    state))
+                self.log(resp.json())
                 self.shutdown(0)
             elif state in ["error", "none", "cancelled"]:
                 self.log("{0} -- {1} returned state {2}. Will now stop polling the status.".format(current_time,
