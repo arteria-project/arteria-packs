@@ -203,9 +203,10 @@ workflows:
                     url: "<% $.sisyphus_check_indicies_status_url %>"
                     ignore_result: <% $.ignore_sisyphus_qc_result %>
                 on-success:
-                    - download_qc_config
-            ### CHECK INDICIES END###
-
+                    - notify_finished
+#                    - download_qc_config
+#            ### CHECK INDICIES END###
+#
 #            ### QUALITY CONTROL START ###
 #            download_qc_config:
 #                action: core.http
@@ -256,11 +257,11 @@ workflows:
 #              action: core.local
 #              input:
 #                cmd: echo 20$(echo <% $.runfolder_name %> | cut -c1-2)
-              publish:
-                current_year: <% task(get_year).result.stdout %>
-              on-success:
-                - rsync_to_summary_host
-
+#              publish:
+#                current_year: <% task(get_year).result.stdout %>
+#              on-success:
+#                - rsync_to_summary_host
+#
 #            rsync_to_summary_host:
 #                action: arteria-packs.rsync
 #                input:
@@ -342,13 +343,13 @@ workflows:
 #               input:
 #                    method: "POST"
 #                    url: <% $.irma_checksum_base_url %>/start/<% $.runfolder_name %>?apikey=<% $.irma_api_key %>
-                    body: '{"path_to_md5_sum_file": "MD5/checksums.md5"}'
-                    verify_ssl_cert: False
-               publish:
-                 md5sum_job_id: <% task(irma_check_md5sums).result.body.job_id %>
-               on-success:
-                 - poll_irma_check_md5sums
-
+#                    body: '{"path_to_md5_sum_file": "MD5/checksums.md5"}'
+#                    verify_ssl_cert: False
+#               publish:
+#                 md5sum_job_id: <% task(irma_check_md5sums).result.body.job_id %>
+#               on-success:
+#                 - poll_irma_check_md5sums
+#
 #            poll_irma_check_md5sums:
 #                action: arteria-packs.poll_status
 #                input:
@@ -421,14 +422,14 @@ workflows:
 #                input:
 #                    hosts: <% $.remote_host %>
 #                    username: <% $.remote_user %>
-                    cwd: <% $.remote_destination %>/<% $.runfolder_name %>
-                    cmd: <% $.remote_sisyphus_location %>/aeacus-reports.pl -runfolder <% $.remote_destination %>/<% $.runfolder_name %>
-                    env:
-                        PERL5LIB: /proj/a2009002/perl/lib/perl5/
-                on-success:
-                    - notify_finished
-                    - mark_as_finished
-            ## START AEACUS REPORT STEPS END ###
+#                    cwd: <% $.remote_destination %>/<% $.runfolder_name %>
+#                    cmd: <% $.remote_sisyphus_location %>/aeacus-reports.pl -runfolder <% $.remote_destination %>/<% $.runfolder_name %>
+#                    env:
+#                        PERL5LIB: /proj/a2009002/perl/lib/perl5/
+#                on-success:
+#                    - notify_finished
+#                    - mark_as_finished
+#            ## START AEACUS REPORT STEPS END ###
 
             ## START NGI_PIPELINE IF NECESSARY ##
             # TODO Make sure to setup new URL for ngi_pipeline
