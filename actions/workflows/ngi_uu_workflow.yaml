@@ -48,7 +48,6 @@ workflows:
                 runfolder_service_port: <% task(get_config).result.result.runfolder_service_port %>
                 send_mail_to: <% task(get_config).result.result.send_mail_to %>
                 remote_sisyphus_location: <% task(get_config).result.result.remote_sisyphus_location %>
-                nestor_remote_path: <% task(get_config).result.result.nestor_remote_path %>
                 irma_remote_path: <% task(get_config).result.result.irma_remote_path %>
                 irma_api_key: <% task(get_config).result.result.irma_api_key %>
                 irma_checksum_base_url: <% task(get_config).result.result.irma_checksum_base_url %>
@@ -56,11 +55,11 @@ workflows:
                 ngi_pipeline_url: <% task(get_config).result.result.ngi_pipeline_url %>
                 irma_replace_expressions: <% task(get_config).result.result.irma_replace_expressions %>
               on-success:
-                 - mark_as_started
+                 - get_runfolder_name
 
             mark_as_started:
               action: core.http
-              input:               
+              input:
                 url: http://<% $.host %>:<% $.runfolder_service_port %>/api/1.0/runfolders/path<% $.runfolder %>
                 body: '{"state": "started"}'
                 method: "POST"
@@ -91,7 +90,7 @@ workflows:
                 action: core.http
                 input:
                     url: <% $.hermes_base_url %>/<% $.flowcell_name %>/samplesheetfile
-                    headers: 
+                    headers:
                         USER: <% $.hermes_user %>
                         X-XSRF-TOKEN: <% $.hermes_token %>
                 publish:
@@ -189,8 +188,7 @@ workflows:
                     method: "POST"
                     headers:
                       Content-Type: application/json
-                    body:
-                      runfolder: <% $.runfolder_name %>
+                    body: '{"runfolder": "<% $.runfolder_name %>"}'
                 publish:
                     sisyphus_check_indicies_status_url: <% task(run_sisyphus_check_indicies).result.body.link %>
                 on-success:
