@@ -166,7 +166,8 @@ workflows:
                     method: "POST"
                     headers:
                       Content-Type: application/json
-                    body: <% $.report_body %>
+                    body:
+                      runfolder: <% $.runfolder_name %>
                 publish:
                     report_status_url: <% task(run_sisyphus_quick_report).result.body.link %>
                 on-success:
