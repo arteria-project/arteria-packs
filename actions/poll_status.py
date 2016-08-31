@@ -40,8 +40,7 @@ class PollStatus(Action):
     def query(self, url, verify_ssl_cert):
         try:
             resp = requests.get(url, verify=verify_ssl_cert)
-            state = resp.json()["state"]
-            return state, resp
+            return resp
         except RequestException as err:
             current_time = datetime.datetime.now()
             self.log("{0} -- {1} - an error was encountered: {2}".format(current_time, url, err))
@@ -65,7 +64,9 @@ class PollStatus(Action):
         while state == "started" or state == "pending" or not state:
             current_time = datetime.datetime.now()
 
-            state, resp = self.query(url, verify_ssl_cert)
+            resp = self.query(url, verify_ssl_cert)
+            json_resp = resp.json()
+            state = json_resp["state"]
 
             if state == "started" or state == "pending":
                 self.log("{0} -- {1} returned state {2}. Sleeping {3}m until retrying again...".format(current_time,
@@ -77,13 +78,13 @@ class PollStatus(Action):
                 self.log("{0} -- {1} returned state {2}. Will now stop polling the status.".format(current_time,
                                                                                                    url,
                                                                                                    state))
-                self.log(resp.json())
+                self.log(json_resp)
                 self.shutdown(0)
             elif state in ["error", "none", "cancelled"]:
                 self.log("{0} -- {1} returned state {2}. Will now stop polling the status.".format(current_time,
                                                                                                    url,
                                                                                                    state))
-                self.log(resp.json())
+                self.log(json_resp)
                 if ignore_result:
                     self.shutdown(0)
                 else:
