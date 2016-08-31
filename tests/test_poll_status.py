@@ -23,14 +23,12 @@ class PollStatusTestCase(BaseActionTestCase):
         with mock.patch.object(requests, 'get', return_value=self.MockResponse(state)):
             action = self.get_action_instance()
 
-            with self.assertRaises(SystemExit) as cm:
-                result = action.run(url='http://www.google.com',
-                                    sleep=0.02,
-                                    log="/dev/null",
-                                    ignore_result=ignore_results,
-                                    verify_ssl_cert=False,
-                                    max_retries=1)
-            self.assertTrue(cm.exception.code == expected_exit_status)
+            (exit_code, result) = action.run(url='http://www.google.com',
+                                sleep=0.02,
+                                ignore_result=ignore_results,
+                                verify_ssl_cert=False,
+                                max_retries=1)
+            self.assertTrue(exit_code == expected_exit_status)
 
     def test_done(self):
         self.run_with_state(state=["done"], expected_exit_status=0, ignore_results=False)
