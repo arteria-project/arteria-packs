@@ -180,7 +180,7 @@ workflows:
                     - run_sisyphus_check_indicies
             ### QUICK REPORT END ###
 
-            ### CHECK INDICIES START###
+            ### CHECK INDICES START###
             run_sisyphus_check_indicies:
                 action: core.http
                 input:
@@ -201,7 +201,7 @@ workflows:
                     ignore_result: <% $.ignore_sisyphus_qc_result %>
                 on-success:
                     - download_qc_config
-            ### CHECK INDICIES END###
+            ### CHECK INDICES END###
 
             ### QUALITY CONTROL START ###
             download_qc_config:
