@@ -45,7 +45,7 @@ Getting an authentication token
 
 Get your auth token setup (substitute for correct user and password as necessary) :
 
-    export ST2_AUTH_TOKEN=$(st2 auth --only-token testu -p testp)
+    export ST2_AUTH_TOKEN=$(st2 auth --only-token arteriaadmin -p arteriarulz)
     
 Example of starting a workflow
 ------------------------------
