@@ -32,9 +32,3 @@ parameters:
         required: false
         position: 3
         default: true
-    log:
-        type: string
-        description: Path to log file (default /var/log/arteria/poll_status.log)
-        required: false
-        position: 3
-        default: /var/log/arteria/poll_status.log
