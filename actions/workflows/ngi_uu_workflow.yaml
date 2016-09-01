@@ -177,11 +177,11 @@ workflows:
                 input:
                     url: "<% $.report_status_url %>"
                 on-success:
-                    - run_sisyphus_check_indicies
+                    - run_sisyphus_check_indices
             ### QUICK REPORT END ###
 
             ### CHECK INDICES START###
-            run_sisyphus_check_indicies:
+            run_sisyphus_check_indices:
                 action: core.http
                 input:
                     url: "http://<% $.host %>:<% $.siswrap_service_port %>/api/1.0/checkindices/run/<% $.runfolder_name %>"
@@ -190,14 +190,14 @@ workflows:
                       Content-Type: application/json
                     body: '{"runfolder": "<% $.runfolder_name %>"}'
                 publish:
-                    sisyphus_check_indicies_status_url: <% task(run_sisyphus_check_indicies).result.body.link %>
+                    sisyphus_check_indices_status_url: <% task(run_sisyphus_check_indices).result.body.link %>
                 on-success:
-                    - poll_check_indicies_status
+                    - poll_check_indices_status
 
-            poll_check_indicies_status:
+            poll_check_indices_status:
                 action: arteria-packs.poll_status
                 input:
-                    url: "<% $.sisyphus_check_indicies_status_url %>"
+                    url: "<% $.sisyphus_check_indices_status_url %>"
                     ignore_result: <% $.ignore_sisyphus_qc_result %>
                 on-success:
                     - download_qc_config
