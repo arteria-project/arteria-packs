@@ -59,7 +59,7 @@ workflows:
 
             mark_as_started:
               action: core.http
-              input:               
+              input:
                 url: http://<% $.host %>:<% $.runfolder_service_port %>/api/1.0/runfolders/path<% $.runfolder %>
                 body: '{"state": "started"}'
                 method: "POST"
@@ -90,7 +90,7 @@ workflows:
                 action: core.http
                 input:
                     url: <% $.hermes_base_url %>/<% $.flowcell_name %>/samplesheetfile
-                    headers: 
+                    headers:
                         USER: <% $.hermes_user %>
                         X-XSRF-TOKEN: <% $.hermes_token %>
                 publish:
@@ -177,8 +177,31 @@ workflows:
                 input:
                     url: "<% $.report_status_url %>"
                 on-success:
-                    - download_qc_config
+                    - run_sisyphus_check_indicies
             ### QUICK REPORT END ###
+
+            ### CHECK INDICIES START###
+            run_sisyphus_check_indicies:
+                action: core.http
+                input:
+                    url: "http://<% $.host %>:<% $.siswrap_service_port %>/api/1.0/checkindices/run/<% $.runfolder_name %>"
+                    method: "POST"
+                    headers:
+                      Content-Type: application/json
+                    body: '{"runfolder": "<% $.runfolder_name %>"}'
+                publish:
+                    sisyphus_check_indicies_status_url: <% task(run_sisyphus_check_indicies).result.body.link %>
+                on-success:
+                    - poll_check_indicies_status
+
+            poll_check_indicies_status:
+                action: arteria-packs.poll_status
+                input:
+                    url: "<% $.sisyphus_check_indicies_status_url %>"
+                    ignore_result: <% $.ignore_sisyphus_qc_result %>
+                on-success:
+                    - download_qc_config
+            ### CHECK INDICIES END###
 
             ### QUALITY CONTROL START ###
             download_qc_config:
@@ -252,7 +275,7 @@ workflows:
                action: core.http
                input:
                     url: <% $.hermes_base_url %>/<% $.flowcell_name %>/flowcell/analysishostinfo
-                    headers: 
+                    headers:
                       USER: <% $.hermes_user %>
                       X-XSRF-TOKEN: <% $.hermes_token %>
                on-success:
