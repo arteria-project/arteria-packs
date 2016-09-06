@@ -62,16 +62,17 @@ class PollStatus(Action):
                                                                                                            url,
                                                                                                            state))
 
-                return (0, json_resp)
+                return True, json_resp
             elif state in ["error", "none", "cancelled"]:
                 self.logger.warning("{0} -- {1} returned state {2}. Will now stop polling the status.".format(current_time,
                                                                                                               url,
                                                                                                               state))
 
                 if ignore_result:
-                    return (0, json_resp)
+                    self.logger.warning("Ignoring the failed result because of override flag.")
+                    return True, json_resp
                 else:
-                    return (1, json_resp)
+                    return False, json_resp
 
             elif not state and retry_attempts < max_retries:
                 retry_attempts += 1
@@ -85,7 +86,7 @@ class PollStatus(Action):
             else:
                 self.logger.error("{0} -- {1} returned state unknown state {2}. "
                                   "Will now stop polling the status.".format(current_time, url, state))
-                return (1, json_resp)
+                return False, json_resp
 
 
 @click.command()
