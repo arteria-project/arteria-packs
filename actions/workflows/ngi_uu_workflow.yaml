@@ -54,6 +54,7 @@ workflows:
                 irma_siswrap_base_url: <% task(get_config).result.result.irma_siswrap_base_url %>
                 ngi_pipeline_url: <% task(get_config).result.result.ngi_pipeline_url %>
                 irma_replace_expressions: <% task(get_config).result.result.irma_replace_expressions %>
+                remote_host_key: <% task(get_config).result.result.remote_host_key %>
               on-success:
                  - mark_as_started
 
@@ -316,6 +317,7 @@ workflows:
                     cwd: <% $.remote_destination %>
                     cmd: md5sum -c  <% $.remote_destination %>/<% $.runfolder_name %>/MD5/checksums.md5
                     timeout: 86400 # 24 h timeout
+                    private_key: <% $.remote_host_key %>
                 on-success:
                     - milou_start_aeacus_stats
 
@@ -408,6 +410,7 @@ workflows:
                     username: <% $.remote_user %>
                     cwd: <% $.remote_destination %>/<% $.runfolder_name %>
                     cmd: <% $.remote_sisyphus_location %>/aeacus-stats.pl -runfolder <% $.remote_destination %>/<% $.runfolder_name %>
+                    private_key: <% $.remote_host_key %>
                     env:
                         PERL5LIB: /proj/a2009002/perl/lib/perl5/
                 on-success:
@@ -420,6 +423,7 @@ workflows:
                     username: <% $.remote_user %>
                     cwd: <% $.remote_destination %>/<% $.runfolder_name %>
                     cmd: <% $.remote_sisyphus_location %>/aeacus-reports.pl -runfolder <% $.remote_destination %>/<% $.runfolder_name %>
+                    private_key: <% $.remote_host_key %>
                     env:
                         PERL5LIB: /proj/a2009002/perl/lib/perl5/
                 on-success:

@@ -31,23 +31,23 @@ class PollStatusTestCase(BaseActionTestCase):
             self.assertTrue(exit_code == expected_exit_status)
 
     def test_done(self):
-        self.run_with_state(state=["done"], expected_exit_status=0, ignore_results=False)
+        self.run_with_state(state=["done"], expected_exit_status=True, ignore_results=False)
 
     def test_error(self):
-        self.run_with_state(state=["error", "error"], expected_exit_status=1, ignore_results=False)
+        self.run_with_state(state=["error"], expected_exit_status=False, ignore_results=False)
 
     def test_error_ignore_result(self):
-        self.run_with_state(state=["error", "error"], expected_exit_status=0, ignore_results=True)
+        self.run_with_state(state=["error"], expected_exit_status=True, ignore_results=True)
 
     def test_pending_then_done(self):
-        self.run_with_state(state=["pending", "done"], expected_exit_status=0, ignore_results=False)
+        self.run_with_state(state=["pending", "done"], expected_exit_status=True, ignore_results=False)
 
     def test_cancelled(self):
-        self.run_with_state(state=["cancelled", "cancelled"], expected_exit_status=1, ignore_results=False)
+        self.run_with_state(state=["cancelled"], expected_exit_status=False, ignore_results=False)
 
     def test_none(self):
-        self.run_with_state(state=["none", "none"], expected_exit_status=1, ignore_results=False)
+        self.run_with_state(state=["none"], expected_exit_status=False, ignore_results=False)
 
     def test_eventually_successful_request(self):
-        self.run_with_state(state=[None, "done"], expected_exit_status=0, ignore_results=False)
+        self.run_with_state(state=[None, "done"], expected_exit_status=True, ignore_results=False)
 
