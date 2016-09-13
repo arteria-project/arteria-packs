@@ -44,6 +44,7 @@ workflows:
                 directory: <% $.summary_destination %>/<% $.current_year %>/
                 username: <% $.summary_user %>
                 hosts: <% $.summary_host %>
+                private_key: <% $.summary_host_key %>
               publish:
                 runfolders: <% task(check_for_runfolders).result.get($.summary_host).stdout %>
               on-success:
@@ -75,6 +76,7 @@ workflows:
                 directory: <% $.summary_destination %>/<% $.current_year %>/
                 username: <% $.summary_user %>
                 hosts: <% $.summary_host %>
+                private_key: <% $.summary_host_key %>
                 # Require the summary report file to be at least 20 min old.
                 # This avoids trying to read a report into the db
                 # for which the report job has not yet been finished.
