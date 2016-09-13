@@ -22,6 +22,7 @@ workflows:
               publish:
                 summary_host: <% task(get_config).result.result.summary_host %>
                 summary_user: <% task(get_config).result.result.summary_user %>
+                summary_host_key: <% task(get_config).result.result.summary_host_key %>
                 summary_destination: <% task(get_config).result.result.summary_destination %>
                 irma_remote_path: <% task(get_config).result.result.irma_remote_path %>
               on-success:
@@ -43,6 +44,7 @@ workflows:
                 directory: <% $.summary_destination %>/<% $.current_year %>/
                 username: <% $.summary_user %>
                 hosts: <% $.summary_host %>
+                private_key: <% $.summary_host_key %>
               publish:
                 runfolders: <% task(check_for_runfolders).result.get($.summary_host).stdout %>
               on-success:
@@ -64,6 +66,7 @@ workflows:
                 cmd: rsync -e "ssh -i /home/seqsum/.ssh/mm-xlas002" -r --times funk_901@irma1.uppmax.uu.se:<% $.irma_remote_path %>/<% $.runfolder %>/Summary <% $.summary_destination %>/<% $.current_year %>/<% $.runfolder %>/; if (( $? == 0 || $? == 23 )) ; then true; else false; fi
                 hosts: <% $.summary_host %>
                 username: <% $.summary_user %>
+                private_key: <% $.summary_host_key %>
               on-complete:
                 - check_reports_old_enough
 
@@ -73,6 +76,7 @@ workflows:
                 directory: <% $.summary_destination %>/<% $.current_year %>/
                 username: <% $.summary_user %>
                 hosts: <% $.summary_host %>
+                private_key: <% $.summary_host_key %>
                 # Require the summary report file to be at least 20 min old.
                 # This avoids trying to read a report into the db
                 # for which the report job has not yet been finished.
@@ -90,4 +94,5 @@ workflows:
                 cwd: /home/seqsum
                 username: <% $.summary_user %>
                 hosts: <% $.summary_host %>
+                private_key: <% $.summary_host_key %>
 

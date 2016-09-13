@@ -6,11 +6,12 @@ hermes_token: my_token
 
 summary_host: testuppmax
 summary_user: arteria
+summary_host_key: /path/to/ssh/key
 summary_destination: /tmp/summaries/
 
 remote_host: testuppmax
 remote_user: arteria
-remote_host_key:/path/to/ssh/key 
+remote_host_key: /path/to/ssh/key
 remote_destination: /tmp/runfolders/
 remote_sisyphus_location: /opt/arteria/arteria-siswrap-env/deps/sisyphus/sisyphus-latest
 
