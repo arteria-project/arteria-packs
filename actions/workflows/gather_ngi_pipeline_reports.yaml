@@ -20,7 +20,7 @@ workflows:
               publish:
                 summary_host: <% task(get_config).result.result.summary_host %>
                 summary_user: <% task(get_config).result.result.summary_user %>
-                summary_destination: <% task(get_config).result.result.summary_destination %>
+                summary_ngi_pipeline_reports_destination: <% task(get_config).result.result.summary_ngi_pipeline_reports_destination %>
                 irma_reports_remote_path: <% task(get_config).result.result.irma_reports_remote_path %>
                 summary_host_key: <% task(get_config).result.result.summary_host_key %>
               on-success:
@@ -29,7 +29,7 @@ workflows:
             rsync_from_irma:
               action: core.remote
               input:
-                cmd: rsync -e "ssh -i /home/seqsum/.ssh/mm-xlas002" -r funk_901@irma1.uppmax.uu.se:<% $.irma_reports_remote_path %>/ <% $.summary_destination %>/
+                cmd: rsync -e "ssh -i /home/seqsum/.ssh/mm-xlas002" -r funk_901@irma1.uppmax.uu.se:<% $.irma_reports_remote_path %>/ <% $.summary_ngi_pipeline_reports_destination %>/
                 hosts: <% $.summary_host %>
                 username: <% $.summary_user %>
                 private_key: <% $.summary_host_key %>
