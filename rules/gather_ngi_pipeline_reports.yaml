@@ -8,7 +8,7 @@ trigger:
     type: "core.st2.IntervalTimer"
     parameters:
       unit: hours
-      delta: 2
+      delta: 6
 
 action:
     ref: "arteria-packs.gather_ngi_pipeline_reports"
