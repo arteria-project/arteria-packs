@@ -1,0 +1,16 @@
+---
+name: "arteria-packs.gather_ngi_pipeline_reports"
+pack: "arteria-packs"
+description: "Attempts to synchronize project reports from the ngi_pipeline at the set intervals."
+enabled: true
+
+trigger:
+    type: "core.st2.IntervalTimer"
+    parameters:
+      unit: hours
+      delta: 6
+
+action:
+    ref: "arteria-packs.gather_ngi_pipeline_reports"
+
+

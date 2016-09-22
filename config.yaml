@@ -8,6 +8,7 @@ summary_host: testuppmax
 summary_user: arteria
 summary_host_key: /path/to/ssh/key
 summary_destination: /tmp/summaries/
+summary_ngi_pipeline_reports_destination: /tmp/summaries/ngi_reports
 
 remote_host: testuppmax
 remote_user: arteria
@@ -19,6 +20,7 @@ ngi_pipeline_url: https://irma1.uppmax.uu.se:4444/ngi_pipeline_upps
 
 irma_api_key: aaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 irma_remote_path: ./staging/
+irma_reports_remote_path: ./staging/reports/
 irma_checksum_base_url: https://irma1.uppmax.uu.se:4444/arteria_checksum_staging/api/1.0
 irma_siswrap_base_url: https://irma1.uppmax.uu.se:4444/arteria_siswrap_staging/api/1.0
 
