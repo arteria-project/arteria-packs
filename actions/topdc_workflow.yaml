@@ -1,0 +1,23 @@
+---
+name: topdc_workflow
+description: >
+  Uploads a runfolder to PDC with TSM (and checks MD5 sums of the transfered files?)
+enabled: true
+runner_type: mistral-v2
+entry_point: workflows/topdc_workflow.yaml
+pack: arteria-packs
+parameters:
+  context:
+    default: {}
+    immutable: true
+    type: object
+  workflow:
+    default: arteria-packs.topdc_workflow
+    immutable: true
+    type: string
+  archive_excludes:
+    required: true
+    type: string
+  host:
+    required: true
+    type: string
