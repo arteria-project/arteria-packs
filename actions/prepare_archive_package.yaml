@@ -16,7 +16,7 @@
             position: 1
         exclude:
             type: 'string'
-            description: "egrep pattern for files to exclude from archive"
+            description: 'egrep pattern for files to exclude from archive'
             required: true
             position: 2
         host:
