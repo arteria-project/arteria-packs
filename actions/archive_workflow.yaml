@@ -15,10 +15,6 @@ parameters:
     default: arteria-packs.archive_workflow
     immutable: true
     type: string
-  archive_excludes:
-    description: 'egrep pattern for files to exclude from archive'
-    required: true
-    type: string
   host:
     description: 'Host where runfolder is located'
     required: true

@@ -55,7 +55,6 @@ workflows:
                 ngi_pipeline_url: <% task(get_config).result.result.ngi_pipeline_url %>
                 irma_replace_expressions: <% task(get_config).result.result.irma_replace_expressions %>
                 remote_host_key: <% task(get_config).result.result.remote_host_key %>
-                archive_excludes: <% task(get_config).result.result.archive_excludes %>
               on-success:
                  - mark_as_started
 

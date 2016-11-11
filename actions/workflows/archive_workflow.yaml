@@ -8,7 +8,6 @@ workflows:
         input:
             - runfolder
             - host
-            - archive_excludes
         output:
             output_the_whole_workflow_context: <% $ %>
 
@@ -20,7 +19,15 @@ workflows:
                 cmd: git rev-parse HEAD
                 cwd: /opt/stackstorm/packs/arteria-packs/
               on-success:
+                - get_excludes
+
+            get_excludes:
+              action: arteria-packs.get_pack_config
+              publish:
+                archive_excludes: <% task(get_excludes).result.result.archive_excludes %>
+              on-success:
                 - prepare_tsm_archive
+
             ### GENERAL TASKS END ###
 
             ### TRANSFER FILES START ###
