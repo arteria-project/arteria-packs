@@ -1,6 +1,6 @@
 version: "2.0" # mistral version
-name: arteria-packs.sync_workflow
-description: Syncs a run for the source host to the remote_host.
+name: arteria-packs.archive_workflow
+description: Archives a runfolder to PDC with TSM
 
 workflows:
     main:
