@@ -26,7 +26,7 @@
             position: 3
         cmd:
             immutable: true
-            default: 'ssh {{ host }} "bash -s" < /opt/stackstorm/packs/arteria-packs/actions/lib/prepare_archive_package.sh {{ runfolder }} {{ exclude }}'
+            default: 'scp /opt/stackstorm/packs/arteria-packs/actions/lib/prepare_archive_package.sh {{ host }}:. && ssh {{ host }} bash ./prepare_archive_package.sh {{ runfolder }} {{ exclude }}'
         connect_timeout:
             type: 'integer'
             description: 'SSH connect timeout in seconds'

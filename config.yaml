@@ -44,4 +44,4 @@ slack_webhook_url: https://slack.webhook.url
 charon_status_report_slack_channel: "#bottest"
 
 # String of file paths to exclude from the compressed archive (egrep syntax)
-archive_excludes: "^./Config|^./InterOp|^./SampleSheet.csv|^./Unaligned|^./Data|^./Thumbnail_Images"
+archive_excludes: "\"'^./Config|^./InterOp|^./SampleSheet.csv|^./Unaligned|^./Data|^./Thumbnail_Images'\""
