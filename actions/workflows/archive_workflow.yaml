@@ -43,21 +43,21 @@ workflows:
             # find . -type f ! -path "./Data/*" -and ! -path "./Thumbnail_Images/*"
             # find . -type f | egrep -v '^./Data|^./Thumbnail_Images' > ./.checksum-includes
             generate_checksums:
-                actions: core.local
+                action: core.local
                 input:
                   cmd: ssh <% $.host %> "cd <% $.runfolder %> && find . -type f ! -path './Data/*' -and ! -path './Thumbnail_Images/*' -and ! -path './checksums_prior_to_pdc.md5' -exec md5sum {} + > checksums_prior_to_pdc.md5"
                 # TODO: Unsure which one is required.
                 timeout: 86400 # 24 h timeout
-                connect_timeout: 86400
+                #connect_timeout: 86400
                 on-success:
                   - tsm_archive_to_pdc
 
             tsm_archive_to_pdc:
-                actions: core.local
+                action: core.local
                 input:
                   cmd: ssh <% $.host %> "dsmc archive <% $.runfolder %> -description='`uuidgen`'"
                   # TODO: Unsure which one is required.
                   timeout: 259200 # 72 h timeout
-                  connect_timeout: 259200
+                  #connect_timeout: 259200
 
             ### TRANSFER FILES END ###
