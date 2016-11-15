@@ -58,10 +58,12 @@ workflows:
                 on-success:
                   - tsm_archive_to_pdc
 
+            # We need to filter out all files excluded from the upload because otherwise TSM
+            # will fill up the Stackstorm/Mongo buffer too much. 
             tsm_archive_to_pdc:
                 action: core.local
                 input:
-                  cmd: ssh <% $.host %> "dsmc archive <% $.runfolder %>/ -subdir=yes -description=`uuidgen`"
+                  cmd: ssh <% $.host %> "dsmc archive <% $.runfolder %>/ -subdir=yes -description=`uuidgen` | egrep -v '<% $.runfolder %>/Data/|<% $.runfolder %>/Thumbnail_Images/'"
                   timeout: 604800 # 1w worst-case timeout
 
             # TODO: Implement a separate workflow that for an interval does a random download (if enough disk space exists)
