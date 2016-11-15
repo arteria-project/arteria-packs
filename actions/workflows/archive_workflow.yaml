@@ -62,7 +62,7 @@ workflows:
                 action: core.local
                 input:
                   cmd: ssh <% $.host %> "dsmc archive <% $.runfolder %>/ -subdir=yes -description=`uuidgen`"
-                  timeout: 259200 # 72 h timeout
+                  timeout: 604800 # 1w worst-case timeout
 
             # TODO: Implement a separate workflow that for an interval does a random download (if enough disk space exists)
             # that does a "md5sum -c checksums_prior_to_pdc.md5"
