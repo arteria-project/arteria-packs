@@ -440,11 +440,10 @@ workflows:
 
             ## START TSM ARCHIVE TO PDC ##
             upload_runfolder_to_pdc:
-                action: arteria-packs.topdc_workflow
+                action: arteria-packs.archive_workflow
                 input:
                     runfolder: <% $.runfolder %>
                     host: <% $.host %>
-                    archive_excludes: <% $.archive_excludes %>
                 on-success:
                   - notify_finished
                   - mark_as_finished
