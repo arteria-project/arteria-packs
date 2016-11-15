@@ -1,7 +1,7 @@
 ---
 name: archive_workflow
 description: >
-  Archives a runfolder to PDC with TSM (and checks MD5 sums of the transfered files?)
+  Archives a runfolder to PDC with TSM
 enabled: true
 runner_type: mistral-v2
 entry_point: workflows/archive_workflow.yaml
