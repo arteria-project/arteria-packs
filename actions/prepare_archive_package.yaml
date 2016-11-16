@@ -25,7 +25,7 @@
             required: true
             position: 3
         cmd:
-            immutable: true
+            immutable: true 
             default: 'ssh -v {{host}} "bash -s" < /opt/stackstorm/packs/arteria-packs/actions/lib/prepare_archive_package.sh {{ runfolder }} {{ exclude }}'
         connect_timeout:
             type: 'integer'
