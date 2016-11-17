@@ -14,6 +14,9 @@ workflows:
             - tiles
             - use_base_mask
             - bcl2fastq_additional_arguments
+            - conversionstats_swap_read_nr
+            - conversionstats_swap_read_from
+            - conversionstats_swap_read_to
         output:
             output_the_whole_workflow_context: <% $ %>
         task-defaults:
@@ -135,7 +138,28 @@ workflows:
                     url: <% $.bcl2fastq_status_url %>
                     timeout: 86400 # Wait for 24 h before timing out.
                 on-success:
+                    - conversionstats_workaround: <% $.conversionstats_swap_read_nr == true %>
+                    - download_sisyphus_config: <% $.conversionstats_swap_read_nr == false %>
+
+            conversionstats_workaround:
+                action: core.remote
+                input:
+                    cmd: ssh <% $.host %> sed -i -e \'s/Read number=\"<% $.conversionstats_swap_read_from %>\"/Read number=\"<% $.conversionstats_swap_read_to\"/g\' <% $.runfolder %>/Unaligned/Stats/ConversionStats.xml
+                on-success:
                     - download_sisyphus_config
+                 
+            milou_check_md5sums:
+                action: core.remote
+                input:
+                    hosts: <% $.remote_host %>
+                    username: <% $.remote_user %>
+                    cwd: <% $.remote_destination %>
+                    cmd: md5sum -c  <% $.remote_destination %>/<% $.runfolder_name %>/MD5/checksums.md5
+                    timeout: 86400 # 24 h timeout
+                    private_key: <% $.remote_host_key %>
+                on-success:
+                    - milou_start_aeacus_stats
+
             ## DEMULTIPLEX END ###
             ### QUICK REPORT START ###
             download_sisyphus_config:
