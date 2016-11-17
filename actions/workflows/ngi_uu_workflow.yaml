@@ -142,12 +142,12 @@ workflows:
                     - download_sisyphus_config: <% $.conversionstats_swap_read_nr == false %>
 
             conversionstats_workaround:
-                action: core.remote
+                action: core.local
                 input:
                     cmd: ssh <% $.host %> sed -i -e \'s/Read number=\"<% $.conversionstats_swap_read_from %>\"/Read number=\"<% $.conversionstats_swap_read_to\"/g\' <% $.runfolder %>/Unaligned/Stats/ConversionStats.xml
                 on-success:
                     - download_sisyphus_config
-                 
+
             milou_check_md5sums:
                 action: core.remote
                 input:
