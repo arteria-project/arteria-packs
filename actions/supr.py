@@ -2,11 +2,16 @@
 
 import requests
 import json
+from datetime import date
+from dateutil.relativedelta import relativedelta
 
 # Needs to be run in a Stackstorm virtualenv
 from st2actions.runners.pythonrunner import Action
 
+
 class Supr(Action):
+
+    DATE_FORMAT = '%Y-%m-%d'
 
     @staticmethod
     def search_by_email(base_url, email, user, key):
@@ -30,8 +35,47 @@ class Supr(Action):
 
         return matches[0]["id"]
 
-    def run(self, action, email, supr_base_api_url, api_user, api_key):
-        if action == "get_id_from_email":
-            return self.search_by_email(supr_base_api_url, email, api_user, api_key)
+    @staticmethod
+    def create_delivery_project(base_url, ngi_project_name, pi_id, user, key):
 
+        create_delivery_project_url = '{}/ngi_delivery/project/create/'.format(base_url)
+
+        today = date.today()
+        today_formatted = today.strftime(Supr.DATE_FORMAT)
+        six_months_from_now = today + relativedelta(months=+6)
+        six_months_from_now_formatted = six_months_from_now.strftime(Supr.DATE_FORMAT)
+
+        payload = {
+            'ngi_project_name': ngi_project_name,
+            'title': "DELIVERY_{}_{}".format(ngi_project_name, today_formatted),
+            'pi_id': pi_id,
+            'start_date': today_formatted,
+            'end_date': six_months_from_now_formatted,
+            'continuation_name': '',
+            # TODO Right now this default to 1T, we might want to get something
+            # realistic in here later.
+            # 'allocated': size_of_delivery,
+            'api_opaque_data': '',
+            'ngi_ready': False,
+            'ngi_delivery_status': ''
+        }
+
+        response = requests.post(create_delivery_project_url,
+                                 data=json.dumps(payload),
+                                 auth=(user, key))
+
+        if response.status_code != 200:
+            raise AssertionError("Status code returned when trying to create delivery project was not 200. Response "
+                                 "was: {}".format(response.content))
+
+        return json.loads(response.content)
+
+    def run(self, action, supr_base_api_url, api_user, api_key, **kwargs):
+        if action == "get_id_from_email":
+            return self.search_by_email(supr_base_api_url, kwargs['email'], api_user, api_key)
+        elif action == 'create_delivery_project':
+            return self.create_delivery_project(supr_base_api_url, kwargs['project_name'],
+                                                kwargs['pi_id'], api_user, api_key)
+        else:
+            raise AssertionError("Action: {} was not recognized.".format(action))
 

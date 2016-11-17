@@ -1,0 +1,36 @@
+---
+name: create_delivery_project_in_super
+runner_type: run-python
+description: Create a delivery project in SUPR for the specified PI and project name
+enabled: true
+entry_point: supr.py
+parameters:
+    timeout:
+        default: 10
+    action:
+        type: string
+        required: true
+        default: create_delivery_project
+        immutable: true
+    project_name:
+        type: string
+        description: Name to use for the delivery project (Normally same as NGI internal code)
+        required: true
+    pi_id:
+        type: integer
+        description: SUPR Id of PI to create project for
+        required: true
+    supr_base_api_url:
+        type: string
+        description: Email adress to look for associated PI for.
+        required: false
+        # TODO Change to production instance?
+        default: https://disposer.c3se.chalmers.se/supr-test/api
+    api_user:
+      type: string
+      description: SUPR api user
+      required: true
+    api_key:
+      type: string
+      description: SUPR api key
+      required: true
