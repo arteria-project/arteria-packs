@@ -138,8 +138,8 @@ workflows:
                     url: <% $.bcl2fastq_status_url %>
                     timeout: 86400 # Wait for 24 h before timing out.
                 on-success:
-                    - conversionstats_workaround: <% $.conversionstats_swap_read_nr == true %>
-                    - download_sisyphus_config: <% $.conversionstats_swap_read_nr == false %>
+                    - conversionstats_workaround: <% $.conversionstats_swap_read_nr = true %>
+                    - download_sisyphus_config: <% $.conversionstats_swap_read_nr = false %>
 
             conversionstats_workaround:
                 action: core.local
