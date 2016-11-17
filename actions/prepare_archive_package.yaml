@@ -1,0 +1,33 @@
+---
+    name: 'prepare_archive_package'
+    runner_type: 'run-local'
+    description: 'Creates a compressed archive of a subset of files inside a runfolder, ready to be sent to PDC with TSM.'
+    enabled: true
+    entry_point: ''
+    parameters:
+        timeout:
+        # Use a default timeout of 24 hour. "No timout" is fixed in a new version
+        # https://github.com/StackStorm/st2/issues/1654
+            default: 86400
+        runfolder:
+            type: 'string'
+            description: 'Path to runfolder to archive'
+            required: true
+            position: 1
+        exclude:
+            type: 'string'
+            description: 'egrep pattern for files to exclude from archive'
+            required: true
+            position: 2
+        host:
+            type: 'string'
+            description: 'Host where runfolder is located'
+            required: true
+            position: 3
+        cmd:
+            immutable: true 
+            default: 'ssh -v {{host}} "bash -s" < /opt/stackstorm/packs/arteria-packs/actions/lib/prepare_archive_package.sh {{ runfolder }} {{ exclude }}'
+        connect_timeout:
+            type: 'integer'
+            description: 'SSH connect timeout in seconds'
+            default: 86400 # 24 h

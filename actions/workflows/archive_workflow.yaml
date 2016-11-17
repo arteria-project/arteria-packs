@@ -1,0 +1,72 @@
+version: "2.0" # mistral version
+name: arteria-packs.archive_workflow
+description: Archives a runfolder to PDC with TSM
+
+workflows:
+    main:
+        type: direct
+        input:
+            - runfolder
+            - host
+        output:
+            output_the_whole_workflow_context: <% $ %>
+
+        tasks:
+            ### GENERAL TASKS START ###
+            note_workflow_repo_version:
+              action: core.local
+              input:
+                cmd: git rev-parse HEAD
+                cwd: /opt/stackstorm/packs/arteria-packs/
+              on-success:
+                - get_excludes
+
+            get_excludes:
+              action: arteria-packs.get_pack_config
+              publish:
+                archive_excludes: <% task(get_excludes).result.result.archive_excludes %>
+              on-success:
+                - prepare_tsm_archive
+
+            ### GENERAL TASKS END ###
+
+            ### TRANSFER FILES START ###
+            # Will remove all files not excluded, after they've been added to the tar archive
+            # TODO: Script will fail if gziped archive already exists. Manually extract it for now
+            # if the workflow should be re-run.
+            prepare_tsm_archive:
+               action: arteria-packs.prepare_archive_package
+               input:
+                 host: <% $.host %>
+                 runfolder: <% $.runfolder %>
+                 exclude: <% $.archive_excludes %>
+               on-success:
+                 - generate_checksums
+
+            # Don't generate checksums for Data and Thumbnail_Images, because those will be filtered out
+            # by TSM when uploading to PDC, but we do want to keep them locally for a while if we
+            # want to re-process the runfolder. Notes that it is only the files that gets filtered out,
+            # the empty subdirs will still be uploaded.
+            # TODO: How to best pass these checksum excludes from config? Hardcoded for now.
+            # find . -type f ! -path "./Data/*" -and ! -path "./Thumbnail_Images/*"
+            # find . -type f | egrep -v '^./Data|^./Thumbnail_Images' > ./.checksum-includes
+            generate_checksums:
+                action: core.local
+                input:
+                  cmd: ssh <% $.host %> "cd <% $.runfolder %> && find . -type f ! -path './Data/*' -and ! -path './Thumbnail_Images/*' -and ! -path './checksums_prior_to_pdc.md5' -exec md5sum {} + > checksums_prior_to_pdc.md5"
+                timeout: 86400 # 24 h timeout
+                on-success:
+                  - tsm_archive_to_pdc
+
+            # We need to filter out all files excluded from the upload because otherwise TSM
+            # will fill up the Stackstorm/Mongo buffer too much. 
+            tsm_archive_to_pdc:
+                action: core.local
+                input:
+                  cmd: ssh <% $.host %> "dsmc archive <% $.runfolder %>/ -subdir=yes -description=`uuidgen` | egrep -v '<% $.runfolder %>/Data/|<% $.runfolder %>/Thumbnail_Images/'"
+                  timeout: 604800 # 1w worst-case timeout
+
+            # TODO: Implement a separate workflow that for an interval does a random download (if enough disk space exists)
+            # that does a "md5sum -c checksums_prior_to_pdc.md5"
+
+            ### TRANSFER FILES END ###

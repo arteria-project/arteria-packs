@@ -427,8 +427,7 @@ workflows:
                     env:
                         PERL5LIB: /proj/a2009002/perl/lib/perl5/
                 on-success:
-                    - notify_finished
-                    - mark_as_finished
+                    - upload_runfolder_to_pdc
             ## START AEACUS REPORT STEPS END ###
 
             ## START NGI_PIPELINE IF NECESSARY ##
@@ -438,6 +437,17 @@ workflows:
             #  input:
             #    url: <% $.ngi_pipeline_url %>/<% $.runfolder_name %>
             ## END START NGI_PIPELINE ##
+
+            ## START TSM ARCHIVE TO PDC ##
+            upload_runfolder_to_pdc:
+                action: arteria-packs.archive_workflow
+                input:
+                    runfolder: <% $.runfolder %>
+                    host: <% $.host %>
+                on-success:
+                  - notify_finished
+                  - mark_as_finished
+            ## END TSM ARCHIVE TO PDC ##
 
             ## NOTIFIER START ###
             notify_finished:
