@@ -144,7 +144,7 @@ workflows:
             conversionstats_workaround:
                 action: core.local
                 input:
-                    cmd: ssh <% $.host %> sed -i -e \'s/Read number=\"<% $.conversionstats_swap_read_from %>\"/Read number=\"<% $.conversionstats_swap_read_to\"/g\' <% $.runfolder %>/Unaligned/Stats/ConversionStats.xml
+                    cmd: ssh <% $.host %> "bash -s" < /opt/stackstorm/packs/arteria-packs/actions/lib/swap_read_nr_in_conversionstats.sh <% $.runfolder %> <% $.conversionstats_swap_read_from %> <% $.conversionstats_swap_read_to %>
                 on-success:
                     - download_sisyphus_config
 
