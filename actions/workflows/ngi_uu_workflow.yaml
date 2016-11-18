@@ -148,18 +148,6 @@ workflows:
                 on-success:
                     - download_sisyphus_config
 
-            milou_check_md5sums:
-                action: core.remote
-                input:
-                    hosts: <% $.remote_host %>
-                    username: <% $.remote_user %>
-                    cwd: <% $.remote_destination %>
-                    cmd: md5sum -c  <% $.remote_destination %>/<% $.runfolder_name %>/MD5/checksums.md5
-                    timeout: 86400 # 24 h timeout
-                    private_key: <% $.remote_host_key %>
-                on-success:
-                    - milou_start_aeacus_stats
-
             ## DEMULTIPLEX END ###
             ### QUICK REPORT START ###
             download_sisyphus_config:
