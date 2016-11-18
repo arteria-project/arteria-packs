@@ -141,6 +141,9 @@ workflows:
                     - conversionstats_workaround: <% $.conversionstats_swap_read_nr = true %>
                     - download_sisyphus_config: <% $.conversionstats_swap_read_nr = false %>
 
+            # Due to a bug in bcl2fastq some read numbers in Unaligned/Stats/ConversionStats.xml will sometimes have the wrong number. 
+            # If the Arteria operator manually sets "conversionstats_swap_read"_nr to "true" then this workaround action will swap 
+            # the incorrect value "conversionstats_swap_read_from" to the requested correct value "conversionstats_swap_read_to". 
             conversionstats_workaround:
                 action: core.local
                 input:
