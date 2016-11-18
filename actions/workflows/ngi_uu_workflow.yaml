@@ -397,8 +397,7 @@ workflows:
                   url: <% $.irma_siswrap_base_url %>/aeacusreports/status/<% $.irma_run_aeacus_reports_job_id %>?apikey=<% $.irma_api_key %>
                   verify_ssl_cert: False
                 on-success:
-                  - notify_finished
-                  - mark_as_finished
+                  - upload_runfolder_to_pdc
 
             ### END AEACUS REPORT STEPS ###
             # TODO Need to add starting the ngi pipeline on irma
