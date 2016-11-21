@@ -12,9 +12,9 @@ parameters:
         required: true
         default: get_id_from_email
         immutable: true
-    email:
-        type: string
-        description: Email adress to look for associated PI for.
+    project_to_email_dict:
+        type: object
+        description: dict from project to emails
         required: true
     supr_base_api_url:
         type: string

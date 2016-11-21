@@ -36,6 +36,16 @@ class Supr(Action):
         return matches[0]["id"]
 
     @staticmethod
+    def search_for_pis(project_to_email_dict, supr_base_api_url, api_user, api_key):
+        res = {}
+        for project, email in project_to_email_dict.iteritems():
+            res[project] = Supr.search_by_email(base_url=supr_base_api_url,
+                                                email=email,
+                                                user=api_user,
+                                                key=api_key)
+        return res
+
+    @staticmethod
     def create_delivery_project(base_url, ngi_project_name, pi_id, user, key):
 
         create_delivery_project_url = '{}/ngi_delivery/project/create/'.format(base_url)
@@ -72,7 +82,7 @@ class Supr(Action):
 
     def run(self, action, supr_base_api_url, api_user, api_key, **kwargs):
         if action == "get_id_from_email":
-            return self.search_by_email(supr_base_api_url, kwargs['email'], api_user, api_key)
+            return self.search_for_pis(kwargs['project_to_email_dict'], supr_base_api_url, api_user, api_key)
         elif action == 'create_delivery_project':
             return self.create_delivery_project(supr_base_api_url, kwargs['project_name'],
                                                 kwargs['pi_id'], api_user, api_key)
