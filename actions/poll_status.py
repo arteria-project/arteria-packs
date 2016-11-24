@@ -1,14 +1,18 @@
 #!/usr/bin/env python
 
 import datetime
-import sys
 import time
+from urlparse import urlparse
+
 import requests
+
 from requests.exceptions import RequestException
-import click
-import os
+
 # Needs to be run in a Stackstorm virtualenv
 from st2actions.runners.pythonrunner import Action
+
+
+
 
 class PollStatus(Action):
     """
@@ -25,17 +29,50 @@ class PollStatus(Action):
             resp = requests.get(url, verify=verify_ssl_cert)
             return resp
         except RequestException as err:
-            current_time = datetime.datetime.now()
-            self.logger.warning(
-                "{0} -- {1} - an error was encountered: {2}".format(current_time, url, err))
-            return None, None
+            self.logger.warning("An error was encountered when "
+                                "querying url: {0},  {1}".format(url, err))
+            return None
 
-    def run(self, url, sleep, ignore_result, verify_ssl_cert, max_retries=3):
+    def post_to_endpoint(self, endpoint, body, irma_mode, verify_ssl_cert):
+
+        def _rewrite_link(link):
+            endpoint_parsed = urlparse(endpoint)
+            first_part_of_path = endpoint_parsed.path.split('/')[1]
+            link_parsed = urlparse(link)
+            return "{}://{}/{}{}?{}".format(endpoint_parsed.scheme,
+                                            endpoint_parsed.netloc,
+                                            first_part_of_path,
+                                            link_parsed.path,
+                                            endpoint_parsed.query)
+
+        try:
+            response = requests.post(endpoint, json=body, verify=verify_ssl_cert)
+            response_json = response.json()
+
+            if irma_mode:
+                modified_link = _rewrite_link(response_json['link'])
+                self.logger.info("In irma mode, will rewrite link to: {}".format(modified_link))
+                return modified_link
+            else:
+                return response_json['link']
+        except RequestException as err:
+            self.logger.warning("An error was encountered when trying to "
+                                "post to url: {0}, {1}".format(endpoint, err))
+            raise err
+        except KeyError as err:
+            self.logger.warning("Could not find correct key in response json: {}".format(response_json))
+            raise err
+        except ValueError as err:
+            self.logger.warning("Error decoding response as json. Got status: {} and response: {}".format(
+                response.status_code,
+                response.content))
+            raise err
+
+    def check_status(self, url, sleep, ignore_result, verify_ssl_cert, max_retries):
         """
         Query the url end-point. Can be called directly from StackStorm, or via the script cli
         :param url: to call
         :param sleep: minutes to sleep between attempts
-        :param log: file name to write log to
         :param ignore_result: return 0 exit status even if polling failed (for known errors).
         :param verify_ssl_cert: Set to False to skip verifying the ssl cert when making requests
         :param max_retries: maximum number of retries
@@ -88,26 +125,8 @@ class PollStatus(Action):
                                   "Will now stop polling the status.".format(current_time, url, state))
                 return False, json_resp
 
+    def run(self, url, body, sleep, ignore_result, irma_mode, verify_ssl_cert, max_retries=3):
+        status_link = self.post_to_endpoint(url, body, irma_mode, verify_ssl_cert)
+        return self.check_status(status_link, sleep, ignore_result, verify_ssl_cert, max_retries)
 
-@click.command()
-@click.option("--url", required=True, help="URL to poll")
-@click.option("--sleep", default=1, required=False,
-              help="Number of minutes to sleep between poll (default 1)")
-@click.option("--ignore_result", required=False,
-              default=False,
-              help="Return 0 exit status even if polling failed.")
-@click.option("--verify_ssl_cert/--skip_ssl_cert", required=False,
-              default=True,
-              help="Verify SSL cert. Default is true.")
-def start(url, sleep, ignore_result, verify_ssl_cert):
-    """ Accepts an URL to poll (e.g. http://testarteria1:10900/api/1.0/qc/status/4224)
-        and sleeps a number of minutes between every poll (default 1 minute).
 
-        Will continue to poll as long as a returned JSON field called state contains 'started'.
-        Exits with an error if 'error' or 'none' is received, and with success if 'done'
-        is received.
-    """
-    PollStatus().run(url, sleep, ignore_result, verify_ssl_cert)
-
-if __name__ == "__main__":
-    start()

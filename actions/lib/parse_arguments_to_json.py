@@ -13,4 +13,4 @@ class ParseArgumentsToJson(Action):
         return new_dict
 
     def run(self, **kwargs):
-        print(self._strip_null_values(kwargs))
+        return self._strip_null_values(kwargs)

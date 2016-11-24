@@ -115,28 +115,16 @@ workflows:
                     use_base_mask: "<% $.use_base_mask %>"
                     additional_arguments: "<% $.bcl2fastq_additional_arguments %>"
                 publish:
-                    bcl2fastq_body: <% task(construct_bcl2fastq_body).result.stdout %>
+                    bcl2fastq_body: <% task(construct_bcl2fastq_body).result.result %>
                 on-success:
                     - run_bcl2fastq
 
             run_bcl2fastq:
-                action: core.http
-                input:
-                    url: "http://<% $.host %>:<% $.bcl2fastq_service_port %>/api/1.0/start/<% $.runfolder_name %>"
-                    method: "POST"
-                    headers:
-                        Content-Type: application/json
-                    body: <% $.bcl2fastq_body %>
-                publish:
-                    bcl2fastq_status_url: <% task(run_bcl2fastq).result.body.link %>
-                on-success:
-                    - poll_demultiplex_status
-
-            poll_demultiplex_status:
                 action: arteria-packs.poll_status
                 input:
-                    url: <% $.bcl2fastq_status_url %>
+                    url: "http://<% $.host %>:<% $.bcl2fastq_service_port %>/api/1.0/start/<% $.runfolder_name %>"
                     timeout: 86400 # Wait for 24 h before timing out.
+                    body: <% $.bcl2fastq_body %>
                 on-success:
                     - conversionstats_workaround: <% $.conversionstats_swap_read_nr = true %>
                     - download_sisyphus_config: <% $.conversionstats_swap_read_nr = false %>
@@ -171,49 +159,26 @@ workflows:
                     runfolder: "<% $.runfolder_name %>"
                     sisyphus_config: "<% $.sisyphus_conf_string %>"
                 publish:
-                    report_body: <% task(construct_report_body).result.stdout %>
+                    report_body: <% task(construct_report_body).result.result %>
                 on-success:
                     - run_sisyphus_quick_report
 
             run_sisyphus_quick_report:
-                action: core.http
-                input:
-                    url: "http://<% $.host %>:<% $.siswrap_service_port %>/api/1.0/report/run/<% $.runfolder_name %>"
-                    method: "POST"
-                    headers:
-                      Content-Type: application/json
-                    body: <% $.report_body %>
-                publish:
-                    report_status_url: <% task(run_sisyphus_quick_report).result.body.link %>
-                on-success:
-                    - poll_report_status
-
-            poll_report_status:
                 action: arteria-packs.poll_status
                 input:
-                    url: "<% $.report_status_url %>"
+                    url: "http://<% $.host %>:<% $.siswrap_service_port %>/api/1.0/report/run/<% $.runfolder_name %>"
+                    body: <% $.report_body %>
                 on-success:
                     - run_sisyphus_check_indices
             ### QUICK REPORT END ###
 
             ### CHECK INDICES START###
             run_sisyphus_check_indices:
-                action: core.http
-                input:
-                    url: "http://<% $.host %>:<% $.siswrap_service_port %>/api/1.0/checkindices/run/<% $.runfolder_name %>"
-                    method: "POST"
-                    headers:
-                      Content-Type: application/json
-                    body: '{"runfolder": "<% $.runfolder_name %>"}'
-                publish:
-                    sisyphus_check_indices_status_url: <% task(run_sisyphus_check_indices).result.body.link %>
-                on-success:
-                    - poll_check_indices_status
-
-            poll_check_indices_status:
                 action: arteria-packs.poll_status
                 input:
-                    url: "<% $.sisyphus_check_indices_status_url %>"
+                    url: "http://<% $.host %>:<% $.siswrap_service_port %>/api/1.0/checkindices/run/<% $.runfolder_name %>"
+                    body:
+                      runfolder: <% $.runfolder_name %>
                     ignore_result: <% $.ignore_sisyphus_qc_result %>
                 on-success:
                     - download_qc_config
@@ -238,27 +203,15 @@ workflows:
                     runfolder: "<% $.runfolder_name %>"
                     qc_config: "<% $.qc_conf_string %>"
                 publish:
-                    qc_body: <% task(construct_qc_body).result.stdout %>
+                    qc_body: <% task(construct_qc_body).result.result %>
                 on-success:
                     - run_sisyphus_qc
 
             run_sisyphus_qc:
-                action: core.http
-                input:
-                    url: "http://<% $.host %>:<% $.siswrap_service_port %>/api/1.0/qc/run/<% $.runfolder_name %>"
-                    method: "POST"
-                    headers:
-                      Content-Type: application/json
-                    body: <% $.qc_body %>
-                publish:
-                    qc_status_url: "<% task(run_sisyphus_qc).result.body.link %>"
-                on-success:
-                    - poll_qc_status
-
-            poll_qc_status:
                 action: arteria-packs.poll_status
                 input:
-                    url: <% $.qc_status_url %>
+                    url: "http://<% $.host %>:<% $.siswrap_service_port %>/api/1.0/qc/run/<% $.runfolder_name %>"
+                    body: <% $.qc_body %>
                     ignore_result: <% $.ignore_sisyphus_qc_result %>
                 on-success:
                     - get_year
@@ -352,22 +305,13 @@ workflows:
                   - irma_check_md5sums
 
             irma_check_md5sums:
-               action: core.http
-               input:
-                    method: "POST"
-                    url: <% $.irma_checksum_base_url %>/start/<% $.runfolder_name %>?apikey=<% $.irma_api_key %>
-                    body: '{"path_to_md5_sum_file": "MD5/checksums.md5"}'
-                    verify_ssl_cert: False
-               publish:
-                 md5sum_job_id: <% task(irma_check_md5sums).result.body.job_id %>
-               on-success:
-                 - poll_irma_check_md5sums
-
-            poll_irma_check_md5sums:
                 action: arteria-packs.poll_status
                 input:
-                  url: <% $.irma_checksum_base_url %>/status/<% $.md5sum_job_id %>?apikey=<% $.irma_api_key %>
-                  verify_ssl_cert: False
+                    url: <% $.irma_checksum_base_url %>/start/<% $.runfolder_name %>?apikey=<% $.irma_api_key %>
+                    body:
+                      path_to_md5_sum_file: "MD5/checksums.md5"
+                    verify_ssl_cert: False
+                    irma_mode: True
                 on-success:
                   - irma_run_aeacus_stats
 
@@ -375,44 +319,26 @@ workflows:
 
             ### START AEACUS REPORT STEPS ###
             irma_run_aeacus_stats:
-               action: core.http
-               input:
-                    method: "POST"
-                    url: <% $.irma_siswrap_base_url %>/aeacusstats/run/<% $.runfolder_name %>?apikey=<% $.irma_api_key %>
-                    body: '{"runfolder": "<% $.runfolder_name %>"}'
-                    verify_ssl_cert: False
-               publish:
-                   irma_run_aeacus_stats_job_id: <% task(irma_run_aeacus_stats).result.body.pid %>
-               on-success:
-                 - poll_irma_aeacus_stats
-
-            poll_irma_aeacus_stats:
                action: arteria-packs.poll_status
                input:
-                  url: <% $.irma_siswrap_base_url %>/aeacusstats/status/<% $.irma_run_aeacus_stats_job_id %>?apikey=<% $.irma_api_key %>
-                  verify_ssl_cert: False
+                    url: <% $.irma_siswrap_base_url %>/aeacusstats/run/<% $.runfolder_name %>?apikey=<% $.irma_api_key %>
+                    body:
+                      runfolder: <% $.runfolder_name %>
+                    verify_ssl_cert: False
+                    irma_mode: True
                on-success:
                  - irma_run_aeacus_reports
 
             irma_run_aeacus_reports:
-               action: core.http
+               action: arteria-packs.poll_status
                input:
-                  method: "POST"
                   url: <% $.irma_siswrap_base_url %>/aeacusreports/run/<% $.runfolder_name %>?apikey=<% $.irma_api_key %>
-                  body: '{"runfolder": "<% $.runfolder_name %>"}'
+                  body:
+                    runfolder: <% $.runfolder_name %>
                   verify_ssl_cert: False
-               publish:
-                 irma_run_aeacus_reports_job_id: <% task(irma_run_aeacus_reports).result.body.pid %>
+                  irma_mode: True
                on-success:
-                 - poll_irma_aeacus_reports
-
-            poll_irma_aeacus_reports:
-                action: arteria-packs.poll_status
-                input:
-                  url: <% $.irma_siswrap_base_url %>/aeacusreports/status/<% $.irma_run_aeacus_reports_job_id %>?apikey=<% $.irma_api_key %>
-                  verify_ssl_cert: False
-                on-success:
-                  - upload_runfolder_to_pdc
+                - upload_runfolder_to_pdc
 
             ### END AEACUS REPORT STEPS ###
             # TODO Need to add starting the ngi pipeline on irma
