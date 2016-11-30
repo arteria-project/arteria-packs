@@ -58,14 +58,14 @@ class PollStatus(Action):
             else:
                 return response_json['link']
         except RequestException as err:
-            self.logger.warning("An error was encountered when trying to "
+            self.logger.error("An error was encountered when trying to "
                                 "post to url: {0}, {1}".format(endpoint, err))
             raise err
         except KeyError as err:
-            self.logger.warning("Could not find correct key in response json: {}".format(response_json))
+            self.logger.error("Could not find correct key in response json: {}".format(response_json))
             raise err
         except ValueError as err:
-            self.logger.warning("Error decoding response as json. Got status: {} and response: {}".format(
+            self.logger.error("Error decoding response as json. Got status: {} and response: {}".format(
                 response.status_code,
                 response.content))
             raise err
