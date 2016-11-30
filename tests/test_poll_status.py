@@ -42,9 +42,10 @@ class PollStatusTestCase(BaseActionTestCase):
                                              sleep=0.001,
                                              ignore_result=ignore_results,
                                              verify_ssl_cert=False,
+                                             irma_mode=False,
                                              max_retries=1)
 
-            post_mock.assert_called_with(fake_url, fake_body)
+            post_mock.assert_called_with(fake_url, json=fake_body, verify=False)
             get_mock.assert_called_with(response_link, verify=False)
 
             self.assertTrue(exit_code == expected_exit_status)
