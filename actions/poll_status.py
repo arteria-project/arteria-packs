@@ -37,7 +37,9 @@ class PollStatus(Action):
 
         def _rewrite_link(link):
             endpoint_parsed = urlparse(endpoint)
-            first_part_of_path = endpoint_parsed.path.split('/')[1]
+            # Gets the first non-empty element from the path, this lets it account
+            # for multiple slashes
+            first_part_of_path = filter(None, endpoint_parsed.path.split('/'))[0]
             link_parsed = urlparse(link)
             return "{}://{}/{}{}?{}".format(endpoint_parsed.scheme,
                                             endpoint_parsed.netloc,
