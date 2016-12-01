@@ -29,9 +29,9 @@ class PollStatus(Action):
             resp = requests.get(url, verify=verify_ssl_cert)
             return resp
         except RequestException as err:
-            self.logger.warning("An error was encountered when "
-                                "querying url: {0},  {1}".format(url, err))
-            return None
+            self.logger.error("An error was encountered when "
+                              "querying url: {0},  {1}".format(url, err))
+            raise err
 
     def post_to_endpoint(self, endpoint, body, irma_mode, verify_ssl_cert):
 
