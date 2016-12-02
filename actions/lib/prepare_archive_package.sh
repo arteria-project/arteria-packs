@@ -10,9 +10,10 @@ RUNFOLDER=$1
 
 RUNFOLDER_NAME=$(basename ${RUNFOLDER})
 
-# The exclude pattern is configurable upstreams, but it should hopefully look
-# something like the following. Escaping various quotes can be messy though. 
-# EXCLUDE="^./Config|^./InterOp|^./SampleSheet.csv|^./Unaligned|^./Data|^./Thumbnail_Images"
+# The exclude pattern is for everything we do not want to pack, and is configurable 
+# upstreams. It should hopefully look something like the following. 
+# EXCLUDE="^./Config|^./InterOp|^./SampleSheet.csv|^./Unaligned|^./Data|^./Thumbnail_Images|^./runParameters.xml|^./RunInfo.xml"
+# Escaping various quotes can be messy though. 
 EXCLUDE=$2
 
 cd ${RUNFOLDER}
