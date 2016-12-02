@@ -48,8 +48,6 @@ workflows:
             # want to re-process the runfolder. Notes that it is only the files that gets filtered out,
             # the empty subdirs will still be uploaded.
             # TODO: How to best pass these checksum excludes from config? Hardcoded for now.
-            # find . -type f ! -path "./Data/*" -and ! -path "./Thumbnail_Images/*"
-            # find . -type f | egrep -v '^./Data|^./Thumbnail_Images' > ./.checksum-includes
             generate_checksums:
                 action: core.local
                 input:
