@@ -52,7 +52,7 @@ workflows:
                 action: core.local
                 input:
                   cmd: ssh <% $.host %> "cd <% $.runfolder %> && find -L . -type f ! -path './Data/*' -and ! -path './Thumbnail_Images/*' -and ! -path './checksums_prior_to_pdc.md5' -exec md5sum {} + > checksums_prior_to_pdc.md5"
-                timeout: 86400 # 24 h timeout
+                  timeout: 86400 # 24 h timeout
                 on-success:
                   - tsm_archive_to_pdc
 
