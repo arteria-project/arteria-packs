@@ -34,7 +34,6 @@ workflows:
                 supr_api_user: <% task(get_config).result.result.supr_api_user %>
                 supr_api_key: <% task(get_config).result.result.supr_api_key %>
                 supr_api_url: <% task(get_config).result.result.supr_api_url %>
-                supr_api_url: <% task(get_config).result.result.supr_api_url %>
                 irma_api_key: <% task(get_config).result.result.irma_api_key %>
                 delivery_service_url: <% task(get_config).result.result.delivery_service_url %>
               on-success:
