@@ -26,5 +26,5 @@ class ReadProjectsEmailFile(Action):
             self.logger.info("Projects given and projects found in file did match...")
             return True, result
         else:
-            self.logger.info("Projects given and projects found in file did not match!")
+            self.logger.error("Projects given and projects found in file did not match!")
             return False, {}
