@@ -14,15 +14,20 @@ class ArteriaDeliveryService(Action):
     def query_for_status(self, links):
         STAGING_SUCCESSFUL = 'staging_successful'
         STAGING_FAILED = 'staging_failed'
+        STAGING_PENDING = 'pending'
+        STAGING_IN_PROGRESS = 'staging_in_progress'
+        valid_states = [STAGING_SUCCESSFUL, STAGING_FAILED, STAGING_PENDING, STAGING_IN_PROGRESS]
 
         def update_links(links_results):
             for link, state in links_results.iteritems():
                 if state == STAGING_SUCCESSFUL or state == STAGING_FAILED:
                     continue
-                else:
+                elif state in valid_states:
                     response = requests.get(link)
                     response_as_json = json.loads(response.content)
                     links_results[link] = response_as_json["status"]
+                else:
+                    raise NotImplemented("Do not know how to handle state: {}".format(state))
 
         def is_in_end_state(link_state):
             if not link_state:
