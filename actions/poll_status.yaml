@@ -1,7 +1,7 @@
 ---
 name: poll_status
 runner_type: run-python
-description: Polls an URL until the web service says that the long process has finished
+description: Posts data to a url starting a process, and polls the status link it gets back until it finishes or fails.
 enabled: true
 entry_point: poll_status.py
 parameters:
@@ -11,24 +11,28 @@ parameters:
         default: 86400
     url:
         type: string
-        description: URL you want to poll for current status of long running process
+        description: URL you want to post the data to for current status of long running process
         required: true
-        position: 1
     sleep:
         type: integer
         description: Number of minutes to sleep between poll retries (default 1 m)
         required: false
-        position: 2
         default: 1
+    body:
+        type: object
+        description: The json data to post to the url.
     ignore_result:
         type: boolean
         description: Allows manually overriding the result, e.g. even script will return 0 exit status even if polling failed. Useful for e.g. overriding qc result checking.
         required: false
-        position: 2
+        default: false
+    irma_mode:
+        type: boolean
+        description: Services on irma live behind a gateway and will therefore return incorrect links. Setting this to true will rewrite those links
+        required: false
         default: false
     verify_ssl_cert:
         type: boolean
         description: Verify the ssl cert if using https, default is true.
         required: false
-        position: 3
         default: true
