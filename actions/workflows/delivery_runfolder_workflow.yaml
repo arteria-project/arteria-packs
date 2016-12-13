@@ -80,7 +80,9 @@ workflows:
                  delivery_base_api_url: <% $.delivery_service_url %>
                  runfolder_name: <% $.runfolder_name %>
                  projects:
-                  projects: <% $.projects_on_runfolder %>
+                   projects: <% $.projects_on_runfolder %>
+                 publish:
+                   projects_and_stage_ids: <% task(stage_runfolder).result.result %>
               on-success:
                 - create_delivery_projects
 
@@ -92,4 +94,8 @@ workflows:
                 project_name: <% $.project_name %>
                 api_user: <% $.supr_api_user %>
                 api_key: <% $.supr_api_key %>
+              publish:
+                delivery_projects:
+                  <% $.project_name %>: <% task(create_delivery_projects).result.name %>
 
+            # TODO Remember to pass correct md5sum files for the project.
