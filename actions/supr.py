@@ -22,7 +22,7 @@ class Supr(Action):
 
         if response.status_code != 200:
             raise AssertionError("Status code returned when trying to get PI id for email: "
-                                 "{} was not 200.".format(email))
+                                 "{} was not 200. Response was: {}".format(email, response.content))
 
         response_as_json = json.loads(response.content)
         matches = response_as_json["matches"]
@@ -46,46 +46,50 @@ class Supr(Action):
         return res
 
     @staticmethod
-    def create_delivery_project(base_url, ngi_project_name, pi_id, user, key):
+    def create_delivery_project(base_url, project_names_and_ids, user, key):
 
-        create_delivery_project_url = '{}/ngi_delivery/project/create/'.format(base_url)
+        result = {}
+        for ngi_project_name, pi_id in project_names_and_ids.iteritems():
 
-        today = date.today()
-        today_formatted = today.strftime(Supr.DATE_FORMAT)
-        six_months_from_now = today + relativedelta(months=+6)
-        six_months_from_now_formatted = six_months_from_now.strftime(Supr.DATE_FORMAT)
+            create_delivery_project_url = '{}/ngi_delivery/project/create/'.format(base_url)
 
-        payload = {
-            'ngi_project_name': ngi_project_name,
-            'title': "DELIVERY_{}_{}".format(ngi_project_name, today_formatted),
-            'pi_id': pi_id,
-            'start_date': today_formatted,
-            'end_date': six_months_from_now_formatted,
-            'continuation_name': '',
-            # TODO Right now this default to 1T, we might want to get something
-            # realistic in here later.
-            # 'allocated': size_of_delivery,
-            'api_opaque_data': '',
-            'ngi_ready': False,
-            'ngi_delivery_status': ''
-        }
+            today = date.today()
+            today_formatted = today.strftime(Supr.DATE_FORMAT)
+            six_months_from_now = today + relativedelta(months=+6)
+            six_months_from_now_formatted = six_months_from_now.strftime(Supr.DATE_FORMAT)
 
-        response = requests.post(create_delivery_project_url,
-                                 data=json.dumps(payload),
-                                 auth=(user, key))
+            payload = {
+                'ngi_project_name': ngi_project_name,
+                'title': "DELIVERY_{}_{}".format(ngi_project_name, today_formatted),
+                'pi_id': pi_id,
+                'start_date': today_formatted,
+                'end_date': six_months_from_now_formatted,
+                'continuation_name': '',
+                # TODO Right now this default to 1T, we might want to get something
+                # realistic in here later.
+                # 'allocated': size_of_delivery,
+                'api_opaque_data': '',
+                'ngi_ready': False,
+                'ngi_delivery_status': ''
+            }
 
-        if response.status_code != 200:
-            raise AssertionError("Status code returned when trying to create delivery project was not 200. Response "
-                                 "was: {}".format(response.content))
+            response = requests.post(create_delivery_project_url,
+                                     data=json.dumps(payload),
+                                     auth=(user, key))
 
-        return json.loads(response.content)
+            if response.status_code != 200:
+                raise AssertionError("Status code returned when trying to create delivery "
+                                     "project was not 200. Response was: {}".format(response.content))
+
+            result[ngi_project_name] = json.loads(response.content)
+
+        return result
 
     def run(self, action, supr_base_api_url, api_user, api_key, **kwargs):
         if action == "get_id_from_email":
             return self.search_for_pis(kwargs['project_to_email_dict'], supr_base_api_url, api_user, api_key)
         elif action == 'create_delivery_project':
-            return self.create_delivery_project(supr_base_api_url, kwargs['project_name'],
-                                                kwargs['pi_id'], api_user, api_key)
+            return self.create_delivery_project(supr_base_api_url, kwargs['project_names_and_ids'], api_user, api_key)
         else:
             raise AssertionError("Action: {} was not recognized.".format(action))
 

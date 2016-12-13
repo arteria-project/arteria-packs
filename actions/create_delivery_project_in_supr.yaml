@@ -12,14 +12,10 @@ parameters:
         required: true
         default: create_delivery_project
         immutable: true
-    project_name:
-        type: string
-        description: Name to use for the delivery project (Normally same as NGI internal code)
+    project_names_and_ids:
+        type: object
         required: true
-    pi_id:
-        type: integer
-        description: SUPR Id of PI to create project for
-        required: true
+        description: Dictionary of project names to pi ids.
     supr_base_api_url:
         type: string
         description: Email adress to look for associated PI for.

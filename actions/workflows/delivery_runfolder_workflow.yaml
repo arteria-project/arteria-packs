@@ -81,21 +81,27 @@ workflows:
                  runfolder_name: <% $.runfolder_name %>
                  projects:
                    projects: <% $.projects_on_runfolder %>
-                 publish:
-                   projects_and_stage_ids: <% task(stage_runfolder).result.result %>
+              publish:
+                 projects_and_stage_ids: <% task(stage_runfolder).result.result %>
               on-success:
                 - create_delivery_projects
 
             create_delivery_projects:
-              with-items: project_name in <% $.pi_supr_ids.keys() %>
               action: arteria-packs.create_delivery_project_in_super
               input:
-                pi_id: <% $.pi_supr_ids.get($.project_name) %>
-                project_name: <% $.project_name %>
+                project_names_and_ids: <% $.pi_supr_ids %>
                 api_user: <% $.supr_api_user %>
                 api_key: <% $.supr_api_key %>
               publish:
-                delivery_projects:
-                  <% $.project_name %>: <% task(create_delivery_projects).result.name %>
+                delivery_projects: <% task(create_delivery_projects).result.result %>
+              on-success:
+                - deliver_runfolder
 
             # TODO Remember to pass correct md5sum files for the project.
+            deliver_runfolder:
+              action: arteria-packs.delivery_service_deliver
+              with-items: ngi_project_name in <% $.projects_and_stage_ids.keys() %>
+              input:
+                staging_id: <% $.projects_and_stage_ids.get($.ngi_project_name)%>
+                delivery_base_api_url: <% $.delivery_service_url %>
+                delivery_project_id: <% $.delivery_projects.get($.ngi_project_name).name %>
