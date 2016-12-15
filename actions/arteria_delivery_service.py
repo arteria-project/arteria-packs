@@ -153,6 +153,8 @@ class ArteriaDeliveryService(Action):
                 exit_status = False
                 self.logger.error('Project: {} was not successfully staged. '
                                   'Had status: {}. Link was: '.format(project, status, link))
+            # The last part of the link contains the staging id. This is sort of a hack,
+            # but it will have to do for now. /JD 20161215
             result[project] = int(link.split('/')[-1])
 
         return exit_status, result
