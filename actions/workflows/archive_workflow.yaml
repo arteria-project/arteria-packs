@@ -26,32 +26,34 @@ workflows:
               publish:
                 archive_excludes: <% task(get_excludes).result.result.archive_excludes %>
               on-success:
-                - prepare_tsm_archive
+                - create_archive_dir
 
             ### GENERAL TASKS END ###
 
             ### TRANSFER FILES START ###
-            # Will remove all files not excluded, after they've been added to the tar archive
-            # TODO: Script will fail if gziped archive already exists. Manually extract it for now
-            # if the workflow should be re-run.
+            create_archive_dir: 
+              action: arteria-packs.create_archive_dir
+              input: 
+                host: <% $.host %>
+                runfolder: <% $.runfolder %>
+                fastq_threshold: 10 # number of fastq files to expect; if less then the action will fail
+              on-success: 
+                - prepare_tsm_archive     
+            
+            # Will compress some of the files in the archive. Script will fail if gziped archive already exists. 
             prepare_tsm_archive:
                action: arteria-packs.prepare_archive_package
                input:
                  host: <% $.host %>
-                 runfolder: <% $.runfolder %>
+                 runfolder: <% $.runfolder %>_archive
                  exclude: <% $.archive_excludes %>
                on-success:
                  - generate_checksums
 
-            # Don't generate checksums for Data and Thumbnail_Images, because those will be filtered out
-            # by TSM when uploading to PDC, but we do want to keep them locally for a while if we
-            # want to re-process the runfolder. Notes that it is only the files that gets filtered out,
-            # the empty subdirs will still be uploaded.
-            # TODO: How to best pass these checksum excludes from config? Hardcoded for now.
             generate_checksums:
                 action: core.local
                 input:
-                  cmd: ssh <% $.host %> "cd <% $.runfolder %> && find -L . -type f ! -path './Data/*' -and ! -path './Thumbnail_Images/*' -and ! -path './checksums_prior_to_pdc.md5' -exec md5sum {} + > checksums_prior_to_pdc.md5"
+                  cmd: ssh <% $.host %> "cd <% $.runfolder %>_archive && find -L . -type f ! -path './checksums_prior_to_pdc.md5' -exec md5sum {} + > checksums_prior_to_pdc.md5"
                   timeout: 86400 # 24 h timeout
                 on-success:
                   - tsm_archive_to_pdc
@@ -61,7 +63,7 @@ workflows:
             tsm_archive_to_pdc:
                 action: core.local
                 input:
-                  cmd: ssh <% $.host %> "dsmc archive <% $.runfolder %>/ -subdir=yes -description=`uuidgen` | egrep -v '<% $.runfolder %>/Data/|<% $.runfolder %>/Thumbnail_Images/'"
+                  cmd: ssh <% $.host %> "dsmc archive <% $.runfolder %>_archive/ -subdir=yes -description=`uuidgen`"
                   timeout: 604800 # 1w worst-case timeout
 
             # TODO: Implement a separate workflow that for an interval does a random download (if enough disk space exists)

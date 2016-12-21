@@ -1,0 +1,31 @@
+---
+    name: 'create_archive_dir'
+    runner_type: 'run-local'
+    description: 'Creates a copy of the runfolder, consisting of symlinks, for archiving purposes.'
+    enabled: true
+    entry_point: ''
+    parameters:
+        timeout:
+            default: 86400
+        runfolder:
+            type: 'string'
+            description: 'Path to runfolder to archive'
+            required: true
+            position: 1
+        fastq_threshold:
+            type: 'integer'
+            description: 'Action will fail if less than this number of fastq files are found'
+            required: true
+            position: 2
+        host:
+            type: 'string'
+            description: 'Host where runfolder is located'
+            required: true
+            position: 3
+        cmd:
+            immutable: true 
+            default: 'ssh -v {{host}} "bash -s" < /opt/stackstorm/packs/arteria-packs/actions/lib/create_archive_dir.py -e Data -e Thumbnail_Images -t {{ fastq_threshold }} {{ runfolder }}'
+        connect_timeout:
+            type: 'integer'
+            description: 'SSH connect timeout in seconds'
+            default: 86400 # 24 h
