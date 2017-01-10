@@ -19,12 +19,15 @@ workflows:
                 cmd: git rev-parse HEAD
                 cwd: /opt/stackstorm/packs/arteria-packs/
               on-success:
-                - get_excludes
+                - get_config
 
-            get_excludes:
+            get_config:
               action: arteria-packs.get_pack_config
               publish:
-                archive_excludes: <% task(get_excludes).result.result.archive_excludes %>
+                archive_excludes: <% task(get_config).result.result.archive_excludes %>
+                archive_fastq_threshold: <% task(get_config).result.result.archive_fastq_threshold %>
+                archive_python_path: <% task(get_config).result.result.archive_python_path %>
+                archive_exclude_links: <% task(get_config).result.result.archive_exclude_links %>
               on-success:
                 - create_archive_dir
 
@@ -36,13 +39,15 @@ workflows:
               input: 
                 host: <% $.host %>
                 runfolder: <% $.runfolder %>
-                fastq_threshold: 10 # number of fastq files to expect; if less then the action will fail
+                fastq_threshold: <% $.archive_fastq_threshold %> # number of fastq files to expect; if less then the action will fail
+                python_path: <% $.archive_python_path %>
+                exclude_links: <% $.archive_exclude_links %>
               on-success: 
-                - prepare_tsm_archive     
+                - compress_tsm_archive     
             
             # Will compress some of the files in the archive. Script will fail if gziped archive already exists. 
-            prepare_tsm_archive:
-               action: arteria-packs.prepare_archive_package
+            compress_tsm_archive:
+               action: arteria-packs.compress_archive_package
                input:
                  host: <% $.host %>
                  runfolder: <% $.runfolder %>_archive

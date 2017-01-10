@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# Simple script that should be executed on a biotank when we want to prepare a
-# runfolder to be archived to PDC via TSM. 
+# Simple script that should be executed on a biotank when we want to compress a
+# runfolder to be archived to PDC via TSM. The runfolder to archive is expected
+# to be a folder full of symlinks pointing to real source folder. 
 
 set -e
 set -o pipefail 
@@ -13,14 +14,14 @@ RUNFOLDER_NAME=$(basename ${RUNFOLDER})
 
 # The exclude pattern is for everything we do not want to pack, and is configurable 
 # upstreams. It should hopefully look something like the following. 
-# EXCLUDE="^./Config|^./InterOp|^./SampleSheet.csv|^./Unaligned|^./runParameters.xml|^./RunInfo.xml"
+# EXCLUDE="^Config|^InterOp|^SampleSheet.csv|^Unaligned|^runParameters.xml|^RunInfo.xml"
 # Escaping various quotes can be messy though. 
 EXCLUDE=$2
 
 cd ${RUNFOLDER}
 
-# If the normal archive workflow is re-run then the tar ball shouldn't exist anymore. 
-# Still, just in case, abort if it is found. 
+# If the normal archive workflow is re-run then the tar ball shouldn't exist anymore because
+# the linked directory structory will be re-created from scratch. Still, just in case, abort if it is found. 
 if [ -f ./${RUNFOLDER_NAME}.tar.gz ]; then
   echo "Gziped archive file ${RUNFOLDER_NAME}.tar.gz already exists. Manual intervention required."
   exit 1

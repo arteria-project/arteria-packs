@@ -22,9 +22,21 @@
             description: 'Host where runfolder is located'
             required: true
             position: 3
+        python_path:
+            type: 'string'
+            description: 'Path to the Python 2.7 binary to use (hard coded for now)'
+            required: true
+            position: 4
+            default: '/opt/arteria/arteria-runfolder-env/bin/python'
+        exclude_links: 
+            type: 'string'
+            description: 'Argument to script for which links we should not create'
+            required: false
+            position: 5
+            default: '-e Data -e Thumbnail_Images'
         cmd:
             immutable: true 
-            default: 'ssh -v {{host}} "bash -s" < /opt/stackstorm/packs/arteria-packs/actions/lib/create_archive_dir.py -e Data -e Thumbnail_Images -t {{ fastq_threshold }} {{ runfolder }}'
+            default: 'ssh -v {{ host }} "{{ python_path }} -u - {{ exclude_links }} -t {{ fastq_threshold }} {{ runfolder }}" < /opt/stackstorm/packs/arteria-packs/actions/lib/create_archive_dir.py'
         connect_timeout:
             type: 'integer'
             description: 'SSH connect timeout in seconds'
