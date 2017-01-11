@@ -72,8 +72,6 @@ workflows:
               on-success:
                 - stage_runfolder
 
-            # TODO Figure out how to connect staging order to projects so that the correct
-            # staging can be corrected to the correct delivery downstream...
             stage_runfolder:
               action: arteria-packs.delivery_service_stage_runfolder
               input:
