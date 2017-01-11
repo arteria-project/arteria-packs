@@ -1,5 +1,5 @@
 ---
-name: delivery_service_stage_runfolder
+name: delivery_service_stage_project
 runner_type: run-python
 description: Stage a runfolder through the Arteria delivery service
 enabled: true
@@ -10,15 +10,11 @@ parameters:
     action:
         type: string
         required: true
-        default: stage_runfolder
+        default: stage_project
         immutable: true
-    runfolder_name:
+    project_name:
         type: string
-        description: Name of the runfolder to stage
-        required: true
-    projects:
-        type: object
-        description: projects to stage as a json object looking like this {"projects":["ABC_123"]}
+        description: Name of the project to stage
         required: true
     delivery_base_api_url:
         type: string

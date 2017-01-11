@@ -110,9 +110,7 @@ class ArteriaDeliveryService(Action):
         response_as_json = json.loads(response.content)
         return response_as_json
 
-    def stage_delivery(self, base_url, runfolder_name, projects):
-        url = "{}/{}/{}".format(base_url, 'api/1.0/stage/runfolder', runfolder_name)
-
+    def stage_delivery(self, url, projects):
         if projects:
             payload = {'projects': projects['projects']}
         else:
@@ -132,12 +130,12 @@ class ArteriaDeliveryService(Action):
         links = response['delivery_order_link']
         return [links]
 
-    def stage_and_check_status(self, delivery_base_api_url, runfolder_name, projects):
-        response = self.stage_delivery(delivery_base_api_url,
-                                       runfolder_name,
+    def stage_and_check_status(self, url, projects):
+        response = self.stage_delivery(url,
                                        projects)
 
         project_and_links = response['staging_order_links']
+        self.logger.info("Projects and links was: {}".format(project_and_links))
         status_links = project_and_links.values()
         arteria_staging_querier = ArteriaStagingQuerier(self.logger)
         final_status = arteria_staging_querier.query_for_status(status_links)
@@ -157,13 +155,26 @@ class ArteriaDeliveryService(Action):
             # but it will have to do for now. /JD 20161215
             result[project] = int(link.split('/')[-1])
 
+        self.logger.info("Exit status was: {}, result was: {}".format(exit_status, result))
         return exit_status, result
+
+    def stage_and_check_status_of_runfolder(self, delivery_base_api_url, runfolder_name, projects):
+        url = "{}/{}/{}".format(delivery_base_api_url, 'api/1.0/stage/runfolder', runfolder_name)
+        return self.stage_and_check_status(url, projects)
+
+    def stage_and_check_status_of_project(self, delivery_base_api_url, project_name):
+        url = "{}/{}/{}".format(delivery_base_api_url, 'api/1.0/stage/project', project_name)
+        return self.stage_and_check_status(url, projects=None)
 
     def run(self, action, delivery_base_api_url, **kwargs):
         if action == "stage_runfolder":
-            return self.stage_and_check_status(delivery_base_api_url,
-                                               kwargs['runfolder_name'],
-                                               kwargs.get('projects'))
+            return self.stage_and_check_status_of_runfolder(delivery_base_api_url,
+                                                            kwargs['runfolder_name'],
+                                                            kwargs.get('projects'))
+
+        elif action == "stage_project":
+            return self.stage_and_check_status_of_project(delivery_base_api_url,
+                                                          kwargs["project_name"])
 
         elif action == "deliver":
             status_links = self.deliver(delivery_base_api_url,
