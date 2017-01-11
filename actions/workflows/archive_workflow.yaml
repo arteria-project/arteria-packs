@@ -73,7 +73,4 @@ workflows:
                   cmd: ssh <% $.host %> "dsmc archive <% $.runfolder %>_archive/ -subdir=yes -description=`uuidgen`"
                   timeout: 604800 # 1w worst-case timeout
 
-            # TODO: Implement a separate workflow that for an interval does a random download (if enough disk space exists)
-            # that does a "md5sum -c checksums_prior_to_pdc.md5"
-
             ### TRANSFER FILES END ###

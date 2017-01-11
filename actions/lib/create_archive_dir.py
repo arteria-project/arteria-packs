@@ -53,7 +53,7 @@ if __name__ == "__main__":
   parser = argparse.ArgumentParser(description="Takes a runfolder's path as an argument and creates a copy of it with symlinks\n"\
                                                "as its content, suitable for archiving to PDC. Created copy will be placed in\n"\
                                                "the same root path as the runfolder, with suffix '_archive'. If the destination\n"\
-                                               "copy already exists then it will be overwritten.\n\n"\
+                                               "copy already exists then the script will abort.\n\n"\
                                                "The script will also scan for expected subdir/link 'Unaligned' in the runfolder\n"\
                                                "to archive. If it doesn't exist then it will abort. Inside 'Unaligned' it will\n"\
                                                "look for fastq.gz files. If the number of files found are less than the\n"\
