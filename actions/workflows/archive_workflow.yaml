@@ -8,6 +8,7 @@ workflows:
         input:
             - runfolder
             - host
+            - remove_previous_archive
         output:
             output_the_whole_workflow_context: <% $ %>
 
@@ -42,6 +43,7 @@ workflows:
                 fastq_threshold: <% $.archive_fastq_threshold %> # number of fastq files to expect; if less then the action will fail
                 python_path: <% $.archive_python_path %>
                 exclude_links: <% $.archive_exclude_links %>
+                remove_previous: <% $.remove_previous_archive %>
               on-success: 
                 - compress_tsm_archive     
             

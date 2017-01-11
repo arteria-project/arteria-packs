@@ -21,7 +21,9 @@ EXCLUDE=$2
 cd ${RUNFOLDER}
 
 # If the normal archive workflow is re-run then the tar ball shouldn't exist anymore because
-# the linked directory structory will be re-created from scratch. Still, just in case, abort if it is found. 
+# either the linked directory structory will be re-created from scratch, or the workflow
+# should have aborted at an earlier stage because the archive dir already exists. 
+# Still, just in case, abort if it is found. 
 if [ -f ./${RUNFOLDER_NAME}.tar.gz ]; then
   echo "Gziped archive file ${RUNFOLDER_NAME}.tar.gz already exists. Manual intervention required."
   exit 1

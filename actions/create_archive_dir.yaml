@@ -11,32 +11,32 @@
             type: 'string'
             description: 'Path to runfolder to archive'
             required: true
-            position: 1
         fastq_threshold:
             type: 'integer'
             description: 'Action will fail if less than this number of fastq files are found'
             required: true
-            position: 2
+        remove_previous: 
+            type: 'boolean'
+            description: 'Set to true if we want to remove an already existing archive directory'
+            required: true
+            default: false
         host:
             type: 'string'
             description: 'Host where runfolder is located'
             required: true
-            position: 3
         python_path:
             type: 'string'
             description: 'Path to the Python 2.7 binary to use (hard coded for now)'
             required: true
-            position: 4
             default: '/opt/arteria/arteria-runfolder-env/bin/python'
         exclude_links: 
             type: 'string'
             description: 'Argument to script for which links we should not create'
             required: false
-            position: 5
             default: '-e Data -e Thumbnail_Images'
         cmd:
             immutable: true 
-            default: 'ssh -v {{ host }} "{{ python_path }} -u - {{ exclude_links }} -t {{ fastq_threshold }} {{ runfolder }}" < /opt/stackstorm/packs/arteria-packs/actions/lib/create_archive_dir.py'
+            default: 'ssh -v {{host}} "{{python_path}} -u - {{exclude_links}} -t {{fastq_threshold}} --remove={{remove_previous}} {{runfolder}}" < /opt/stackstorm/packs/arteria-packs/actions/lib/create_archive_dir.py'
         connect_timeout:
             type: 'integer'
             description: 'SSH connect timeout in seconds'

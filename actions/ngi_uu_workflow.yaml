@@ -59,3 +59,11 @@ parameters:
     default: 1
     type: integer
     description: "Value of new read number"
+  skip_archiving: 
+    default: false
+    type: boolean
+    description: "Set to true to skip archive subworkflow"
+  remove_previous_archive_dir: 
+    default: false
+    type: boolean
+    description: "Set to true to remove previous archive dir; e.g. if re-running a workflow"
