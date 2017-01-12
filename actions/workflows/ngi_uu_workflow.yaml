@@ -125,6 +125,18 @@ workflows:
                     url: "http://<% $.host %>:<% $.bcl2fastq_service_port %>/api/1.0/start/<% $.runfolder_name %>"
                     timeout: 86400 # Wait for 24 h before timing out.
                     body: <% $.bcl2fastq_body %>
+                on-success: 
+                    - save_bcl2fastq_version
+
+            # Save the bcl2fastq version that we used in a file inside the runfolder. 
+            # The version is included in stderr from the previous action as JSON bundled
+            # inside a long text string. So first we parse out the dict from the first line
+            # of stderr, and then we fetch the field to be saved on disk. Note that we need
+            # to launch the oneliner in a subshell for the pipefail to be set properly.  
+            save_bcl2fastq_version: 
+                action: core.local
+                input:
+                    cmd: bash -c "set -o pipefail && echo -e \"<% task(run_bcl2fastq).result.stderr %>\" | cut -d '{' -f2 | cut -d'}' -f1 | python -c \"import ast,sys; print ast.literal_eval('{' + sys.stdin.readline() + '}')['bcl2fastq_version']\" | ssh <% $.host %> \"cat - > <% $.runfolder %>/bcl2fastq_version\""
                 on-success:
                     - conversionstats_workaround: <% $.conversionstats_swap_read_nr = true %>
                     - download_sisyphus_config: <% $.conversionstats_swap_read_nr = false %>
