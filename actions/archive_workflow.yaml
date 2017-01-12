@@ -23,3 +23,8 @@ parameters:
     description: 'Path to runfolder to archive'
     required: true
     type: string
+  remove_previous_archive: 
+    description: 'Set to true to remove previous archive'
+    required: true
+    type: boolean
+    default: false

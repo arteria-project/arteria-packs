@@ -46,7 +46,14 @@ slack_webhook_url: https://slack.webhook.url
 charon_status_report_slack_channel: "#bottest"
 
 # String of file paths to exclude from the compressed archive (egrep syntax)
-archive_excludes: "\"'^./Config|^./InterOp|^./SampleSheet.csv|^./Unaligned|^./Data|^./Thumbnail_Images'\""
+archive_excludes: "\"'^Config|^InterOp|^SampleSheet.csv|^Unaligned|^runParameters.xml|^RunInfo.xml\""
+# Which file entries we should not link to when creating the archive copy of the runfolder 
+archive_exclude_links: "-e Data -e Thumbnail_Images"
+# Number of fastq files to expect when creating archive. If we find less files than this 
+# then the action will fail. 
+archive_fastq_threshold: 10
+archive_python_path: /opt/arteria/arteria-runfolder-env/bin/python
+
 supr_api_user: apiuser
 supr_api_key: apikey
 supr_api_url: https://disposer.c3se.chalmers.se/supr-test/api

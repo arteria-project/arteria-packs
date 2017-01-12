@@ -17,6 +17,8 @@ workflows:
             - conversionstats_swap_read_nr
             - conversionstats_swap_read_from
             - conversionstats_swap_read_to
+            - skip_archiving
+            - remove_previous_archive_dir  
         output:
             output_the_whole_workflow_context: <% $ %>
         task-defaults:
@@ -338,7 +340,9 @@ workflows:
                   verify_ssl_cert: False
                   irma_mode: True
                on-success:
-                - upload_runfolder_to_pdc
+                - upload_runfolder_to_pdc: <% $.skip_archiving = false %>
+                - notify_finished: <% $.skip_archiving = true %>
+                - mark_as_finished: <% $.skip_archiving = true %>
 
             ### END AEACUS REPORT STEPS ###
             # TODO Need to add starting the ngi pipeline on irma
@@ -367,7 +371,9 @@ workflows:
                     env:
                         PERL5LIB: /proj/a2009002/perl/lib/perl5/
                 on-success:
-                    - upload_runfolder_to_pdc
+                    - upload_runfolder_to_pdc: <% $.skip_archiving = false %>
+                    - notify_finished: <% $.skip_archiving = true %>
+                    - mark_as_finished: <% $.skip_archiving = true %>
             ## START AEACUS REPORT STEPS END ###
 
             ## START NGI_PIPELINE IF NECESSARY ##
@@ -384,6 +390,7 @@ workflows:
                 input:
                     runfolder: <% $.runfolder %>
                     host: <% $.host %>
+                    remove_previous_archive: <% $.remove_previous_archive_dir %>
                 on-success:
                   - notify_finished
                   - mark_as_finished
