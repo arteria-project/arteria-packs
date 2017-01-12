@@ -11,9 +11,6 @@ from requests.exceptions import RequestException
 # Needs to be run in a Stackstorm virtualenv
 from st2actions.runners.pythonrunner import Action
 
-
-
-
 class PollStatus(Action):
     """
     Polls a give micro service URL for current status of some long running process.
@@ -54,9 +51,9 @@ class PollStatus(Action):
             if irma_mode:
                 modified_link = _rewrite_link(response_json['link'])
                 self.logger.info("In irma mode, will rewrite link to: {}".format(modified_link))
-                return modified_link
+                return {"response": response_json, "url": modified_link}
             else:
-                return response_json['link']
+                return {"response": response_json, "url": response_json['link']}
         except RequestException as err:
             self.logger.error("An error was encountered when trying to "
                                 "post to url: {0}, {1}".format(endpoint, err))
@@ -128,7 +125,9 @@ class PollStatus(Action):
                 return False, json_resp
 
     def run(self, url, body, sleep, ignore_result, irma_mode, verify_ssl_cert, max_retries=3):
-        status_link = self.post_to_endpoint(url, body, irma_mode, verify_ssl_cert)
-        return self.check_status(status_link, sleep, ignore_result, verify_ssl_cert, max_retries)
+        start_response = self.post_to_endpoint(url, body, irma_mode, verify_ssl_cert) 
+        status_link = start_response['url']
+        status_val, status_response = self.check_status(status_link, sleep, ignore_result, verify_ssl_cert, max_retries)
+        return status_val, { "response_from_start": start_response, "response_from_last_status_check": status_response }
 
 

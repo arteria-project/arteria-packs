@@ -127,6 +127,13 @@ workflows:
                     url: "http://<% $.host %>:<% $.bcl2fastq_service_port %>/api/1.0/start/<% $.runfolder_name %>"
                     timeout: 86400 # Wait for 24 h before timing out.
                     body: <% $.bcl2fastq_body %>
+                on-success: 
+                    - save_bcl2fastq_version
+
+            save_bcl2fastq_version: 
+                action: core.local
+                input:
+                    cmd: ssh <% $.host %> "echo <% task(run_bcl2fastq).result.result.response_from_start.response.bcl2fastq_version %> > <% $.runfolder %>/bcl2fastq_version"
                 on-success:
                     - conversionstats_workaround: <% $.conversionstats_swap_read_nr = true %>
                     - download_sisyphus_config: <% $.conversionstats_swap_read_nr = false %>
