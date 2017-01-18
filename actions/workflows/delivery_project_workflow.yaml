@@ -67,6 +67,7 @@ workflows:
               action: arteria-packs.create_delivery_project_in_super
               input:
                 project_names_and_ids: <% $.pi_supr_ids %>
+                project_info: <% $.projects_and_stage_ids %>
                 api_user: <% $.supr_api_user %>
                 api_key: <% $.supr_api_key %>
               publish:
@@ -79,6 +80,6 @@ workflows:
               action: arteria-packs.delivery_service_deliver
               with-items: ngi_project_name in <% $.projects_and_stage_ids.keys() %>
               input:
-                staging_id: <% $.projects_and_stage_ids.get($.ngi_project_name)%>
+                staging_id: <% $.projects_and_stage_ids.get($.ngi_project_name).staging_id %>
                 delivery_base_api_url: <% $.delivery_service_url %>
                 delivery_project_id: <% $.delivery_projects.get($.ngi_project_name).name %>
