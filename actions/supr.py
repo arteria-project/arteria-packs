@@ -2,6 +2,7 @@
 
 import requests
 import json
+import math
 from datetime import date
 from dateutil.relativedelta import relativedelta
 
@@ -59,7 +60,7 @@ class Supr(Action):
             six_months_from_now_formatted = six_months_from_now.strftime(Supr.DATE_FORMAT)
 
             # Check smallest of delivery size in bytes and one gb (api wants size passed in giga bytes)
-            size_of_delivery = max(1, project_info[ngi_project_name]['size']/pow(10, 9))
+            size_of_delivery = max(1, math.ceil(project_info[ngi_project_name]['size']/pow(10, 9)))
 
             payload = {
                 'ngi_project_name': ngi_project_name,
