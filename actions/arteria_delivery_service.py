@@ -62,6 +62,11 @@ class ArteriaStagingQuerier(ArteriaQuerierBase):
     def __init__(self, logger):
         super(ArteriaStagingQuerier, self).__init__(logger)
 
+    def query_for_size(self, link):
+        response = requests.get(link)
+        response_as_json = json.loads(response.content)
+        return response_as_json['size']
+
     def successful_status(self):
         return self.staging_successful
 
@@ -140,7 +145,6 @@ class ArteriaDeliveryService(Action):
         arteria_staging_querier = ArteriaStagingQuerier(self.logger)
         final_status = arteria_staging_querier.query_for_status(status_links)
         links_to_projects = {v: k for k, v in project_and_links.iteritems()}
-        projects_to_staging_ids = {}
 
         exit_status = True
         result = {}
@@ -150,10 +154,11 @@ class ArteriaDeliveryService(Action):
             if not status == arteria_staging_querier.successful_status():
                 exit_status = False
                 self.logger.error('Project: {} was not successfully staged. '
-                                  'Had status: {}. Link was: '.format(project, status, link))
+                                  'Had status: {}. Link was: {}'.format(project, status, link))
+            size = arteria_staging_querier.query_for_size(link)
             # The last part of the link contains the staging id. This is sort of a hack,
             # but it will have to do for now. /JD 20161215
-            result[project] = int(link.split('/')[-1])
+            result[project] = {'staging_id': int(link.split('/')[-1]), 'size':  size}
 
         self.logger.info("Exit status was: {}, result was: {}".format(exit_status, result))
         return exit_status, result

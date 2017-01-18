@@ -46,7 +46,7 @@ class Supr(Action):
         return res
 
     @staticmethod
-    def create_delivery_project(base_url, project_names_and_ids, user, key):
+    def create_delivery_project(base_url, project_names_and_ids, project_info, user, key):
 
         result = {}
         for ngi_project_name, pi_id in project_names_and_ids.iteritems():
@@ -58,6 +58,9 @@ class Supr(Action):
             six_months_from_now = today + relativedelta(months=+6)
             six_months_from_now_formatted = six_months_from_now.strftime(Supr.DATE_FORMAT)
 
+            # Check smallest of delivery size in bytes and one gb (api wants size passed in giga bytes)
+            size_of_delivery = max(1, project_info[ngi_project_name]['size']/pow(10, 9))
+
             payload = {
                 'ngi_project_name': ngi_project_name,
                 'title': "DELIVERY_{}_{}".format(ngi_project_name, today_formatted),
@@ -65,9 +68,7 @@ class Supr(Action):
                 'start_date': today_formatted,
                 'end_date': six_months_from_now_formatted,
                 'continuation_name': '',
-                # TODO Right now this default to 1T, we might want to get something
-                # realistic in here later.
-                # 'allocated': size_of_delivery,
+                'allocated': size_of_delivery,
                 'api_opaque_data': '',
                 'ngi_ready': False,
                 'ngi_delivery_status': ''
@@ -89,7 +90,10 @@ class Supr(Action):
         if action == "get_id_from_email":
             return self.search_for_pis(kwargs['project_to_email_dict'], supr_base_api_url, api_user, api_key)
         elif action == 'create_delivery_project':
-            return self.create_delivery_project(supr_base_api_url, kwargs['project_names_and_ids'], api_user, api_key)
+            return self.create_delivery_project(supr_base_api_url,
+                                                kwargs['project_names_and_ids'],
+                                                kwargs['project_info'],
+                                                api_user, api_key)
         else:
             raise AssertionError("Action: {} was not recognized.".format(action))
 

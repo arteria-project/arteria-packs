@@ -16,6 +16,10 @@ parameters:
         type: object
         required: true
         description: Dictionary of project names to pi ids.
+    project_info:
+        type: object
+        required: true
+        description: Dictionary with project information, e.g. the size of the allocation of the project
     supr_base_api_url:
         type: string
         description: Email adress to look for associated PI for.
