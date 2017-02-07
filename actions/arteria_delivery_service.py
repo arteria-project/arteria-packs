@@ -92,13 +92,13 @@ class ArteriaDeliveryQuerier(ArteriaQuerierBase):
     valid_states = [pending, mover_processing_delivery, mover_failed_delivery,
                     delivery_in_progress, delivery_successful, delivery_failed]
 
-    successful_states = delivery_successful
+    successful_state = delivery_successful
 
     def __init__(self, logger):
         super(ArteriaDeliveryQuerier, self).__init__(logger)
 
     def successful_status(self):
-        return self.successful_states
+        return self.successful_state
 
     def failed_status(self):
         return [self.mover_failed_delivery, self.delivery_failed]
@@ -109,7 +109,7 @@ class ArteriaDeliveryQuerier(ArteriaQuerierBase):
     def query_for_status(self, link, skip_mover):
         if skip_mover:
             self.valid_states += self.delivery_skipped
-            self.successful_states = self.delivery_skipped
+            self.successful_state = self.delivery_skipped
 
         while True:
             response = requests.get(link)
@@ -129,6 +129,7 @@ class ArteriaDeliveryQuerier(ArteriaQuerierBase):
             else:
                 self.logger.error("Got unrecognized status: {}. Will abort polling.".format(status))
                 return False
+
 
 class ArteriaDeliveryService(Action):
 
