@@ -22,4 +22,8 @@ parameters:
     required: true
     type: string
     description: file containing pi emails and projects
-
+  skip_mover:
+    required: false
+    type: boolean
+    default: false
+    description: This can be used to make the delivery service skip running mover - this is only for testing purposes!
