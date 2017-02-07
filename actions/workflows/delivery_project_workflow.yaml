@@ -8,6 +8,7 @@ workflows:
         input:
           - project_name
           - projects_pi_email_file
+          - skip_mover
 
         tasks:
             note_workflow_version:
@@ -80,6 +81,23 @@ workflows:
               action: arteria-packs.delivery_service_deliver
               with-items: ngi_project_name in <% $.projects_and_stage_ids.keys() %>
               input:
+                ngi_project_name: <% $.ngi_project_name %>
                 staging_id: <% $.projects_and_stage_ids.get($.ngi_project_name).staging_id %>
                 delivery_base_api_url: <% $.delivery_service_url %>
                 delivery_project_id: <% $.delivery_projects.get($.ngi_project_name).name %>
+                skip_mover: <% $.skip_mover %>
+              publish:
+                delivery_projects_and_links: <% task(deliver_project).result.result %>
+              on-success:
+                - check_delivery_status
+
+            check_delivery_status:
+              action: arteria-packs.delivery_service_delivery_status
+              with-items:
+                - status_link in <% $.delivery_projects_and_links.status_link %>
+                - ngi_project_name in <% $.delivery_projects_and_links.project_name %>
+              input:
+                ngi_project_name: <% $.ngi_project_name %>
+                delivery_base_api_url: <% $.delivery_service_url %>
+                status_link: <% $.status_link %>
+                skip_mover: <% $.skip_mover %>

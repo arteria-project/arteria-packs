@@ -26,8 +26,10 @@ class ArteriaQuerierBase(object):
 
         def update_links(links_results):
             for link, state in links_results.iteritems():
-                if state == self.successful_status() or state in self.failed_status():
+                if state == self.successful_status():
                     continue
+                elif state in self.failed_status():
+                    raise Exception("Gor a failed status from link: {}".format(link))
                 elif state in self.valid_status() or not state:
                     response = requests.get(link)
                     response_as_json = json.loads(response.content)
@@ -77,7 +79,6 @@ class ArteriaStagingQuerier(ArteriaQuerierBase):
         valid_states = [self.staging_successful, self.staging_failed, self.staging_pending, self.staging_in_progress]
         return valid_states
 
-
 class ArteriaDeliveryQuerier(ArteriaQuerierBase):
 
     pending = 'pending'
@@ -86,20 +87,48 @@ class ArteriaDeliveryQuerier(ArteriaQuerierBase):
     delivery_in_progress = 'delivery_in_progress'
     delivery_successful = 'delivery_successful'
     delivery_failed = 'delivery_failed'
+    delivery_skipped = 'delivery_skipped'
+
+    valid_states = [pending, mover_processing_delivery, mover_failed_delivery,
+                    delivery_in_progress, delivery_successful, delivery_failed]
+
+    successful_state = delivery_successful
 
     def __init__(self, logger):
         super(ArteriaDeliveryQuerier, self).__init__(logger)
 
     def successful_status(self):
-        return self.delivery_successful
+        return self.successful_state
 
     def failed_status(self):
         return [self.mover_failed_delivery, self.delivery_failed]
 
     def valid_status(self):
-        valid_states = [self.pending, self.mover_processing_delivery, self.mover_failed_delivery,
-                        self.delivery_in_progress, self.delivery_successful, self.delivery_failed]
-        return valid_states
+        return self.valid_states
+
+    def query_for_status(self, link, skip_mover):
+        if skip_mover:
+            self.valid_states += self.delivery_skipped
+            self.successful_state = self.delivery_skipped
+
+        while True:
+            response = requests.get(link)
+            response_as_json = json.loads(response.content)
+            status = response_as_json["status"]
+
+            if status == self.successful_status():
+                self.logger.info("Got successful status {}".format(status))
+                return True
+            elif status in self.failed_status():
+                self.logger.warning("Got unsuccessful status {}".format(status))
+                return False
+            elif status in self.valid_status():
+                self.logger.info("Got valid, but not final status, status: {}. Will keep polling.".format(status))
+                # TODO Make timeout configurable
+                time.sleep(5)
+            else:
+                self.logger.error("Got unrecognized status: {}. Will abort polling.".format(status))
+                return False
 
 
 class ArteriaDeliveryService(Action):
@@ -124,16 +153,21 @@ class ArteriaDeliveryService(Action):
         response = self.post_to_server(url, payload)
         return response
 
-    def deliver(self, base_url, staging_id, delivery_project_id, md5sum_file):
+    def deliver(self, base_url, staging_id, delivery_project_id, md5sum_file, skip_mover):
         url = '{}/{}/{}'.format(base_url, 'api/1.0/deliver/stage_id', str(staging_id))
         payload = {'delivery_project_id': delivery_project_id}
 
         if md5sum_file:
             payload['md5sum_file'] = md5sum_file
 
+        self.logger.debug("skip_mover was set to: {}".format(skip_mover))
+
+        if skip_mover:
+            payload['skip_mover'] = True
+
         response = self.post_to_server(url, payload)
-        links = response['delivery_order_link']
-        return [links]
+        link = response['delivery_order_link']
+        return link
 
     def stage_and_check_status(self, url, projects):
         response = self.stage_delivery(url,
@@ -182,12 +216,16 @@ class ArteriaDeliveryService(Action):
                                                           kwargs["project_name"])
 
         elif action == "deliver":
-            status_links = self.deliver(delivery_base_api_url,
+            status_link = self.deliver(delivery_base_api_url,
                                         kwargs['staging_id'],
                                         kwargs['delivery_project_id'],
-                                        kwargs.get('md5sum_file'))
+                                        kwargs.get('md5sum_file'),
+                                        kwargs.get('skip_mover'))
+            return True, {"project_name": kwargs["ngi_project_name"], "status_link": status_link}
+        elif action == "delivery_status":
+            status_endpoint = kwargs['status_link']
             arteria_delivery_querier = ArteriaDeliveryQuerier(self.logger)
-            return arteria_delivery_querier.query_for_status(status_links)
+            return arteria_delivery_querier.query_for_status(status_endpoint, kwargs.get('skip_mover'))
         else:
             raise AssertionError("Action: {} was not recognized.".format(action))
 
