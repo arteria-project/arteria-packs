@@ -20,3 +20,8 @@ parameters:
         type: string
         description: url to the delivery service
         required: true
+    sleep_time:
+        type: integer
+        description: seconds to sleep between polling for status
+        required: true
+        default: 300

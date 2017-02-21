@@ -87,6 +87,21 @@ class Supr(Action):
 
         return result
 
+    @staticmethod
+    def check_ngi_ready_status(supr_base_api_url, api_user, api_key, project):
+        project_id = project['id']
+        project_url = '{}/project/{}/'.format(supr_base_api_url, project_id)
+        response = requests.get(project_url, auth=(api_user, api_key))
+        response_as_json = json.loads(response.content)
+        ngi_ready = response_as_json['ngi_ready']
+
+        output_object = {project['ngi_project_name']: response_as_json['ngi_ready']}
+
+        if ngi_ready:
+            return True, output_object
+        else:
+            return False, output_object
+
     def run(self, action, supr_base_api_url, api_user, api_key, **kwargs):
         if action == "get_id_from_email":
             return self.search_for_pis(kwargs['project_to_email_dict'], supr_base_api_url, api_user, api_key)
@@ -95,6 +110,8 @@ class Supr(Action):
                                                 kwargs['project_names_and_ids'],
                                                 kwargs['project_info'],
                                                 api_user, api_key)
+        elif action == 'check_ngi_ready':
+            return self.check_ngi_ready_status(supr_base_api_url, api_user, api_key, kwargs['project'])
         else:
             raise AssertionError("Action: {} was not recognized.".format(action))
 

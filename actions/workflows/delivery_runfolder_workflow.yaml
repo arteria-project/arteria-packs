@@ -9,6 +9,7 @@ workflows:
           - runfolder_name
           - projects_pi_email_file
           - skip_mover
+          - sleep_time
           # TODO Later we want to make sure that we can restrict which projects should be delivered...
           #- restrict_to_projects
 
@@ -80,6 +81,7 @@ workflows:
                  runfolder_name: <% $.runfolder_name %>
                  projects:
                    projects: <% $.projects_on_runfolder %>
+                 sleep_time: <% $.sleep_time %>
               publish:
                  projects_and_stage_ids: <% task(stage_runfolder).result.result %>
               on-success:
@@ -90,6 +92,7 @@ workflows:
               input:
                 project_names_and_ids: <% $.pi_supr_ids %>
                 project_info: <% $.projects_and_stage_ids %>
+                supr_base_api_url: <% $.supr_api_url %>
                 api_user: <% $.supr_api_user %>
                 api_key: <% $.supr_api_key %>
               publish:
@@ -122,3 +125,16 @@ workflows:
                 delivery_base_api_url: <% $.delivery_service_url %>
                 status_link: <% $.status_link %>
                 skip_mover: <% $.skip_mover %>
+                sleep_time: <% $.sleep_time %>
+              on-success:
+                - check_ngi_ready_status: <% $.skip_mover = false %>
+
+            check_ngi_ready_status:
+              action: arteria-packs.check_ngi_ready_in_supr
+              with-items:
+                - project in <% $.delivery_projects.keys() %>
+              input:
+                project: <% $.delivery_projects.get($.project) %>
+                supr_base_api_url: <% $.supr_api_url %>
+                api_user: <% $.supr_api_user %>
+                api_key: <% $.supr_api_key %>

@@ -34,4 +34,9 @@ parameters:
     skip_mover:
       type: boolean
       description: (Optional) skip mover. This should only be used when testing!
+    sleep_time:
+        type: integer
+        description: seconds to sleep between polling for status
+        required: true
+        default: 300
 
