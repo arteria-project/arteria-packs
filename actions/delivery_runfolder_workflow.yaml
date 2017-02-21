@@ -27,3 +27,8 @@ parameters:
     type: boolean
     default: false
     description: This can be used to make the delivery service skip running mover - this is only for testing purposes!
+  sleep_time:
+    required: false
+    type: integer
+    description: Configure the time to sleep in poll steps. Useful to reset when testing to make workflows run faster.
+    default: 300
