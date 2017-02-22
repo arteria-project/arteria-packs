@@ -3,10 +3,18 @@
 import requests
 import json
 import time
+from urlparse import urlparse
 
 
 # Needs to be run in a Stackstorm virtualenv
 from st2actions.runners.pythonrunner import Action
+
+def rewrite_link(original_endpoint, link):
+    endpoint_parsed = urlparse(original_endpoint)
+    link_parsed = urlparse(link)
+    return "{}://{}{}".format(endpoint_parsed.scheme,
+                              endpoint_parsed.netloc,
+                              link_parsed.path)
 
 class ArteriaQuerierBase(object):
 
@@ -33,6 +41,7 @@ class ArteriaQuerierBase(object):
                 elif state in self.failed_status():
                     raise Exception("Gor a failed status from link: {}".format(link))
                 elif state in self.valid_status() or not state:
+                    self.logger.info('Query link: {}'.format(link))
                     response = requests.get(link, headers={'apikey': self.irma_api_key})
                     response_as_json = json.loads(response.content)
                     links_results[link] = response_as_json["status"]
@@ -179,8 +188,10 @@ class ArteriaDeliveryService(Action):
         project_and_links = response['staging_order_links']
         self.logger.info("Projects and links was: {}".format(project_and_links))
         status_links = project_and_links.values()
+        rewritten_status_links = map(lambda x: rewrite_link(url, x), status_links)
+
         arteria_staging_querier = ArteriaStagingQuerier(self.logger, sleep_time, irma_api_key)
-        final_status = arteria_staging_querier.query_for_status(status_links)
+        final_status = arteria_staging_querier.query_for_status(rewritten_status_links)
         links_to_projects = {v: k for k, v in project_and_links.iteritems()}
 
         exit_status = True
@@ -231,10 +242,12 @@ class ArteriaDeliveryService(Action):
                                        kwargs.get('md5sum_file'),
                                        kwargs.get('skip_mover'))
             return True, {"project_name": kwargs["ngi_project_name"], "status_link": status_link}
+
         elif action == "delivery_status":
             status_endpoint = kwargs['status_link']
             arteria_delivery_querier = ArteriaDeliveryQuerier(self.logger, sleep_time, irma_api_key)
             return arteria_delivery_querier.query_for_status(status_endpoint, kwargs.get('skip_mover'))
+
         else:
             raise AssertionError("Action: {} was not recognized.".format(action))
 
