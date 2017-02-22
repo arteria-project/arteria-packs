@@ -10,9 +10,10 @@ from st2actions.runners.pythonrunner import Action
 
 class ArteriaQuerierBase(object):
 
-    def __init__(self, logger, sleep_time):
+    def __init__(self, logger, sleep_time, irma_api_key):
         self.logger = logger
         self.sleep_time = sleep_time
+        self.irma_api_key = irma_api_key
 
     def valid_status(self):
         raise NotImplementedError("Has to be implemented by inheriting class")
@@ -32,7 +33,7 @@ class ArteriaQuerierBase(object):
                 elif state in self.failed_status():
                     raise Exception("Gor a failed status from link: {}".format(link))
                 elif state in self.valid_status() or not state:
-                    response = requests.get(link)
+                    response = requests.get(link, headers={'apikey': self.irma_api_key})
                     response_as_json = json.loads(response.content)
                     links_results[link] = response_as_json["status"]
                 else:
@@ -61,11 +62,11 @@ class ArteriaStagingQuerier(ArteriaQuerierBase):
     staging_pending = 'pending'
     staging_in_progress = 'staging_in_progress'
 
-    def __init__(self, logger, sleep_time):
-        super(ArteriaStagingQuerier, self).__init__(logger, sleep_time)
+    def __init__(self, logger, sleep_time, irma_api_key):
+        super(ArteriaStagingQuerier, self).__init__(logger, sleep_time, irma_api_key)
 
     def query_for_size(self, link):
-        response = requests.get(link)
+        response = requests.get(link, headers={'apikey': self.irma_api_key})
         response_as_json = json.loads(response.content)
         return response_as_json['size']
 
@@ -95,8 +96,8 @@ class ArteriaDeliveryQuerier(ArteriaQuerierBase):
 
     successful_state = delivery_successful
 
-    def __init__(self, logger, sleep_time):
-        super(ArteriaDeliveryQuerier, self).__init__(logger, sleep_time)
+    def __init__(self, logger, sleep_time, irma_api_key):
+        super(ArteriaDeliveryQuerier, self).__init__(logger, sleep_time, irma_api_key)
 
     def successful_status(self):
         return self.successful_state
@@ -113,7 +114,7 @@ class ArteriaDeliveryQuerier(ArteriaQuerierBase):
             self.successful_state = self.delivery_skipped
 
         while True:
-            response = requests.get(link)
+            response = requests.get(link, headers={'apikey': self.irma_api_key})
             response_as_json = json.loads(response.content)
             status = response_as_json["status"]
 
@@ -134,8 +135,8 @@ class ArteriaDeliveryQuerier(ArteriaQuerierBase):
 
 class ArteriaDeliveryService(Action):
 
-    def post_to_server(self, url, payload):
-        headers = {'content-type': 'application/json'}
+    def post_to_server(self, url, payload, irma_api_key):
+        headers = {'content-type': 'application/json', 'apikey': irma_api_key}
         response = requests.post(url, data=json.dumps(payload), headers=headers)
 
         if response.status_code != 202:
@@ -145,16 +146,16 @@ class ArteriaDeliveryService(Action):
         response_as_json = json.loads(response.content)
         return response_as_json
 
-    def stage_delivery(self, url, projects):
+    def stage_delivery(self, url, projects, irma_api_key):
         if projects:
             payload = {'projects': projects['projects']}
         else:
             payload = {}
 
-        response = self.post_to_server(url, payload)
+        response = self.post_to_server(url, payload, irma_api_key)
         return response
 
-    def deliver(self, base_url, staging_id, delivery_project_id, md5sum_file, skip_mover):
+    def deliver(self, base_url, irma_api_key, staging_id, delivery_project_id, md5sum_file, skip_mover):
         url = '{}/{}/{}'.format(base_url, 'api/1.0/deliver/stage_id', str(staging_id))
         payload = {'delivery_project_id': delivery_project_id}
 
@@ -166,18 +167,19 @@ class ArteriaDeliveryService(Action):
         if skip_mover:
             payload['skip_mover'] = True
 
-        response = self.post_to_server(url, payload)
+        response = self.post_to_server(url, payload, irma_api_key)
         link = response['delivery_order_link']
         return link
 
-    def stage_and_check_status(self, url, sleep_time, projects):
+    def stage_and_check_status(self, url, irma_api_key, sleep_time, projects):
         response = self.stage_delivery(url,
-                                       projects)
+                                       projects,
+                                       irma_api_key)
 
         project_and_links = response['staging_order_links']
         self.logger.info("Projects and links was: {}".format(project_and_links))
         status_links = project_and_links.values()
-        arteria_staging_querier = ArteriaStagingQuerier(self.logger, sleep_time)
+        arteria_staging_querier = ArteriaStagingQuerier(self.logger, sleep_time, irma_api_key)
         final_status = arteria_staging_querier.query_for_status(status_links)
         links_to_projects = {v: k for k, v in project_and_links.iteritems()}
 
@@ -198,28 +200,32 @@ class ArteriaDeliveryService(Action):
         self.logger.info("Exit status was: {}, result was: {}".format(exit_status, result))
         return exit_status, result
 
-    def stage_and_check_status_of_runfolder(self, delivery_base_api_url, sleep_time, runfolder_name, projects):
+    def stage_and_check_status_of_runfolder(self, delivery_base_api_url, irma_api_key,
+                                            sleep_time, runfolder_name, projects):
         url = "{}/{}/{}".format(delivery_base_api_url, 'api/1.0/stage/runfolder', runfolder_name)
-        return self.stage_and_check_status(url, sleep_time, projects)
+        return self.stage_and_check_status(url, irma_api_key, sleep_time, projects)
 
-    def stage_and_check_status_of_project(self, delivery_base_api_url, sleep_time, project_name):
+    def stage_and_check_status_of_project(self, delivery_base_api_url, irma_api_key, sleep_time, project_name):
         url = "{}/{}/{}".format(delivery_base_api_url, 'api/1.0/stage/project', project_name)
-        return self.stage_and_check_status(url, sleep_time, projects=None)
+        return self.stage_and_check_status(url, irma_api_key, sleep_time, projects=None)
 
-    def run(self, action, delivery_base_api_url, sleep_time, **kwargs):
+    def run(self, action, delivery_base_api_url, irma_api_key, sleep_time, **kwargs):
         if action == "stage_runfolder":
             return self.stage_and_check_status_of_runfolder(delivery_base_api_url,
+                                                            irma_api_key,
                                                             sleep_time,
                                                             kwargs['runfolder_name'],
                                                             kwargs.get('projects'))
 
         elif action == "stage_project":
             return self.stage_and_check_status_of_project(delivery_base_api_url,
+                                                          irma_api_key,
                                                           sleep_time,
                                                           kwargs["project_name"])
 
         elif action == "deliver":
             status_link = self.deliver(delivery_base_api_url,
+                                       irma_api_key,
                                        kwargs['staging_id'],
                                        kwargs['delivery_project_id'],
                                        kwargs.get('md5sum_file'),
@@ -227,7 +233,7 @@ class ArteriaDeliveryService(Action):
             return True, {"project_name": kwargs["ngi_project_name"], "status_link": status_link}
         elif action == "delivery_status":
             status_endpoint = kwargs['status_link']
-            arteria_delivery_querier = ArteriaDeliveryQuerier(self.logger, sleep_time)
+            arteria_delivery_querier = ArteriaDeliveryQuerier(self.logger, sleep_time, irma_api_key)
             return arteria_delivery_querier.query_for_status(status_endpoint, kwargs.get('skip_mover'))
         else:
             raise AssertionError("Action: {} was not recognized.".format(action))

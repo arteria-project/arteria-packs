@@ -32,4 +32,7 @@ parameters:
         description: seconds to sleep between polling for status
         required: true
         default: 300
-
+    irma_api_key:
+        required: true
+        type: string
+        description: A api key for the irma kong api gateway

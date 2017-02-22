@@ -82,6 +82,7 @@ workflows:
                  projects:
                    projects: <% $.projects_on_runfolder %>
                  sleep_time: <% $.sleep_time %>
+                 irma_api_key: <% $.irma_api_key %>
               publish:
                  projects_and_stage_ids: <% task(stage_runfolder).result.result %>
               on-success:
@@ -110,6 +111,7 @@ workflows:
                 delivery_base_api_url: <% $.delivery_service_url %>
                 delivery_project_id: <% $.delivery_projects.get($.ngi_project_name).name %>
                 skip_mover: <% $.skip_mover %>
+                irma_api_key: <% $.irma_api_key %>
               publish:
                 delivery_projects_and_links: <% task(deliver_runfolder).result.result %>
               on-success:
@@ -126,6 +128,7 @@ workflows:
                 status_link: <% $.status_link %>
                 skip_mover: <% $.skip_mover %>
                 sleep_time: <% $.sleep_time %>
+                irma_api_key: <% $.irma_api_key %>
               on-success:
                 - check_ngi_ready_status: <% $.skip_mover = false %>
 
