@@ -68,6 +68,12 @@ class ProjectAndDeliveryId(object):
         else:
             raise AssertionError("Cannot set delivery status to invalid status: {}".format(new_status))
 
+    def is_in_progress(self, skip_mover):
+        if skip_mover:
+            return self.status == self.delivery_skipped
+        else:
+            return not (self.status in self.failed_states)
+
     def is_ready(self, skip_mover):
         return self.is_successful(skip_mover) or (self.status in self.failed_states)
 
@@ -222,15 +228,22 @@ class ArteriaDeliveryService(Action):
             return self._await_and_parse_results(projects_and_stage_ids, service, sleep_time)
 
         elif action == "deliver":
-
+            skip_mover = kwargs.get('skip_mover')
             project_and_delivery_id = service.delivery(ngi_project_name=kwargs['ngi_project_name'],
                                                        delivery_project_id=kwargs['delivery_project_id'],
                                                        staging_id=kwargs['staging_id'],
                                                        md5sum_file=kwargs.get('md5sum_file'),
-                                                       skip_mover=kwargs.get('skip_mover'))
+                                                       skip_mover=skip_mover)
 
-            return True, {'project_name': project_and_delivery_id.project,
-                          'delivery_id': project_and_delivery_id.delivery_id}
+            # Wait a short time and then try to update the status, just to
+            # make sure we fail in this step if we get a failed status early.
+            time.sleep(5)
+            service.update_delivery_status(project_and_delivery_id, skip_mover=skip_mover)
+
+            exit_flag = project_and_delivery_id.is_in_progress(skip_mover)
+
+            return exit_flag, {'project_name': project_and_delivery_id.project,
+                               'delivery_id': project_and_delivery_id.delivery_id}
 
         elif action == "delivery_status":
 
