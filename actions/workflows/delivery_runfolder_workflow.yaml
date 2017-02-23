@@ -113,19 +113,19 @@ workflows:
                 skip_mover: <% $.skip_mover %>
                 irma_api_key: <% $.irma_api_key %>
               publish:
-                delivery_projects_and_links: <% task(deliver_runfolder).result.result %>
+                delivery_projects_and_ids: <% task(deliver_runfolder).result.result %>
               on-success:
                 - check_delivery_status
 
             check_delivery_status:
               action: arteria-packs.delivery_service_delivery_status
               with-items:
-                - status_link in <% $.delivery_projects_and_links.status_link %>
-                - ngi_project_name in <% $.delivery_projects_and_links.project_name %>
+                - id in <% $.delivery_projects_and_ids.delivery_id %>
+                - ngi_project_name in <% $.delivery_projects_and_ids.project_name %>
               input:
                 ngi_project_name: <% $.ngi_project_name %>
                 delivery_base_api_url: <% $.delivery_service_url %>
-                status_link: <% $.status_link %>
+                delivery_id: <% $.id %>
                 skip_mover: <% $.skip_mover %>
                 sleep_time: <% $.sleep_time %>
                 irma_api_key: <% $.irma_api_key %>
