@@ -45,3 +45,4 @@ class DownloadSamplesheetClarity(Action):
             raise err
 
         return (True, samplesheet)
+
