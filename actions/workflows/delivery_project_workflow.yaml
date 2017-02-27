@@ -78,6 +78,14 @@ workflows:
               publish:
                 delivery_projects: <% task(create_delivery_projects).result.result %>
               on-success:
+                - wait_for_uppmax_to_sync
+
+            wait_for_uppmax_to_sync:
+              action: core.local
+              input:
+                cmd: sleep 4500
+                timeout: 4600
+              on-success:
                 - deliver_project
 
             # TODO Remember to pass correct md5sum files for the project.
