@@ -4,6 +4,8 @@ import os
 import requests
 import StringIO
 
+from slack import SlackNotifier
+
 from st2actions.runners.pythonrunner import Action
 from tabulate import tabulate
 
@@ -45,30 +47,6 @@ class CharonProjects(object):
                  for project in projects],
                 headers=self.print_cols))
 
-
-class SlackNotifier():
-
-    def __init__(self, base_url, channel):
-        self.session = requests.Session()
-        self.headers = {'content-type': 'application/json'}
-        self.base_url = base_url
-        self.channel = channel
-
-    def post_message(self, message):
-        attachments = [{
-            "mrkdwn_in": ["text"],
-            "text": "```{}```".format(message)
-        }]
-        json_message = {"text": "<!channel> Charon NGI-U open project status {} Z".format(datetime.datetime.utcnow().isoformat(' ')),
-                        "username": "WGS status",
-                        "icon_emoji": ":see_no_evil:",
-                        "attachments": attachments,
-                        "mrkdwn": "true",
-                        "channel": self.channel}
-        response = self.session.post(self.base_url, json=json_message)
-        return response.status_code
-
-
 class CharonProjectStatus(Action):
 
     def run(self):
@@ -81,8 +59,12 @@ class CharonProjectStatus(Action):
         message = output_handle.getvalue()
         try:
             sn = SlackNotifier(base_url=self.config["slack_webhook_url"],
-                               channel=self.config["charon_status_report_slack_channel"])
-            sn.post_message(message)
+                               channel=self.config["charon_status_report_slack_channel"],
+                               user='WGS Status',
+                               icon_emoji=':see_no_evil:')
+            sn.post_message_with_attachment(message="<!channel> Charon NGI-U open project status {} Z".
+                                            format(datetime.datetime.utcnow().isoformat(' ')),
+                                            attachment=message)
         except Exception as e:
             print("Could not post to Slack:")
             print(e.message)
