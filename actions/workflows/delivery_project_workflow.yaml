@@ -31,6 +31,7 @@ workflows:
                 supr_api_url: <% task(get_config).result.result.supr_api_url %>
                 irma_api_key: <% task(get_config).result.result.irma_api_key %>
                 delivery_service_url: <% task(get_config).result.result.delivery_service_url %>
+                delivery_workflow_status_slack_channel: <% task(get_config).result.result.delivery_workflow_status_slack_channel %>
               on-success:
                  - post_start_message_to_slack
 
@@ -39,7 +40,7 @@ workflows:
               input:
                 user: 'Bot D Liver'
                 emoji_icon: ':robot_face:'
-                channel: '#bottest'
+                channel: <% $.delivery_workflow_status_slack_channel %>
                 message: 'I just started a delivery for `<% $.project_name %>`. You can track my progress by running: `st2 execution get <% env().st2_execution_id %>`'
               on-success:
                  - get_pi_emails
@@ -150,7 +151,7 @@ workflows:
               input:
                 user: 'Bot D Liver'
                 emoji_icon: ':robot_face:'
-                channel: '#bottest'
+                channel: <% $.delivery_workflow_status_slack_channel %>
                 message: 'I just finished a delivery for `<% $.project_name %>`. You can see the details by running: `st2 execution get <% env().st2_execution_id %>`'
 
             post_failed_message_to_slack:
@@ -158,7 +159,7 @@ workflows:
               input:
                 user: 'Bot D Liver'
                 emoji_icon: ':robot_face:'
-                channel: '#bottest'
+                channel: <% $.delivery_workflow_status_slack_channel %>
                 message: 'Sorry, but I just failed to deliver `<% $.project_name %>`. You can see the details by running: `st2 execution get <% env().st2_execution_id %>`'
               on-complete:
                 - fail
