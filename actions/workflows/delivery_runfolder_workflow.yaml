@@ -12,14 +12,9 @@ workflows:
           - sleep_time
           # TODO Later we want to make sure that we can restrict which projects should be delivered...
           #- restrict_to_projects
-
-        # FLOW:
-        # [x] Check which projects are available for runfolder
-        # [x] Get emails for PIs for these projects
-        # [x] Get PI id for PIs in SUPr
-        # [x] Stage projects
-        # [x] Create delivery projects for PIs
-        # [] Run delivery
+        task-defaults:
+          on-error:
+            - post_failed_message_to_slack
 
         tasks:
             note_workflow_version:
@@ -38,6 +33,16 @@ workflows:
                 supr_api_url: <% task(get_config).result.result.supr_api_url %>
                 irma_api_key: <% task(get_config).result.result.irma_api_key %>
                 delivery_service_url: <% task(get_config).result.result.delivery_service_url %>
+              on-success:
+                 - post_start_message_to_slack
+
+            post_start_message_to_slack:
+              action: arteria-packs.post_to_slack
+              input:
+                user: 'Bot D Liver'
+                emoji_icon: ':robot_face:'
+                channel: '#bottest'
+                message: 'I just started a delivery for `<% $.runfolder_name %>`. You can track my progress by running: `st2 execution get <% env().st2_execution_id %>`'
               on-success:
                  - projects_on_runfolder
 
@@ -99,6 +104,14 @@ workflows:
               publish:
                 delivery_projects: <% task(create_delivery_projects).result.result %>
               on-success:
+                - wait_for_uppmax_to_sync
+
+            wait_for_uppmax_to_sync:
+              action: core.local
+              input:
+                cmd: sleep 4500
+                timeout: 4600
+              on-success:
                 - deliver_runfolder
 
             # TODO Remember to pass correct md5sum files for the project.
@@ -131,6 +144,7 @@ workflows:
                 irma_api_key: <% $.irma_api_key %>
               on-success:
                 - check_ngi_ready_status: <% $.skip_mover = false %>
+                - post_finish_message_to_slack: <% $.skip_mover = true %>
 
             check_ngi_ready_status:
               action: arteria-packs.check_ngi_ready_in_supr
@@ -141,3 +155,23 @@ workflows:
                 supr_base_api_url: <% $.supr_api_url %>
                 api_user: <% $.supr_api_user %>
                 api_key: <% $.supr_api_key %>
+              on-success:
+                - post_finish_message_to_slack
+
+            post_finish_message_to_slack:
+              action: arteria-packs.post_to_slack
+              input:
+                user: 'Bot D Liver'
+                emoji_icon: ':robot_face:'
+                channel: '#bottest'
+                message: 'I just finished a delivery for `<% $.runfolder_name %>`. You can see the details by running: `st2 execution get <% env().st2_execution_id %>`'
+
+            post_failed_message_to_slack:
+              action: arteria-packs.post_to_slack
+              input:
+                user: 'Bot D Liver'
+                emoji_icon: ':robot_face:'
+                channel: '#bottest'
+                message: 'Sorry, but I just failed to deliver `<% $.runfolder_name %>`. You can see the details by running: `st2 execution get <% env().st2_execution_id %>`'
+              on-complete:
+                - fail

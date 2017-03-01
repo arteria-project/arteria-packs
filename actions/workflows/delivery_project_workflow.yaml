@@ -10,6 +10,9 @@ workflows:
           - projects_pi_email_file
           - skip_mover
           - sleep_time
+        task-defaults:
+          on-error:
+            - post_failed_message_to_slack
 
         tasks:
             note_workflow_version:
@@ -28,6 +31,16 @@ workflows:
                 supr_api_url: <% task(get_config).result.result.supr_api_url %>
                 irma_api_key: <% task(get_config).result.result.irma_api_key %>
                 delivery_service_url: <% task(get_config).result.result.delivery_service_url %>
+              on-success:
+                 - post_start_message_to_slack
+
+            post_start_message_to_slack:
+              action: arteria-packs.post_to_slack
+              input:
+                user: 'Bot D Liver'
+                emoji_icon: ':robot_face:'
+                channel: '#bottest'
+                message: 'I just started a delivery for `<% $.project_name %>`. You can track my progress by running: `st2 execution get <% env().st2_execution_id %>`'
               on-success:
                  - get_pi_emails
 
@@ -118,6 +131,7 @@ workflows:
                 irma_api_key: <% $.irma_api_key %>
               on-success:
                 - check_ngi_ready_status: <% $.skip_mover = false %>
+                - post_finish_message_to_slack: <% $.skip_mover = true %>
 
             check_ngi_ready_status:
               action: arteria-packs.check_ngi_ready_in_supr
@@ -128,4 +142,23 @@ workflows:
                 supr_base_api_url: <% $.supr_api_url %>
                 api_user: <% $.supr_api_user %>
                 api_key: <% $.supr_api_key %>
+              on-success:
+                - post_finish_message_to_slack
 
+            post_finish_message_to_slack:
+              action: arteria-packs.post_to_slack
+              input:
+                user: 'Bot D Liver'
+                emoji_icon: ':robot_face:'
+                channel: '#bottest'
+                message: 'I just finished a delivery for `<% $.project_name %>`. You can see the details by running: `st2 execution get <% env().st2_execution_id %>`'
+
+            post_failed_message_to_slack:
+              action: arteria-packs.post_to_slack
+              input:
+                user: 'Bot D Liver'
+                emoji_icon: ':robot_face:'
+                channel: '#bottest'
+                message: 'Sorry, but I just failed to deliver `<% $.project_name %>`. You can see the details by running: `st2 execution get <% env().st2_execution_id %>`'
+              on-complete:
+                - fail
