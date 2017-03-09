@@ -5,15 +5,47 @@ NOTE: This is very much a work in progress, mostly containing dummy workflows so
 
 StackStorm pack to setup automation workflow taking data from the sequencer to delivery on the remote host...
 
-If you are using the `arteria-provisioning` this directory should be mounted under the `/opt/stackstorm/packs/arteria-packs` 
-(make sure to set the path in the Vagrant file). To load all actions, rules, etc, run `st2 run packs.load register=all`.
+Development and testing
+-----------------------
+To make development and testing of arteria-packs simpler, we provide a Vagrant environment (this requires that VirtualBox is installed on your system).
+
+```
+# Get it up and running
+vagrant up
+
+# SSH into the vagrant environment
+vagrant ssh
+
+# Then go to the vagrant synced folder which contains this code
+cd /vagrant
+
+# Now you can start developing on the packs
+
+# Note that all the scripts run below this point assume that your current
+# working directory is the packs directory i.e. /arteria-packs in
+# the vagrant environment
+
+# Prepare the test environment environment (this only needs to be
+# done when setting up for the first time), run this:
+./utils/prepare_test_env.sh
+
+# Note that this will checkout the st2 repo and create a virtual env called
+# venv in the working directory
+
+# Run the tests
+./utils/run_tests.sh /opt/stackstorm/packs/arteria-packs
+
+# To test registering all pack components run
+./utils/st2-check-register-pack-resources utils/st2.tests.conf /opt/stackstorm/packs/arteria-packs
+
+```
 
 Getting an authentication token
 -------------------------------
 
 Get your auth token setup (substitute for correct user and password as necessary) :
 
-    export ST2_AUTH_TOKEN=$(st2 auth --only-token testu -p testp)
+    export ST2_AUTH_TOKEN=$(st2 auth --only-token arteriaadmin -p arteriarulz)
     
 Example of starting a workflow
 ------------------------------

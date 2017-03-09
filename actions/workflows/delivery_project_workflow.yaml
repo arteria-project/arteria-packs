@@ -1,0 +1,85 @@
+version: "2.0" # mistral version
+name: arteria-packs.delivery_project_workflow
+description: Deliver data from a project (i.e. a directory with the project name) to a SNIC delivery project
+
+workflows:
+    main:
+        type: direct
+        input:
+          - project_name
+          - projects_pi_email_file
+
+        tasks:
+            note_workflow_version:
+              action: core.local
+              input:
+                cmd: git rev-parse HEAD
+                cwd: /opt/stackstorm/packs/arteria-packs/
+              on-success:
+                  - get_config
+
+            get_config:
+              action: arteria-packs.get_pack_config
+              publish:
+                supr_api_user: <% task(get_config).result.result.supr_api_user %>
+                supr_api_key: <% task(get_config).result.result.supr_api_key %>
+                supr_api_url: <% task(get_config).result.result.supr_api_url %>
+                irma_api_key: <% task(get_config).result.result.irma_api_key %>
+                delivery_service_url: <% task(get_config).result.result.delivery_service_url %>
+              on-success:
+                 - get_pi_emails
+
+            get_pi_emails:
+              action: arteria-packs.read_projects_email_file
+              input:
+                file_path: <% $.projects_pi_email_file %>
+                projects:
+                  projects:
+                   -  <% $.project_name %>
+              publish:
+                projects_to_emails: <% task(get_pi_emails).result.result %>
+              on-success:
+                - get_pi_ids
+
+            get_pi_ids:
+              action: arteria-packs.get_pi_id_for_email_from_supr
+              input:
+                project_to_email_dict: <% $.projects_to_emails %>
+                api_user: <% $.supr_api_user %>
+                api_key: <% $.supr_api_key %>
+                supr_base_api_url: <% $.supr_api_url %>
+              publish:
+                pi_supr_ids: <% task(get_pi_ids).result.result %>
+              on-success:
+                - stage_project
+
+            stage_project:
+              action: arteria-packs.delivery_service_stage_project
+              input:
+                 delivery_base_api_url: <% $.delivery_service_url %>
+                 project_name: <% $.project_name %>
+              publish:
+                 projects_and_stage_ids: <% task(stage_project).result.result %>
+              on-success:
+                - create_delivery_projects
+
+            create_delivery_projects:
+              action: arteria-packs.create_delivery_project_in_super
+              input:
+                project_names_and_ids: <% $.pi_supr_ids %>
+                project_info: <% $.projects_and_stage_ids %>
+                api_user: <% $.supr_api_user %>
+                api_key: <% $.supr_api_key %>
+              publish:
+                delivery_projects: <% task(create_delivery_projects).result.result %>
+              on-success:
+                - deliver_project
+
+            # TODO Remember to pass correct md5sum files for the project.
+            deliver_project:
+              action: arteria-packs.delivery_service_deliver
+              with-items: ngi_project_name in <% $.projects_and_stage_ids.keys() %>
+              input:
+                staging_id: <% $.projects_and_stage_ids.get($.ngi_project_name).staging_id %>
+                delivery_base_api_url: <% $.delivery_service_url %>
+                delivery_project_id: <% $.delivery_projects.get($.ngi_project_name).name %>

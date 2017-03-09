@@ -1,0 +1,30 @@
+---
+name: archive_workflow
+description: >
+  Archives a runfolder to PDC with TSM
+enabled: true
+runner_type: mistral-v2
+entry_point: workflows/archive_workflow.yaml
+pack: arteria-packs
+parameters:
+  context:
+    default: {}
+    immutable: true
+    type: object
+  workflow:
+    default: arteria-packs.archive_workflow
+    immutable: true
+    type: string
+  host:
+    description: 'Host where runfolder is located'
+    required: true
+    type: string
+  runfolder:
+    description: 'Path to runfolder to archive'
+    required: true
+    type: string
+  remove_previous_archive: 
+    description: 'Set to true to remove previous archive'
+    required: true
+    type: boolean
+    default: false

@@ -1,0 +1,12 @@
+---
+name: get_remote_folder_list
+runner_type: remote-shell-script
+description: This will list all the directories in a remote directory and return them as a json array.
+enabled: true
+entry_point: lib/get_remote_folder_list.py
+parameters:
+  directory:
+    type: 'string'
+    description: 'List all files in this directory'
+    required: true
+    position: 0

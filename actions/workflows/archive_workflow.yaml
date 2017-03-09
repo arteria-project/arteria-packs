@@ -1,0 +1,76 @@
+version: "2.0" # mistral version
+name: arteria-packs.archive_workflow
+description: Archives a runfolder to PDC with TSM
+
+workflows:
+    main:
+        type: direct
+        input:
+            - runfolder
+            - host
+            - remove_previous_archive
+        output:
+            output_the_whole_workflow_context: <% $ %>
+
+        tasks:
+            ### GENERAL TASKS START ###
+            note_workflow_repo_version:
+              action: core.local
+              input:
+                cmd: git rev-parse HEAD
+                cwd: /opt/stackstorm/packs/arteria-packs/
+              on-success:
+                - get_config
+
+            get_config:
+              action: arteria-packs.get_pack_config
+              publish:
+                archive_excludes: <% task(get_config).result.result.archive_excludes %>
+                archive_fastq_threshold: <% task(get_config).result.result.archive_fastq_threshold %>
+                archive_python_path: <% task(get_config).result.result.archive_python_path %>
+                archive_exclude_links: <% task(get_config).result.result.archive_exclude_links %>
+              on-success:
+                - create_archive_dir
+
+            ### GENERAL TASKS END ###
+
+            ### TRANSFER FILES START ###
+            create_archive_dir: 
+              action: arteria-packs.create_archive_dir
+              input: 
+                host: <% $.host %>
+                runfolder: <% $.runfolder %>
+                fastq_threshold: <% $.archive_fastq_threshold %> # number of fastq files to expect; if less then the action will fail
+                python_path: <% $.archive_python_path %>
+                exclude_links: <% $.archive_exclude_links %>
+                remove_previous: <% $.remove_previous_archive %>
+              on-success: 
+                - compress_tsm_archive     
+            
+            # Will compress some of the files in the archive. Script will fail if gziped archive already exists. 
+            compress_tsm_archive:
+               action: arteria-packs.compress_archive_package
+               input:
+                 host: <% $.host %>
+                 runfolder: <% $.runfolder %>_archive
+                 exclude: <% $.archive_excludes %>
+               on-success:
+                 - generate_checksums
+
+            generate_checksums:
+                action: core.local
+                input:
+                  cmd: ssh <% $.host %> "cd <% $.runfolder %>_archive && find -L . -type f ! -path './checksums_prior_to_pdc.md5' -exec md5sum {} + > checksums_prior_to_pdc.md5"
+                  timeout: 86400 # 24 h timeout
+                on-success:
+                  - tsm_archive_to_pdc
+
+            # We need to filter out all files excluded from the upload because otherwise TSM
+            # will fill up the Stackstorm/Mongo buffer too much. 
+            tsm_archive_to_pdc:
+                action: core.local
+                input:
+                  cmd: ssh <% $.host %> "dsmc archive <% $.runfolder %>_archive/ -subdir=yes -description=`uuidgen`"
+                  timeout: 604800 # 1w worst-case timeout
+
+            ### TRANSFER FILES END ###

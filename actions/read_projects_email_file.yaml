@@ -1,0 +1,18 @@
+---
+name: read_projects_email_file
+runner_type: run-python
+description: Reads a csv file of projects and email
+enabled: true
+entry_point: read_projects_email_file.py
+parameters:
+    timeout:
+        default: 10
+    file_path:
+        type: string
+        description: Path to read the csv file from.
+        required: true
+    projects:
+        type: object
+        description: Projects to look for (will fail if not available)
+        required: true
+

@@ -1,0 +1,106 @@
+version: "2.0" # mistral version
+name: arteria-packs.delivery_runfolder_workflow
+description: Deliver data from a runfolder to a SNIC delivery project
+
+workflows:
+    main:
+        type: direct
+        input:
+          - runfolder_name
+          - projects_pi_email_file
+          # TODO Later we want to make sure that we can restrict which projects should be delivered...
+          #- restrict_to_projects
+
+        # FLOW:
+        # [x] Check which projects are available for runfolder
+        # [x] Get emails for PIs for these projects
+        # [x] Get PI id for PIs in SUPr
+        # [x] Stage projects
+        # [x] Create delivery projects for PIs
+        # [] Run delivery
+
+        tasks:
+            note_workflow_version:
+              action: core.local
+              input:
+                cmd: git rev-parse HEAD
+                cwd: /opt/stackstorm/packs/arteria-packs/
+              on-success:
+                  - get_config
+
+            get_config:
+              action: arteria-packs.get_pack_config
+              publish:
+                supr_api_user: <% task(get_config).result.result.supr_api_user %>
+                supr_api_key: <% task(get_config).result.result.supr_api_key %>
+                supr_api_url: <% task(get_config).result.result.supr_api_url %>
+                irma_api_key: <% task(get_config).result.result.irma_api_key %>
+                delivery_service_url: <% task(get_config).result.result.delivery_service_url %>
+              on-success:
+                 - projects_on_runfolder
+
+            projects_on_runfolder:
+              action: core.http
+              input:
+                url: "<% $.delivery_service_url %>/api/1.0/runfolders/<% $.runfolder_name %>/projects"
+                method: "GET"
+              publish:
+                projects_on_runfolder: <% task(projects_on_runfolder).result.body.projects.name %>
+              on-success:
+                - get_pi_emails
+
+            get_pi_emails:
+              action: arteria-packs.read_projects_email_file
+              input:
+                file_path: <% $.projects_pi_email_file %>
+                projects:
+                  projects: <% $.projects_on_runfolder %>
+              publish:
+                projects_to_emails: <% task(get_pi_emails).result.result %>
+              on-success:
+                - get_pi_ids
+
+            get_pi_ids:
+              action: arteria-packs.get_pi_id_for_email_from_supr
+              input:
+                project_to_email_dict: <% $.projects_to_emails %>
+                api_user: <% $.supr_api_user %>
+                api_key: <% $.supr_api_key %>
+                supr_base_api_url: <% $.supr_api_url %>
+              publish:
+                pi_supr_ids: <% task(get_pi_ids).result.result %>
+              on-success:
+                - stage_runfolder
+
+            stage_runfolder:
+              action: arteria-packs.delivery_service_stage_runfolder
+              input:
+                 delivery_base_api_url: <% $.delivery_service_url %>
+                 runfolder_name: <% $.runfolder_name %>
+                 projects:
+                   projects: <% $.projects_on_runfolder %>
+              publish:
+                 projects_and_stage_ids: <% task(stage_runfolder).result.result %>
+              on-success:
+                - create_delivery_projects
+
+            create_delivery_projects:
+              action: arteria-packs.create_delivery_project_in_super
+              input:
+                project_names_and_ids: <% $.pi_supr_ids %>
+                project_info: <% $.projects_and_stage_ids %>
+                api_user: <% $.supr_api_user %>
+                api_key: <% $.supr_api_key %>
+              publish:
+                delivery_projects: <% task(create_delivery_projects).result.result %>
+              on-success:
+                - deliver_runfolder
+
+            # TODO Remember to pass correct md5sum files for the project.
+            deliver_runfolder:
+              action: arteria-packs.delivery_service_deliver
+              with-items: ngi_project_name in <% $.projects_and_stage_ids.keys() %>
+              input:
+                staging_id: <% $.projects_and_stage_ids.get($.ngi_project_name).staging_id %>
+                delivery_base_api_url: <% $.delivery_service_url %>
+                delivery_project_id: <% $.delivery_projects.get($.ngi_project_name).name %>

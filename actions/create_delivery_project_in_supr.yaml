@@ -1,0 +1,36 @@
+---
+name: create_delivery_project_in_super
+runner_type: run-python
+description: Create a delivery project in SUPR for the specified PI and project name
+enabled: true
+entry_point: supr.py
+parameters:
+    timeout:
+        default: 10
+    action:
+        type: string
+        required: true
+        default: create_delivery_project
+        immutable: true
+    project_names_and_ids:
+        type: object
+        required: true
+        description: Dictionary of project names to pi ids.
+    project_info:
+        type: object
+        required: true
+        description: Dictionary with project information, e.g. the size of the allocation of the project
+    supr_base_api_url:
+        type: string
+        description: Email adress to look for associated PI for.
+        required: false
+        # TODO Change to production instance?
+        default: https://disposer.c3se.chalmers.se/supr-test/api
+    api_user:
+      type: string
+      description: SUPR api user
+      required: true
+    api_key:
+      type: string
+      description: SUPR api key
+      required: true
