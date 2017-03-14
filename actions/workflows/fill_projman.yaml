@@ -67,6 +67,7 @@ workflows:
                 hosts: <% $.summary_host %>
                 username: <% $.summary_user %>
                 private_key: <% $.summary_host_key %>
+                timeout: 18000 # 5 h timeout
               concurrency: 5
               on-complete:
                 - check_reports_old_enough
