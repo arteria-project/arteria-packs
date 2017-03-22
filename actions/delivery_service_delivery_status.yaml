@@ -16,9 +16,9 @@ parameters:
         type: string
         description: Name of the ngi project to be delivered
         required: true
-    status_link:
-        type: string
-        description: Link to query for status
+    delivery_id:
+        type: integer
+        description: Id for the delivery
         required: true
     delivery_base_api_url:
         type: string
@@ -32,4 +32,7 @@ parameters:
         description: seconds to sleep between polling for status
         required: true
         default: 300
-
+    irma_api_key:
+        required: true
+        type: string
+        description: A api key for the irma kong api gateway

@@ -10,6 +10,9 @@ workflows:
           - projects_pi_email_file
           - skip_mover
           - sleep_time
+        task-defaults:
+          on-error:
+            - post_failed_message_to_slack
 
         tasks:
             note_workflow_version:
@@ -28,6 +31,17 @@ workflows:
                 supr_api_url: <% task(get_config).result.result.supr_api_url %>
                 irma_api_key: <% task(get_config).result.result.irma_api_key %>
                 delivery_service_url: <% task(get_config).result.result.delivery_service_url %>
+                delivery_workflow_status_slack_channel: <% task(get_config).result.result.delivery_workflow_status_slack_channel %>
+              on-success:
+                 - post_start_message_to_slack
+
+            post_start_message_to_slack:
+              action: arteria-packs.post_to_slack
+              input:
+                user: 'Bot D Liver'
+                emoji_icon: ':robot_face:'
+                channel: <% $.delivery_workflow_status_slack_channel %>
+                message: 'I just started a delivery for `<% $.project_name %>`. You can track my progress by running: `st2 execution get <% env().st2_execution_id %>`'
               on-success:
                  - get_pi_emails
 
@@ -61,6 +75,7 @@ workflows:
                  delivery_base_api_url: <% $.delivery_service_url %>
                  project_name: <% $.project_name %>
                  sleep_time: <% $.sleep_time %>
+                 irma_api_key: <% $.irma_api_key %>
               publish:
                  projects_and_stage_ids: <% task(stage_project).result.result %>
               on-success:
@@ -89,24 +104,27 @@ workflows:
                 delivery_base_api_url: <% $.delivery_service_url %>
                 delivery_project_id: <% $.delivery_projects.get($.ngi_project_name).name %>
                 skip_mover: <% $.skip_mover %>
+                irma_api_key: <% $.irma_api_key %>
               publish:
-                delivery_projects_and_links: <% task(deliver_project).result.result %>
+                delivery_projects_and_ids: <% task(deliver_project).result.result %>
               on-success:
                 - check_delivery_status
 
             check_delivery_status:
               action: arteria-packs.delivery_service_delivery_status
               with-items:
-                - status_link in <% $.delivery_projects_and_links.status_link %>
-                - ngi_project_name in <% $.delivery_projects_and_links.project_name %>
+                - id in <% $.delivery_projects_and_ids.delivery_id %>
+                - ngi_project_name in <% $.delivery_projects_and_ids.project_name %>
               input:
                 ngi_project_name: <% $.ngi_project_name %>
                 delivery_base_api_url: <% $.delivery_service_url %>
-                status_link: <% $.status_link %>
+                delivery_id: <% $.id %>
                 skip_mover: <% $.skip_mover %>
                 sleep_time: <% $.sleep_time %>
+                irma_api_key: <% $.irma_api_key %>
               on-success:
                 - check_ngi_ready_status: <% $.skip_mover = false %>
+                - post_finish_message_to_slack: <% $.skip_mover = true %>
 
             check_ngi_ready_status:
               action: arteria-packs.check_ngi_ready_in_supr
@@ -117,4 +135,23 @@ workflows:
                 supr_base_api_url: <% $.supr_api_url %>
                 api_user: <% $.supr_api_user %>
                 api_key: <% $.supr_api_key %>
+              on-success:
+                - post_finish_message_to_slack
 
+            post_finish_message_to_slack:
+              action: arteria-packs.post_to_slack
+              input:
+                user: 'Bot D Liver'
+                emoji_icon: ':robot_face:'
+                channel: <% $.delivery_workflow_status_slack_channel %>
+                message: 'I just finished a delivery for `<% $.project_name %>`. You can see the details by running: `st2 execution get <% env().st2_execution_id %>`'
+
+            post_failed_message_to_slack:
+              action: arteria-packs.post_to_slack
+              input:
+                user: 'Bot D Liver'
+                emoji_icon: ':robot_face:'
+                channel: <% $.delivery_workflow_status_slack_channel %>
+                message: 'Sorry, but I just failed to deliver `<% $.project_name %>`. You can see the details by running: `st2 execution get <% env().st2_execution_id %>`'
+              on-complete:
+                - fail

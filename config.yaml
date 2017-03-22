@@ -45,6 +45,7 @@ charon_base_url: http://charon.url
 slack_webhook_url: https://slack.webhook.url
 charon_status_report_slack_channel: "#bottest"
 
+delivery_workflow_status_slack_channel: '#bottest'
 # String of file paths to exclude from the compressed archive (egrep syntax)
 archive_excludes: "\"'^Config|^InterOp|^SampleSheet.csv|^Unaligned|^runParameters.xml|^RunInfo.xml\""
 # Which file entries we should not link to when creating the archive copy of the runfolder 
