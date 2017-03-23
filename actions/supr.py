@@ -56,8 +56,8 @@ class Supr(Action):
 
             today = date.today()
             today_formatted = today.strftime(Supr.DATE_FORMAT)
-            six_months_from_now = today + relativedelta(months=+6)
-            six_months_from_now_formatted = six_months_from_now.strftime(Supr.DATE_FORMAT)
+            three_months_from_now = today + relativedelta(months=+3)
+            three_months_from_now_formatted = three_months_from_now.strftime(Supr.DATE_FORMAT)
 
             # Check smallest of delivery size in bytes and one gb (api wants size passed in giga bytes)
             size_of_delivery = max(1, math.ceil(project_info[ngi_project_name]['size']/pow(10, 9)))
@@ -67,7 +67,7 @@ class Supr(Action):
                 'title': "DELIVERY_{}_{}".format(ngi_project_name, today_formatted),
                 'pi_id': pi_id,
                 'start_date': today_formatted,
-                'end_date': six_months_from_now_formatted,
+                'end_date': three_months_from_now_formatted,
                 'continuation_name': '',
                 'allocated': size_of_delivery,
                 'api_opaque_data': '',
