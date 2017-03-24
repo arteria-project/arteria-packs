@@ -22,8 +22,8 @@ class DownloadSamplesheetClarity(Action):
     def highest_id(self, process_ids):
         highest_proc_number = 0
         highest_proc_type = ''
-        for id in process_ids:
-            (proc_type, proc_number) = id.split('-')
+        for process_id in process_ids:
+            (proc_type, proc_number) = process_id.split('-')
             if highest_proc_number == 0 or int(proc_number) > highest_proc_number:
                 highest_proc_number = int(proc_number)
                 highest_proc_type = proc_type

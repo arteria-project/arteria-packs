@@ -9,5 +9,4 @@ parameters:
     type: "string"
     description: "Name of the flowcell used to look up the samplesheet in the Clarity LIMS"
     required: true
-    position: 0
 
