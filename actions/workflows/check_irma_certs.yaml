@@ -1,0 +1,61 @@
+version: "2.0" # mistral version
+name: arteria-packs.check_irma_certs
+description: Logins to all hosts daily and warns if the SSH certs expires within two weeks.
+
+workflows:
+    main:
+        type: direct
+        input:
+          - days
+        task-defaults:
+          on-error:
+            - post_failed_message_to_slack
+
+        tasks:
+            note_workflow_version:
+              action: core.local
+              input:
+                cmd: git rev-parse HEAD
+                cwd: /opt/stackstorm/packs/arteria-packs/
+              on-success:
+                  - get_config
+
+            get_config:
+              action: arteria-packs.get_pack_config
+              publish:
+                biotank_hosts: <% task(get_config).result.result.biotank_hosts %>
+                biotank_user: <% task(get_config).result.result.biotank_user %>
+                biotank_user_key: <% task(get_config).result.result.biotank_user_key %>
+                summary_host: <% task(get_config).result.result.summary_host %>
+                summary_user: <% task(get_config).result.result.summary_user %>
+                summary_host_key: <% task(get_config).result.result.summary_host_key %>
+                slack_channel: <% task(get_config).result.result.check_cert_slack_channel %>
+              on-success:
+                 - get_summary_cert_expiry
+                 - get_biotank_certs_expiries
+
+            get_summary_cert_expiry:
+              action: core.remote
+              input:
+                cmd: EXPIRE=`ssh-keygen -L -f /home/seqsum/.ssh/mm-xlas002-cert.pub | grep Valid | awk '{print $5 }'` && DIFF=$((`date -d "${EXPIRE}" +%s`-`date +%s`)) && if [ ${DIFF} -lt $((60*60*24*<% $.days %>)) ]; then echo "SSH certificate expires within <% $.days %> days!" && false; fi
+                hosts: <% $.summary_host %>
+                username: <% $.summary_user %>
+                private_key: <% $.summary_host_key %>
+
+            get_biotank_certs_expiries: 
+              action: core.remote
+              input: 
+                cmd: EXPIRE=`ssh-keygen -L -f /home/arteria/.ssh/irma_biotank-cert.pub | grep Valid | awk '{print $5 }'` && DIFF=$((`date -d "${EXPIRE}" +%s`-`date +%s`)) && if [ ${DIFF} -lt $((60*60*24*<% $.days %>)) ]; then echo "SSH certificate expires within <% $.days %> days!" && false; fi
+                hosts: <% $.biotank_hosts %>
+                username: <% $.biotank_user %>
+                private_key: <% $.biotank_user_key %>
+
+            post_failed_message_to_slack:
+              action: arteria-packs.post_to_slack
+              input:
+                user: 'Cert Police'
+                emoji_icon: ':robot_face:'
+                channel: <% $.slack_channel %>
+                message: 'SSH certificates for Irma expires within <% $.days %> days! Check details by running: `st2 execution get <% env().st2_execution_id %>`'
+              on-complete:
+                - fail
