@@ -52,8 +52,8 @@ workflows:
               input:
                 url: "<% $.delivery_service_url %>/api/1.0/runfolders/<% $.runfolder_name %>/projects"
                 method: "GET"
-		headers:
-		  apikey: "<% $.irma_api_key %>"
+                headers:
+                  apikey: "<% $.irma_api_key %>"
               publish:
                 projects_on_runfolder: <% task(projects_on_runfolder).result.body.projects.name %>
               on-success:
