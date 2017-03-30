@@ -10,6 +10,11 @@ summary_host_key: /path/to/ssh/key
 summary_destination: /tmp/summaries/
 summary_ngi_pipeline_reports_destination: /tmp/summaries/ngi_reports
 
+biotank_hosts: mm-xart002,mm-xart003
+biotank_user: arteria
+biotank_user_key: "/path/to/ssh/key"
+check_cert_slack_channel: "#bottest"
+
 remote_host: testuppmax
 remote_user: arteria
 remote_host_key: /path/to/ssh/key
