@@ -14,9 +14,6 @@ workflows:
             - tiles
             - use_base_mask
             - bcl2fastq_additional_arguments
-            - conversionstats_swap_read_nr
-            - conversionstats_swap_read_from
-            - conversionstats_swap_read_to
             - skip_archiving
             - remove_previous_archive_dir  
         output:
@@ -134,17 +131,6 @@ workflows:
                 action: core.local
                 input:
                     cmd: ssh <% $.host %> "echo <% task(run_bcl2fastq).result.result.response_from_start.response.bcl2fastq_version %> > <% $.runfolder %>/bcl2fastq_version"
-                on-success:
-                    - conversionstats_workaround: <% $.conversionstats_swap_read_nr = true %>
-                    - download_sisyphus_config: <% $.conversionstats_swap_read_nr = false %>
-
-            # Due to a bug in bcl2fastq some read numbers in Unaligned/Stats/ConversionStats.xml will sometimes have the wrong number. 
-            # If the Arteria operator manually sets "conversionstats_swap_read"_nr to "true" then this workaround action will swap 
-            # the incorrect value "conversionstats_swap_read_from" to the requested correct value "conversionstats_swap_read_to". 
-            conversionstats_workaround:
-                action: core.local
-                input:
-                    cmd: ssh <% $.host %> "bash -s" < /opt/stackstorm/packs/arteria-packs/actions/lib/swap_read_nr_in_conversionstats.sh <% $.runfolder %> <% $.conversionstats_swap_read_from %> <% $.conversionstats_swap_read_to %>
                 on-success:
                     - download_sisyphus_config
 
