@@ -12,7 +12,7 @@ parameters:
         required: true
         default: get_id_from_email
         immutable: true
-    project_to_email_dict:
+    project_to_email_sensitive_dict:
         type: object
         description: dict from project to emails
         required: true
