@@ -16,10 +16,14 @@ parameters:
         type: object
         required: true
         description: Dictionary of project names to pi ids.
+    staging_info:
+        type: object
+        required: true
+        description: Dictionary with staging information, e.g. the size of the project and its staging id.
     project_info:
         type: object
         required: true
-        description: Dictionary with project information, e.g. the size of the allocation of the project
+        description: Dictionary with information about the project, e.g. if it is sensitive or not.
     supr_base_api_url:
         type: string
         description: Email adress to look for associated PI for.

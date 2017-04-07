@@ -39,15 +39,15 @@ class Supr(Action):
     @staticmethod
     def search_for_pis(project_to_email_dict, supr_base_api_url, api_user, api_key):
         res = {}
-        for project, email in project_to_email_dict.iteritems():
+        for project, project_info in project_to_email_dict.iteritems():
             res[project] = Supr.search_by_email(base_url=supr_base_api_url,
-                                                email=email,
+                                                email=project_info['email'],
                                                 user=api_user,
                                                 key=api_key)
         return res
 
     @staticmethod
-    def create_delivery_project(base_url, project_names_and_ids, project_info, user, key):
+    def create_delivery_project(base_url, project_names_and_ids, staging_info, project_info, user, key):
 
         result = {}
         for ngi_project_name, pi_id in project_names_and_ids.iteritems():
@@ -60,7 +60,7 @@ class Supr(Action):
             three_months_from_now_formatted = three_months_from_now.strftime(Supr.DATE_FORMAT)
 
             # Check smallest of delivery size in bytes and one gb (api wants size passed in giga bytes)
-            size_of_delivery = max(1, math.ceil(project_info[ngi_project_name]['size']/pow(10, 9)))
+            size_of_delivery = max(1, math.ceil(staging_info[ngi_project_name]['size']/pow(10, 9)))
 
             payload = {
                 'ngi_project_name': ngi_project_name,
@@ -72,7 +72,8 @@ class Supr(Action):
                 'allocated': size_of_delivery,
                 'api_opaque_data': '',
                 'ngi_ready': False,
-                'ngi_delivery_status': ''
+                'ngi_delivery_status': '',
+                'ngi_sensitive_data': project_info[ngi_project_name]['sensitive']
             }
 
             response = requests.post(create_delivery_project_url,
@@ -104,10 +105,11 @@ class Supr(Action):
 
     def run(self, action, supr_base_api_url, api_user, api_key, **kwargs):
         if action == "get_id_from_email":
-            return self.search_for_pis(kwargs['project_to_email_dict'], supr_base_api_url, api_user, api_key)
+            return self.search_for_pis(kwargs['project_to_email_sensitive_dict'], supr_base_api_url, api_user, api_key)
         elif action == 'create_delivery_project':
             return self.create_delivery_project(supr_base_api_url,
                                                 kwargs['project_names_and_ids'],
+                                                kwargs['staging_info'],
                                                 kwargs['project_info'],
                                                 api_user, api_key)
         elif action == 'check_ngi_ready':

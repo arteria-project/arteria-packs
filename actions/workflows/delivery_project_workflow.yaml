@@ -53,14 +53,14 @@ workflows:
                   projects:
                    -  <% $.project_name %>
               publish:
-                projects_to_emails: <% task(get_pi_emails).result.result %>
+                projects_to_emails_sensitive: <% task(get_pi_emails).result.result %>
               on-success:
                 - get_pi_ids
 
             get_pi_ids:
               action: arteria-packs.get_pi_id_for_email_from_supr
               input:
-                project_to_email_dict: <% $.projects_to_emails %>
+                project_to_email_sensitive_dict: <% $.projects_to_emails_sensitive %>
                 api_user: <% $.supr_api_user %>
                 api_key: <% $.supr_api_key %>
                 supr_base_api_url: <% $.supr_api_url %>
@@ -85,7 +85,8 @@ workflows:
               action: arteria-packs.create_delivery_project_in_super
               input:
                 project_names_and_ids: <% $.pi_supr_ids %>
-                project_info: <% $.projects_and_stage_ids %>
+                staging_info: <% $.projects_and_stage_ids %>
+                project_info: <% $.projects_to_emails_sensitive %>
                 supr_base_api_url: <% $.supr_api_url %>
                 api_user: <% $.supr_api_user %>
                 api_key: <% $.supr_api_key %>
