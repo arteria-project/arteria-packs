@@ -10,6 +10,7 @@ workflows:
           - projects_pi_email_file
           - skip_mover
           - sleep_time
+          - restrict_to_projects
           # TODO Later we want to make sure that we can restrict which projects should be delivered...
           #- restrict_to_projects
         task-defaults:
@@ -91,6 +92,7 @@ workflows:
                    projects: <% $.projects_on_runfolder %>
                  sleep_time: <% $.sleep_time %>
                  irma_api_key: <% $.irma_api_key %>
+                 restrict_to_projects: <% $.restrict_to_projects %>
               publish:
                  projects_and_stage_ids: <% task(stage_runfolder).result.result %>
               on-success:

@@ -50,7 +50,8 @@ class Supr(Action):
     def create_delivery_project(base_url, project_names_and_ids, staging_info, project_info, user, key):
 
         result = {}
-        for ngi_project_name, pi_id in project_names_and_ids.iteritems():
+        for ngi_project_name in staging_info.keys():
+            pi_id = project_names_and_ids[ngi_project_name]
 
             create_delivery_project_url = '{}/ngi_delivery/project/create/'.format(base_url)
 
