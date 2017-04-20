@@ -130,7 +130,8 @@ class ArteriaDeliveryServiceHandler(object):
             else:
                 payload = {}
         else:
-            payload = {'projects':[restrict_to_projects]}
+            restrict_to_projects_list = restrict_to_projects.split(",")
+            payload = {'projects':restrict_to_projects_list}
 
         response = self._post_to_server(stage_runfolder_endpoint, payload)
         return self.parse_stage_order_ids_from_response(response)

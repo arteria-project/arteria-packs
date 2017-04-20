@@ -36,5 +36,5 @@ parameters:
     restrict_to_projects:
         required: false
         type: string
-        description: Name of specific project to be delivered from runfolder.
+        description: Name of specific project/projects to be delivered from runfolder. If several projects are specified separate project names on ,.
         default: None
