@@ -124,13 +124,13 @@ class ArteriaDeliveryServiceHandler(object):
     def stage_runfolder(self, runfolder_name, projects,restrict_to_projects):
         stage_runfolder_endpoint = '{}/api/1.0/stage/runfolder/{}'.format(self.delivery_service_location, runfolder_name)
 
-        if restrict_to_projects == 'None':
+        if restrict_to_projects == 'keep_all_projects':
             if projects:
                 payload = {'projects': projects['projects']}
             else:
                 payload = {}
         else:
-            restrict_to_projects_list = restrict_to_projects.split(",")
+            restrict_to_projects_list = [proj.strip() for proj in restrict_to_projects.split(",")]
             payload = {'projects':restrict_to_projects_list}
 
         response = self._post_to_server(stage_runfolder_endpoint, payload)

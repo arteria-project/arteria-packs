@@ -36,4 +36,4 @@ parameters:
     required: false
     type: string
     description: Name of specific project/projects to be delivered from runfolder. If several projects are specified separate project names on ,.
-    default: None
+    default: 'keep_all_projects'
