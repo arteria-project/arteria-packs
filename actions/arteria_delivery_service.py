@@ -121,13 +121,17 @@ class ArteriaDeliveryServiceHandler(object):
 
         return result
 
-    def stage_runfolder(self, runfolder_name, projects):
+    def stage_runfolder(self, runfolder_name, projects,restrict_to_projects):
         stage_runfolder_endpoint = '{}/api/1.0/stage/runfolder/{}'.format(self.delivery_service_location, runfolder_name)
 
-        if projects:
-            payload = {'projects': projects['projects']}
+        if restrict_to_projects == 'keep_all_projects':
+            if projects:
+                payload = {'projects': projects['projects']}
+            else:
+                payload = {}
         else:
-            payload = {}
+            restrict_to_projects_list = [proj.strip() for proj in restrict_to_projects.split(",")]
+            payload = {'projects':restrict_to_projects_list}
 
         response = self._post_to_server(stage_runfolder_endpoint, payload)
         return self.parse_stage_order_ids_from_response(response)
@@ -220,7 +224,8 @@ class ArteriaDeliveryService(Action):
 
         if action == "stage_runfolder":
             projects_and_stage_ids = service.stage_runfolder(runfolder_name=kwargs['runfolder_name'],
-                                                             projects=kwargs['projects'])
+                                                             projects=kwargs['projects'],
+                                                             restrict_to_projects=kwargs['restrict_to_projects'])
             return self._await_and_parse_results(projects_and_stage_ids, service, sleep_time)
 
         elif action == "stage_project":

@@ -33,3 +33,8 @@ parameters:
         required: true
         type: string
         description: A api key for the irma kong api gateway
+    restrict_to_projects:
+        required: false
+        type: string
+        description: Name of specific project/projects to be delivered from runfolder. If several projects are specified separate project names on ,.
+        default: 'keep_all_projects'
