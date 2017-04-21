@@ -1,8 +1,6 @@
 arteria-packs
 -------------
 
-NOTE: This is very much a work in progress, mostly containing dummy workflows so far.
-
 StackStorm pack to setup automation workflow taking data from the sequencer to delivery on the remote host...
 
 Development and testing
