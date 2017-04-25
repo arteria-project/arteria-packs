@@ -58,6 +58,10 @@ class ProjectAndDeliveryId(object):
         self.project = project
         self.delivery_id = delivery_id
         self.status = status
+        self.mover_delivery_id = None
+
+    def set_mover_delivery_id(self, new_id):
+        self.mover_delivery_id = new_id
 
     def set_status(self, new_status, skip_mover):
         if skip_mover:
@@ -174,6 +178,7 @@ class ArteriaDeliveryServiceHandler(object):
                                                                          project_and_delivery_id.delivery_id)
         response = self._get_from_server(delivery_status_endpoint)
         project_and_delivery_id.set_status(response['status'], skip_mover)
+        project_and_delivery_id.set_mover_delivery_id(response['mover_delivery_id'])
         return project_and_delivery_id
 
 
@@ -267,7 +272,8 @@ class ArteriaDeliveryService(Action):
             return_flag = project_and_delivery_id.is_successful(skip_mover=skip_mover)
             return return_flag, {'project_name': project_and_delivery_id.project,
                                  'status': project_and_delivery_id.status,
-                                 'delivery_id': project_and_delivery_id.delivery_id}
+                                 'delivery_id': project_and_delivery_id.delivery_id,
+                                 'mover_delivery_id': project_and_delivery_id.mover_delivery_id}
         else:
             raise AssertionError("Action: {} was not recognized.".format(action))
 
