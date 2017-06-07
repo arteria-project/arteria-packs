@@ -3,6 +3,7 @@ import os
 import requests
 import json
 import argparse
+import datetime
 
 def get_traces_for_tag(tag, headers):
     traces_response = requests.get(
@@ -35,6 +36,9 @@ def get_actions_from_executions(executions, headers):
 def filter_actions_by_name(actions, name):
     return (action for action in actions if action["action"]["name"] == name)
 
+def sort_actions_by_timestamp(actions):
+    sort_actions = sorted(actions, key=lambda x:datetime.datetime.strptime(x['start_timestamp'].split(".")[0], "%Y-%m-%dT%H:%M:%S"))
+    return sort_actions
 
 if __name__ == "__main__":
 
@@ -62,5 +66,6 @@ if __name__ == "__main__":
     #print list(executions)
     actions = get_actions_from_executions(executions, access_headers)
     filtered_actions = filter_actions_by_name(actions, workflow_name)
-    for a in filtered_actions:
+    sorted_actions = sort_actions_by_timestamp(filtered_actions)
+    for a in sorted_actions:
         print a["id"]
