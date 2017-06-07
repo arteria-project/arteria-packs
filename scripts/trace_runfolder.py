@@ -3,7 +3,7 @@ import os
 import requests
 import json
 import argparse
-import datetime
+from datetime import datetime
 
 def get_traces_for_tag(tag, headers):
     traces_response = requests.get(
@@ -37,7 +37,7 @@ def filter_actions_by_name(actions, name):
     return (action for action in actions if action["action"]["name"] == name)
 
 def sort_actions_by_timestamp(actions):
-    sort_actions = sorted(actions, key=lambda x:datetime.datetime.strptime(x['start_timestamp'].split(".")[0], "%Y-%m-%dT%H:%M:%S"))
+    sort_actions = sorted(actions, key=lambda x:datetime.strptime(x['start_timestamp'].split(".")[0], "%Y-%m-%dT%H:%M:%S")) #Sort on start_time, e.g. 2017-05-29T15:03:03.818222Z for each action
     return sort_actions
 
 if __name__ == "__main__":
