@@ -38,9 +38,9 @@ def filter_actions_by_name(actions, name):
 
 def sort_actions_by_timestamp(actions):
     def get_start_time(action):
-	#Select start_time, e.g. 2017-05-29T15:03:03.818222Z for each action. Remove everything after ".".
+        #Select start_time, e.g. 2017-05-29T15:03:03.818222Z for each action. Remove everything after ".".
         start_time = datetime.strptime(action['start_timestamp'].split(".")[0], "%Y-%m-%dT%H:%M:%S")
-	return start_time
+        return start_time
     #Compare elements in actions on key value start_timestamp.
     sort_actions = sorted(actions, key=get_start_time)
     return sort_actions
