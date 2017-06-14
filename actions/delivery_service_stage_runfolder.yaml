@@ -31,5 +31,6 @@ parameters:
         default: 300
     irma_api_key:
         required: true
+        secret: true
         type: string
         description: A api key for the irma kong api gateway
