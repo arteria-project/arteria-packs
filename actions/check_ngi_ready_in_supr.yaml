@@ -30,3 +30,4 @@ parameters:
       type: string
       description: SUPR api key
       required: true
+      secret: true

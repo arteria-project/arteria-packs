@@ -28,5 +28,6 @@ parameters:
       required: true
     api_key:
       type: string
+      secret: true
       description: SUPR api key
       required: true
