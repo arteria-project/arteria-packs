@@ -305,7 +305,7 @@ workflows:
                     url: <% $.irma_checksum_base_url %>/start/<% $.runfolder_name %>?apikey=<% $.irma_api_key %>
                     body:
                       path_to_md5_sum_file: "MD5/checksums.md5"
-                    verify_ssl_cert: False
+                    verify_ssl_cert: True
                     irma_mode: True
                 on-success:
                   - irma_run_aeacus_stats
@@ -319,7 +319,7 @@ workflows:
                     url: <% $.irma_siswrap_base_url %>/aeacusstats/run/<% $.runfolder_name %>?apikey=<% $.irma_api_key %>
                     body:
                       runfolder: <% $.runfolder_name %>
-                    verify_ssl_cert: False
+                    verify_ssl_cert: True
                     irma_mode: True
                on-success:
                  - irma_run_aeacus_reports
@@ -330,7 +330,7 @@ workflows:
                   url: <% $.irma_siswrap_base_url %>/aeacusreports/run/<% $.runfolder_name %>?apikey=<% $.irma_api_key %>
                   body:
                     runfolder: <% $.runfolder_name %>
-                  verify_ssl_cert: False
+                  verify_ssl_cert: True
                   irma_mode: True
                on-success:
                 - upload_runfolder_to_pdc: <% $.skip_archiving = false %>
