@@ -1,7 +1,8 @@
 import requests
 import json
 import sys
- 
+import yaml
+
 # Usage:
 # python runfolder_search.py <search term>
 
@@ -11,13 +12,18 @@ else:
     print "Missing argument!\nUsage: python search_runfolder.py <search term>"
     sys.exit()
 
-hosts = ["biotank5", "biotank6" ,"biotank7", "biotank8", "biotank9", "biotank10", "biotank11", "biotank12", "biotank13", "biotank14"]
+# Load config
+with open("/opt/stackstorm/packs/arteria-packs/config.yaml", 'r') as ymlfile:
+    cfg = yaml.load(ymlfile)
+
+# Get hosts from config
+hosts = cfg['runfolder_svc_urls']
 
 # Print header
 print "status\trunfolder_link"
 
 for host in hosts:
-    result = requests.get("http://{}:10800/api/1.0/runfolders?state=*".format(host))
+    result = requests.get("{}/api/1.0/runfolders?state=*".format(host))
     result_json = json.loads(result.text)
     all_runfolders = result_json["runfolders"]
     for runfolder in all_runfolders:
