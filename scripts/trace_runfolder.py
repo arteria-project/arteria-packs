@@ -34,7 +34,7 @@ def get_actions_from_executions(executions, headers):
         yield execution_info
 
 def filter_actions_by_name(actions, name):
-    return (action for action in actions if action["action"]["name"] == name)
+    return (action for action in actions if name in action["action"]["name"])
 
 def sort_actions_by_timestamp(actions):
     def get_start_time(action):
@@ -52,7 +52,7 @@ if __name__ == "__main__":
                                              "python scripts/trace_runfolder.py --tag 150605_M00485_0183_000000000-ABGT6_testbio14 | xargs -n1 st2 execution get")
     parser.add_argument('--tag', required=True)
     parser.add_argument('--api_base_url', default="http://localhost:9101/v1")
-    parser.add_argument('--workflow', default="ngi_uu_workflow")
+    parser.add_argument('--workflow', default="workflow")
     args = parser.parse_args()
 
     api_base_url = args.api_base_url
