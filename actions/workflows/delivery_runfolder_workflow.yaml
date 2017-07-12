@@ -11,8 +11,6 @@ workflows:
           - skip_mover
           - sleep_time
           - restrict_to_projects
-          # TODO Later we want to make sure that we can restrict which projects should be delivered...
-          #- restrict_to_projects
         task-defaults:
           on-error:
             - post_failed_message_to_slack
@@ -66,6 +64,7 @@ workflows:
                 file_path: <% $.projects_pi_email_file %>
                 projects:
                   projects: <% $.projects_on_runfolder %>
+                restrict_to_projects: <% $.restrict_to_projects %>
               publish:
                 projects_to_emails_sensitive: <% task(get_pi_emails).result.result %>
               on-success:

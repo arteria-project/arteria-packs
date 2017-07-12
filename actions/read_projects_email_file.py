@@ -9,9 +9,12 @@ from st2actions.runners.pythonrunner import Action
 
 class ReadProjectsEmailFile(Action):
 
-    def run(self, file_path, projects):
+    def run(self, file_path, projects, restrict_to_projects):
 
-        projects_list = projects['projects']
+        if restrict_to_projects == 'keep_all_projects':
+            projects_list = projects['projects']
+        else:
+            projects_list = [proj.strip() for proj in restrict_to_projects.split(",")]
 
         result = {}
 

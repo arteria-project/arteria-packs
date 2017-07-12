@@ -15,4 +15,9 @@ parameters:
         type: object
         description: Projects to look for (will fail if not available)
         required: true
+    restrict_to_projects:
+        type: string
+        description: Name of specific project/projects to be delivered from runfolder. If several projects are specified separate project names on ,.
+        required: false                                           
+        default: 'keep_all_projects'
 
