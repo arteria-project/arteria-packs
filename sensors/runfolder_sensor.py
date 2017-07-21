@@ -6,13 +6,14 @@ import os
 
 class RunfolderSensor(PollingSensor):
 
-    def __init__(self, sensor_service, config=None, poll_interval=None):
+    def __init__(self, sensor_service, config=None, poll_interval=None, trigger='arteria-packs.runfolder_ready'):
         super(RunfolderSensor, self).__init__(sensor_service=sensor_service,
                                               config=config,
                                               poll_interval=poll_interval)
         self._logger = self._sensor_service.get_logger(__name__)
         self._infolog("__init__")
         self._client = None
+        self._trigger = trigger
 
     def setup(self):
         self._infolog("setup")
@@ -53,7 +54,7 @@ class RunfolderSensor(PollingSensor):
 
     def _handle_result(self, result):
         self._infolog("_handle_result")
-        trigger = 'arteria-packs.runfolder_ready'
+        trigger = self._trigger
         runfolder_path = result['path']
         runfolder_name = os.path.split(runfolder_path)[1]
         payload = {

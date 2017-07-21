@@ -1,5 +1,5 @@
 from runfolder_sensor import RunfolderSensor
-from runfolder_client import RunfolderClient
+from incoming_client import IncomingClient
 
 
 class IncomingSensor(RunfolderSensor):
@@ -7,7 +7,8 @@ class IncomingSensor(RunfolderSensor):
     def __init__(self, sensor_service, config=None, poll_interval=None):
         super(IncomingSensor, self).__init__(sensor_service=sensor_service,
                                              config=config,
-                                             poll_interval=poll_interval)
+                                             poll_interval=poll_interval,
+                                             trigger='arteria-packs.incoming_ready')
         self._logger = self._sensor_service.get_logger(__name__)
         self._infolog("__init__")
         self._client = None
@@ -17,7 +18,7 @@ class IncomingSensor(RunfolderSensor):
         try:
             self._load_config()
             client_urls = self.config["incoming_svc_urls"]
-            self._client = RunfolderClient(client_urls, self._logger)
+            self._client = IncomingClient(client_urls, self._logger)
             self._infolog("Created client: {0}".format(self._client))
         except Exception as ex:
             # TODO: It seems that st2 isn't logging the entire exception, or
