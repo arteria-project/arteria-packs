@@ -39,3 +39,8 @@ parameters:
         type: string
         description: Name of specific project/projects to be delivered from runfolder. If several projects are specified separate project names on ,.
         default: 'keep_all_projects'
+    force_delivery:
+        required: false
+        type: boolean
+        description: Force a delivery of this runfolder even if it has been delivered before.
+        default: false

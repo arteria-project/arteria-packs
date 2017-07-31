@@ -10,6 +10,7 @@ workflows:
           - projects_pi_email_file
           - skip_mover
           - sleep_time
+          - force_delivery
         task-defaults:
           on-error:
             - post_failed_message_to_slack
@@ -76,6 +77,7 @@ workflows:
                  project_name: <% $.project_name %>
                  sleep_time: <% $.sleep_time %>
                  irma_api_key: <% $.irma_api_key %>
+                 force_delivery: <% $.force_delivery %>
               publish:
                  projects_and_stage_ids: <% task(stage_project).result.result %>
               on-success:

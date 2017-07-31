@@ -30,3 +30,8 @@ parameters:
         secret: true
         type: string
         description: A api key for the irma kong api gateway
+    force_delivery:
+        required: false
+        type: boolean
+        description: If a project has already been delivered, the delivery service will deny delivering it again. This allows this to be overridden. Use with care!
+        default: false

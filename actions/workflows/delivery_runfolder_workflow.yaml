@@ -11,6 +11,7 @@ workflows:
           - skip_mover
           - sleep_time
           - restrict_to_projects
+          - force_delivery
         task-defaults:
           on-error:
             - post_failed_message_to_slack
@@ -92,6 +93,7 @@ workflows:
                  sleep_time: <% $.sleep_time %>
                  irma_api_key: <% $.irma_api_key %>
                  restrict_to_projects: <% $.restrict_to_projects %>
+                 force_delivery: <% $.force_delivery %>
               publish:
                  projects_and_stage_ids: <% task(stage_runfolder).result.result %>
               on-success:

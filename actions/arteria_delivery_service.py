@@ -100,6 +100,10 @@ class ArteriaDeliveryServiceHandler(object):
         headers = {'content-type': 'application/json', 'apikey': self.irma_api_key}
         response = requests.post(url, data=json.dumps(payload), headers=headers)
 
+        if response.status_code == 403:
+            raise AssertionError("The delivery service denied the request with 403. This might indicate that "
+                                 "this runfolder/project has already been delivered.")
+
         if response.status_code != 202:
             raise AssertionError("Delivery server did not accept request. "
                                  "URL: {} with response: \n {}".format(url, response.content))
@@ -125,7 +129,7 @@ class ArteriaDeliveryServiceHandler(object):
 
         return result
 
-    def stage_runfolder(self, runfolder_name, projects,restrict_to_projects):
+    def stage_runfolder(self, runfolder_name, projects, restrict_to_projects, force_delivery):
         stage_runfolder_endpoint = '{}/api/1.0/stage/runfolder/{}'.format(self.delivery_service_location, runfolder_name)
 
         if restrict_to_projects == 'keep_all_projects':
@@ -135,14 +139,21 @@ class ArteriaDeliveryServiceHandler(object):
                 payload = {}
         else:
             restrict_to_projects_list = [proj.strip() for proj in restrict_to_projects.split(",")]
-            payload = {'projects':restrict_to_projects_list}
+            payload = {'projects': restrict_to_projects_list}
+
+        if force_delivery:
+            payload['force_delivery'] = True
 
         response = self._post_to_server(stage_runfolder_endpoint, payload)
         return self.parse_stage_order_ids_from_response(response)
 
-    def stage_project(self, project_name):
+    def stage_project(self, project_name, force_delivery):
         stage_project_endpoint = '{}/api/1.0/stage/project/{}'.format(self.delivery_service_location, project_name)
-        response = self._post_to_server(stage_project_endpoint, payload=None)
+        if force_delivery:
+            payload = {'force_delivery': True}
+        else:
+            payload = None
+        response = self._post_to_server(stage_project_endpoint, payload=payload)
         return self.parse_stage_order_ids_from_response(response)
 
     def update_stage_status(self, project_and_stage_id):
@@ -230,11 +241,13 @@ class ArteriaDeliveryService(Action):
         if action == "stage_runfolder":
             projects_and_stage_ids = service.stage_runfolder(runfolder_name=kwargs['runfolder_name'],
                                                              projects=kwargs['projects'],
-                                                             restrict_to_projects=kwargs['restrict_to_projects'])
+                                                             restrict_to_projects=kwargs['restrict_to_projects'],
+                                                             force_delivery=kwargs['force_delivery'])
             return self._await_and_parse_results(projects_and_stage_ids, service, sleep_time)
 
         elif action == "stage_project":
-            projects_and_stage_ids = service.stage_project(project_name=kwargs['project_name'])
+            projects_and_stage_ids = service.stage_project(project_name=kwargs['project_name'],
+                                                           force_delivery=kwargs['force_delivery'])
             return self._await_and_parse_results(projects_and_stage_ids, service, sleep_time)
 
         elif action == "deliver":
