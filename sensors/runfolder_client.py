@@ -19,7 +19,7 @@ class RunfolderClient():
         for host in self._hosts:
             # TODO: Add packs id to log in a generic way
             self._logger.info("Querying {0}".format(host))
-            url = "{0}/api/1.0/runfolders/pickup".format(host)
+            url = host
             try:
                 resp = requests.get(url)
                 if resp.status_code != 200:

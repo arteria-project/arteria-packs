@@ -1,5 +1,5 @@
 from runfolder_sensor import RunfolderSensor
-from incoming_client import IncomingClient
+from runfolder_client import RunfolderClient
 
 
 class IncomingSensor(RunfolderSensor):
@@ -18,7 +18,7 @@ class IncomingSensor(RunfolderSensor):
         try:
             self._load_config()
             client_urls = self.config["incoming_svc_urls"]
-            self._client = IncomingClient(client_urls, self._logger)
+            self._client = RunfolderClient(client_urls, self._logger)
             self._infolog("Created client: {0}".format(self._client))
         except Exception as ex:
             # TODO: It seems that st2 isn't logging the entire exception, or
