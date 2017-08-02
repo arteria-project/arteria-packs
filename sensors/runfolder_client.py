@@ -29,7 +29,9 @@ class RunfolderClient():
                     json = resp.text
                     self._logger.debug("RunfolderClient: Successful call to {0}. {1}.".
                         format(url, json))
-                    result = jsonpickle.decode(json)
+                    result = dict()
+                    result['response'] = jsonpickle.decode(json)
+                    result['requesturl'] = url
                     return result 
             except requests.exceptions.ConnectionError:
                self._logger.error("RunfolderClient: Not able to connect to host {0}".format(host))

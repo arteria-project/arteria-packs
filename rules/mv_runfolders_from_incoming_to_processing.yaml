@@ -13,5 +13,5 @@ action:
     parameters:
         hosts: "{{ trigger.host }}"
         source: "{{ trigger.runfolder }}"
-        destination: "{{ trigger.runfolder }}/../../runfolders/"
+        destination: "{{ trigger.destination }}"
 

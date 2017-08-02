@@ -18,3 +18,5 @@
             type: "string"
           timestamp:
             type: "string"
+          destination:
+            type: "string"
