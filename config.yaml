@@ -43,7 +43,11 @@ siswrap_service_port: 10700
 
 # The service URL polled in the runfolder sensor:
 runfolder_svc_urls:
-  - http://testarteria1:10800
+  - http://testarteria1:10800/api/1.0/runfolders/pickup
+
+incoming_svc_urls:
+  - url: http://testarteria1:10850/api/1.0/runfolders/next
+    dest_folder: /data/testarteria1/runfolders
 
 charon_api_token: dummy_token
 charon_base_url: http://charon.url

@@ -1,0 +1,17 @@
+---
+
+name: "arteria-packs.mv_runfolders_from_incoming_to_processing"
+pack: "arteria-packs"
+description: "Checks the incoming runfolders service for runfolders that have been uploaded completely and moves them to the processing folder"
+enabled: true
+
+trigger:
+    type: "arteria-packs.incoming_ready"
+
+action:
+    ref: "linux.mv"
+    parameters:
+        hosts: "{{ trigger.host }}"
+        source: "{{ trigger.runfolder }}"
+        destination: "{{ trigger.destination }}"
+

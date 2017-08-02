@@ -6,13 +6,15 @@ import os
 
 class RunfolderSensor(PollingSensor):
 
-    def __init__(self, sensor_service, config=None, poll_interval=None):
+    def __init__(self, sensor_service, config=None, poll_interval=None, trigger='arteria-packs.runfolder_ready'):
         super(RunfolderSensor, self).__init__(sensor_service=sensor_service,
                                               config=config,
                                               poll_interval=poll_interval)
         self._logger = self._sensor_service.get_logger(__name__)
         self._infolog("__init__")
         self._client = None
+        self._trigger = trigger
+        self._destinations = {}
 
     def setup(self):
         self._infolog("setup")
@@ -53,16 +55,19 @@ class RunfolderSensor(PollingSensor):
 
     def _handle_result(self, result):
         self._infolog("_handle_result")
-        trigger = 'arteria-packs.runfolder_ready'
-        runfolder_path = result['path']
+        trigger = self._trigger
+        runfolder_path = result['response']['path']
         runfolder_name = os.path.split(runfolder_path)[1]
         payload = {
-            'host': result['host'],
+            'host': result['response']['host'],
             'runfolder': runfolder_path,
             'runfolder_name': runfolder_name,
-            'link': result['link'],
-            'timestamp': datetime.utcnow().isoformat()
+            'link': result['response']['link'],
+            'timestamp': datetime.utcnow().isoformat(),
+            'destination': ""
         }
+        if result['requesturl'] in self._destinations:
+            payload['destination'] = self._destinations[result['requesturl']]
         self._sensor_service.dispatch(trigger=trigger, payload=payload, trace_tag=runfolder_name)
 
     def _load_config(self):

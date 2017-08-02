@@ -19,7 +19,7 @@ class RunfolderClient():
         for host in self._hosts:
             # TODO: Add packs id to log in a generic way
             self._logger.info("Querying {0}".format(host))
-            url = "{0}/api/1.0/runfolders/pickup".format(host)
+            url = host
             try:
                 resp = requests.get(url)
                 if resp.status_code != 200:
@@ -29,7 +29,9 @@ class RunfolderClient():
                     json = resp.text
                     self._logger.debug("RunfolderClient: Successful call to {0}. {1}.".
                         format(url, json))
-                    result = jsonpickle.decode(json)
+                    result = dict()
+                    result['response'] = jsonpickle.decode(json)
+                    result['requesturl'] = url
                     return result 
             except requests.exceptions.ConnectionError:
                self._logger.error("RunfolderClient: Not able to connect to host {0}".format(host))
