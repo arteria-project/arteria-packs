@@ -1,0 +1,41 @@
+---
+name: delivery_service_stage_runfolders_for_project
+runner_type: run-python
+description: Stage runfolders for a project through the Arteria delivery service
+enabled: true
+entry_point: arteria_delivery_service.py
+parameters:
+    timeout:
+        default: 86400
+    action:
+        type: string
+        required: true
+        default: stage_runfolders_for_project
+        immutable: true
+    mode:
+        type: string
+        required: true
+        default: CLEAN
+    project_name:
+        type: string
+        description: Name of the project to stage
+        required: true
+    delivery_base_api_url:
+        type: string
+        description: url to the delivery service
+        required: true
+    sleep_time:
+        type: integer
+        description: seconds to sleep between polling for status
+        required: true
+        default: 300
+    irma_api_key:
+        required: true
+        secret: true
+        type: string
+        description: A api key for the irma kong api gateway
+    force_delivery:
+        required: false
+        type: boolean
+        description: If a project has already been delivered, the delivery service will deny delivering it again. This allows this to be overridden. Use with care!
+        default: false

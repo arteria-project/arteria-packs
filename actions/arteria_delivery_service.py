@@ -156,6 +156,12 @@ class ArteriaDeliveryServiceHandler(object):
         response = self._post_to_server(stage_project_endpoint, payload=payload)
         return self.parse_stage_order_ids_from_response(response)
 
+    def stage_runfolders_for_project(self, project_name, mode):
+        stage_project_endpoint = '{}/api/1.0/stage/project/runfolders/{}'.format(self.delivery_service_location, project_name)
+        payload = {'delivery_mode': mode}
+        response = self._post_to_server(stage_project_endpoint, payload=payload)
+        return self.parse_stage_order_ids_from_response(response)
+
     def update_stage_status(self, project_and_stage_id):
         stage_status_endpoint = '{}/api/1.0/stage/{}'.format(self.delivery_service_location,
                                                              project_and_stage_id.stage_id)
@@ -250,6 +256,10 @@ class ArteriaDeliveryService(Action):
                                                            force_delivery=kwargs['force_delivery'])
             return self._await_and_parse_results(projects_and_stage_ids, service, sleep_time)
 
+        elif action == "stage_runfolders_for_project":
+            projects_and_stage_ids = service.stage_runfolders_for_project(project_name=kwargs['project_name'],
+                                                                          mode=kwargs['mode'])
+            return self._await_and_parse_results(projects_and_stage_ids, service, sleep_time)
         elif action == "deliver":
             skip_mover = kwargs.get('skip_mover')
             project_and_delivery_id = service.delivery(ngi_project_name=kwargs['ngi_project_name'],
