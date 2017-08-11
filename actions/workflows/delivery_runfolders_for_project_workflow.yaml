@@ -149,7 +149,7 @@ workflows:
                 user: 'Bot D Liver'
                 emoji_icon: ':robot_face:'
                 channel: <% $.delivery_workflow_status_slack_channel %>
-                message: 'I just finished a delivery for `<% $.project_name %>`. You can see the details by running: `st2 execution get <% env().st2_execution_id %>`'
+                message: 'I just finished a runfolder delivery for `<% $.project_name %>`. You can see the details by running: `st2 execution get <% env().st2_execution_id %>`'
 
             post_failed_message_to_slack:
               action: arteria-packs.post_to_slack
