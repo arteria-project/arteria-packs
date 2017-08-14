@@ -1,7 +1,7 @@
 ---
-name: delivery_service_stage_runfolder
+name: delivery_service_stage_runfolders_for_project
 runner_type: run-python
-description: Stage a runfolder through the Arteria delivery service
+description: Stage runfolders for a project through the Arteria delivery service
 enabled: true
 entry_point: arteria_delivery_service.py
 parameters:
@@ -10,15 +10,15 @@ parameters:
     action:
         type: string
         required: true
-        default: stage_runfolder
+        default: stage_runfolders_for_project
         immutable: true
-    runfolder_name:
+    mode:
         type: string
-        description: Name of the runfolder to stage
         required: true
-    projects:
-        type: object
-        description: projects to stage as a json object looking like this {"projects":["ABC_123"]}
+        default: CLEAN
+    project_name:
+        type: string
+        description: Name of the project to stage
         required: true
     delivery_base_api_url:
         type: string
@@ -34,13 +34,8 @@ parameters:
         secret: true
         type: string
         description: A api key for the irma kong api gateway
-    restrict_to_projects:
-        required: false
-        type: string
-        description: Name of specific project/projects to be delivered from runfolder. If several projects are specified separate project names on ,.
-        default: 'keep_all_projects'
     force_delivery:
         required: false
         type: boolean
-        description: Force a delivery of this runfolder even if it has been delivered before.
+        description: If a project has already been delivered, the delivery service will deny delivering it again. This allows this to be overridden. Use with care!
         default: false

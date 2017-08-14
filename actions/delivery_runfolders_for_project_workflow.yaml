@@ -1,9 +1,9 @@
 ---
-name: delivery_project_workflow
+name: delivery_runfolders_for_project_workflow
 description: Deliver a project (i.e. a directory placed in the directory defined by the arteria delivery service `general_project_directory` configuration)
 enabled: true
 runner_type: mistral-v2
-entry_point: workflows/delivery_project_workflow.yaml
+entry_point: workflows/delivery_runfolders_for_project_workflow.yaml
 pack: arteria-packs
 parameters:
   context:
@@ -11,13 +11,18 @@ parameters:
     immutable: true
     type: object
   workflow:
-    default: arteria-packs.delivery_project_workflow
+    default: arteria-packs.delivery_runfolers_for_workflow
     immutable: true
     type: string
   project_name:
     required: true
     type: string
     description: Name of the project (and the directory) to deliver
+  mode:
+    required: true
+    type: string
+    description: The mode of delivery to apply. Can be CLEAN (default), BATCH or FORCE.
+    default: CLEAN
   projects_pi_email_file:
     required: true
     type: string
