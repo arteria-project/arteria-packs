@@ -37,3 +37,7 @@ parameters:
     type: boolean
     description: If a project has already been delivered, the delivery service will deny delivering it again. This allows this to be overridden. Use with care!
     default: false
+  set_delivery_status_in_charon:
+    required: false
+    type: boolean
+    description: If this is set to True, if this is a best practice project, the delivery status in charon will be set to DELIVERED.

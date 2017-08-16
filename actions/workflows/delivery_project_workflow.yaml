@@ -11,6 +11,7 @@ workflows:
           - skip_mover
           - sleep_time
           - force_delivery
+          - set_delivery_status_in_charon
         task-defaults:
           on-error:
             - post_failed_message_to_slack
@@ -127,7 +128,8 @@ workflows:
                 irma_api_key: <% $.irma_api_key %>
               on-success:
                 - check_ngi_ready_status: <% $.skip_mover = false %>
-                - post_finish_message_to_slack: <% $.skip_mover = true %>
+                - post_finish_message_to_slack: <% $.skip_mover = true and $.set_delivery_status_in_charon = false %>
+                - get_best_practice_samples: <% $.skip_mover = true and $.set_delivery_status_in_charon = true %>
 
             check_ngi_ready_status:
               action: arteria-packs.check_ngi_ready_in_supr
@@ -138,6 +140,27 @@ workflows:
                 supr_base_api_url: <% $.supr_api_url %>
                 api_user: <% $.supr_api_user %>
                 api_key: <% $.supr_api_key %>
+              on-success:
+                - post_finish_message_to_slack: <% $.set_delivery_status_in_charon = false %>
+                - get_best_practice_samples: <% $.set_delivery_status_in_charon = true %>
+
+            get_best_practice_samples:
+              action: core.http
+              input:
+                url: <% $.delivery_service_url %>/api/1.0/project/<% $.project_name %>/best_practice_samples
+                headers:
+                  apikey: <% $.irma_api_key %>
+              publish:
+                best_practice_samples: <% task(get_best_practice_samples).result.body.samples %>
+              on-success:
+                - set_to_delivered_in_charon
+
+            set_to_delivered_in_charon:
+              action: arteria-packs.charon_set_delivery_status
+              input:
+               project: <% $.project_name %>
+               delivery_status: DELIVERED
+               samples: <% $.best_practice_samples %>
               on-success:
                 - post_finish_message_to_slack
 
