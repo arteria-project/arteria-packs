@@ -40,5 +40,5 @@ parameters:
   set_delivery_status_in_charon:
     required: false
     type: boolean
-    default: false
+    default: true
     description: If this is set to True, if this is a best practice project, the delivery status in charon will be set to DELIVERED.
