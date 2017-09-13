@@ -6,7 +6,7 @@ enabled: true
 entry_point: supr.py
 parameters:
     timeout:
-        default: 10
+        default: 600
     action:
         type: string
         required: true
