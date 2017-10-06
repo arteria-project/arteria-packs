@@ -18,7 +18,12 @@ class IncomingSensor(RunfolderSensor):
         try:
             self._load_config()
             client_urls = [x['url'] for x in self.config["incoming_svc_urls"]]
-            self._destinations = {x['url']: x['dest_folder'] for x in self.config["incoming_svc_urls"]}
+            # copy all further keys of every item over to self._hostconfigs
+            for x in self.config["incoming_svc_urls"]:
+                self._hostconfigs[x['url']] = {}
+                for y in x:
+                    if y != 'url':
+                        self._hostconfigs[x['url']][y] = x[y]
             self._client = RunfolderClient(client_urls, self._logger)
             self._infolog("Created client: {0}".format(self._client))
         except Exception as ex:
