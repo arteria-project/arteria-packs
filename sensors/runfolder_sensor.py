@@ -71,7 +71,7 @@ class RunfolderSensor(PollingSensor):
         self._sensor_service.dispatch(trigger=trigger, payload=payload, trace_tag=runfolder_name)
 
     def _load_config(self):
-        config_path = "/opt/stackstorm/packs/arteria-packs/config.yaml"
+        config_path = "/opt/stackstorm/packs/arteria/config.yaml"
         with open(config_path) as stream:
             self.config = yaml.load(stream)
             self._infolog("Loaded configuration from {}".format(config_path))
