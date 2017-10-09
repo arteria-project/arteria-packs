@@ -11,12 +11,12 @@ VAGRANTFILE_API_VERSION = "2"
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define "arteria" do |arteria|
     # Box details
-    arteria.vm.box = "bento/ubuntu-14.04"
+    arteria.vm.box = "bento/ubuntu-16.04"
     arteria.vm.hostname = "arteria-dev"
 
     # Box Specifications
     arteria.vm.provider :virtualbox do |vb|
-      vb.memory = 1028
+      vb.memory = 4096
       vb.cpus = 2
     end
 
@@ -25,7 +25,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     # Start shell provisioning.
     arteria.vm.provision "shell", 
-      inline: "sudo apt-get update && sudo apt-get install -y curl python-virtualenv vim"
+      inline: "sudo apt-get update && sudo apt-get -y upgrade  && sudo apt-get install -y curl python-virtualenv vim"
 
     arteria.vm.provision "shell", 
       inline: "curl -sSL https://stackstorm.com/packages/install.sh | bash -s -- --user=#{arteriauser} --password=#{arteriapasswd} --version=#{st2version}"
