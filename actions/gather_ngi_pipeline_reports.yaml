@@ -4,13 +4,13 @@ description: Downloads the ngi pipeline reports to the summary host
 enabled: true
 runner_type: mistral-v2
 entry_point: workflows/gather_ngi_pipeline_reports.yaml
-pack: arteria-packs
+pack: arteria
 parameters:
   context:
     default: {}
     immutable: true
     type: object
   workflow:
-    default: arteria-packs.gather_ngi_pipeline_reports
+    default: arteria.gather_ngi_pipeline_reports
     immutable: true
     type: string
