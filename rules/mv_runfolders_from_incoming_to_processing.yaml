@@ -14,4 +14,5 @@ action:
         hosts: "{{ trigger.host }}"
         source: "{{ trigger.runfolder }}"
         destination: "{{ trigger.destination }}"
-
+        username: "{{ trigger.remote_user }}"
+        private_key: "{{ trigger.user_key }}"

@@ -20,3 +20,8 @@
             type: "string"
           destination:
             type: "string"
+          remote_user:
+            type: "string"
+          user_key:
+            type: "string"
+
