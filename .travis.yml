@@ -3,6 +3,8 @@ python: 2.7
 sudo: false
 os:
   - linux
+dist:
+  - trusty
 services:
   # Note: MongoDB and RabbitMQ is needed for packs-resource-register check
   - mongodb
