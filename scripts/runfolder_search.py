@@ -13,7 +13,7 @@ else:
     sys.exit()
 
 # Load config
-with open("/opt/stackstorm/packs/arteria-packs/config.yaml", 'r') as ymlfile:
+with open("/opt/stackstorm/packs/arteria/config.yaml", 'r') as ymlfile:
     cfg = yaml.load(ymlfile)
 
 # Get hosts from config
