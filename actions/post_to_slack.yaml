@@ -4,7 +4,7 @@ description: Will post the given message to slack on the specified channel.
 enabled: true
 runner_type: run-python
 entry_point: lib/slack.py
-pack: arteria-packs
+pack: arteria
 parameters:
   channel:
     type: 'string'

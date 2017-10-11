@@ -41,7 +41,7 @@
             position: 6
         cmd:
             immutable: true
-            default: 'ssh -v {{host}} "bash -s" < /opt/stackstorm/packs/arteria-packs/actions/lib/create_sis_style_checksums.sh {{ source }} {{ include_file }} {{ output_file }}'
+            default: 'ssh -v {{host}} "bash -s" < /opt/stackstorm/packs/arteria/actions/lib/create_sis_style_checksums.sh {{ source }} {{ include_file }} {{ output_file }}'
         connect_timeout:
             type: 'integer'
             description: 'SSH connect timeout in seconds'

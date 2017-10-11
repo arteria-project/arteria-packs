@@ -4,14 +4,14 @@ description: Warn if Irma SSH certs are soon to expire
 enabled: true
 runner_type: mistral-v2
 entry_point: workflows/check_irma_certs.yaml
-pack: arteria-packs
+pack: arteria
 parameters:
   context:
     default: {}
     immutable: true
     type: object
   workflow:
-    default: arteria-packs.check_irma_certs
+    default: arteria.check_irma_certs
     immutable: true
     type: string
   days:

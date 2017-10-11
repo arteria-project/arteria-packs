@@ -4,14 +4,14 @@ description: Fill the ProjMan database with QC data
 enabled: true
 runner_type: mistral-v2
 entry_point: workflows/fill_projman.yaml
-pack: arteria-packs
+pack: arteria
 parameters:
   context:
     default: {}
     immutable: true
     type: object
   workflow:
-    default: arteria-packs.fill_projman
+    default: arteria.fill_projman
     immutable: true
     type: string
   year:

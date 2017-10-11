@@ -1,6 +1,6 @@
 ---
-name: "arteria-packs.fill_projman"
-pack: "arteria-packs"
+name: "arteria.fill_projman"
+pack: "arteria"
 description: "Attempts to fill the ProjMan database at the set intervals."
 enabled: true
 
@@ -11,6 +11,6 @@ trigger:
       delta: 2
 
 action:
-    ref: "arteria-packs.fill_projman"
+    ref: "arteria.fill_projman"
 
 

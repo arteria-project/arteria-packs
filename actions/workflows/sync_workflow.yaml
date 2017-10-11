@@ -1,5 +1,5 @@
 version: "2.0" # mistral version
-name: arteria-packs.sync_workflow
+name: arteria.sync_workflow
 description: Syncs a run for the source host to the remote_host.
 
 workflows:
@@ -24,14 +24,14 @@ workflows:
               action: core.local
               input:
                 cmd: git rev-parse HEAD
-                cwd: /opt/stackstorm/packs/arteria-packs/
+                cwd: /opt/stackstorm/packs/arteria/
               on-success:
                  - create_md5sums_for_files_to_transfer
             ### GENERAL TASKS END ###
 
             ### TRANSFER FILES START ###
             create_md5sums_for_files_to_transfer:
-                action: arteria-packs.create_sis_style_checksums
+                action: arteria.create_sis_style_checksums
                 input:
                     source: <% $.runfolder %>
                     host: <% $.source_host %>
@@ -43,7 +43,7 @@ workflows:
                     - rsync_to_destination
 
             rsync_to_destination:
-                action: arteria-packs.rsync
+                action: arteria.rsync
                 input:
                     source: <% $.runfolder %>
                     source_host: <% $.source_host %>
@@ -56,7 +56,7 @@ workflows:
                     - rsync_md5sums
 
             rsync_md5sums:
-                action: arteria-packs.rsync
+                action: arteria.rsync
                 input:
                     source: <% $.runfolder %>/MD5
                     source_host: <% $.source_host %>
