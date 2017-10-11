@@ -4,7 +4,7 @@ description: Set the delivery status of a set of project/samples in Charon.
 enabled: true
 runner_type: run-python
 entry_point: lib/charon.py
-pack: arteria-packs
+pack: arteria
 parameters:
     action:
       type: string

@@ -1,5 +1,5 @@
 version: "2.0" # mistral version
-name: arteria-packs.archive_workflow
+name: arteria.archive_workflow
 description: Archives a runfolder to PDC with TSM
 
 workflows:
@@ -18,12 +18,12 @@ workflows:
               action: core.local
               input:
                 cmd: git rev-parse HEAD
-                cwd: /opt/stackstorm/packs/arteria-packs/
+                cwd: /opt/stackstorm/packs/arteria/
               on-success:
                 - get_config
 
             get_config:
-              action: arteria-packs.get_pack_config
+              action: arteria.get_pack_config
               publish:
                 archive_excludes: <% task(get_config).result.result.archive_excludes %>
                 archive_fastq_threshold: <% task(get_config).result.result.archive_fastq_threshold %>
@@ -36,7 +36,7 @@ workflows:
 
             ### TRANSFER FILES START ###
             create_archive_dir: 
-              action: arteria-packs.create_archive_dir
+              action: arteria.create_archive_dir
               input: 
                 host: <% $.host %>
                 runfolder: <% $.runfolder %>
@@ -49,7 +49,7 @@ workflows:
             
             # Will compress some of the files in the archive. Script will fail if gziped archive already exists. 
             compress_tsm_archive:
-               action: arteria-packs.compress_archive_package
+               action: arteria.compress_archive_package
                input:
                  host: <% $.host %>
                  runfolder: <% $.runfolder %>_archive

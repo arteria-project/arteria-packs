@@ -1,11 +1,11 @@
-arteria-packs
+arteria
 -------------
 
 StackStorm pack to setup automation workflow taking data from the sequencer to delivery on the remote host...
 
 Development and testing
 -----------------------
-To make development and testing of arteria-packs simpler, we provide a Vagrant environment (this requires that VirtualBox is installed on your system).
+To make development and testing of arteria simpler, we provide a Vagrant environment (this requires that VirtualBox is installed on your system).
 
 ```
 # Get it up and running
@@ -20,7 +20,7 @@ cd /vagrant
 # Now you can start developing on the packs
 
 # Note that all the scripts run below this point assume that your current
-# working directory is the packs directory i.e. /arteria-packs in
+# working directory is the packs directory i.e. /arteria in
 # the vagrant environment
 
 # Prepare the test environment environment (this only needs to be
@@ -31,10 +31,10 @@ cd /vagrant
 # venv in the working directory
 
 # Run the tests
-./utils/run_tests.sh /opt/stackstorm/packs/arteria-packs
+./utils/run_tests.sh /opt/stackstorm/packs/arteria
 
 # To test registering all pack components run
-./utils/st2-check-register-pack-resources utils/st2.tests.conf /opt/stackstorm/packs/arteria-packs
+./utils/st2-check-register-pack-resources utils/st2.tests.conf /opt/stackstorm/packs/arteria
 
 ```
 
@@ -50,7 +50,7 @@ Example of starting a workflow
 
 Now you should be good to go. Here's an example of how to run a action:
 
-     st2 run arteria-packs.ngi_uu_workflow runfolder=/data/testarteria1/150605_M00485_0183_000000000-ABGT6_testbio14 host=testarteria1
+     st2 run arteria.ngi_uu_workflow runfolder=/data/testarteria1/150605_M00485_0183_000000000-ABGT6_testbio14 host=testarteria1
      
 To see the result of a run - you can first list the executions:
 
@@ -67,7 +67,7 @@ Each execution will get it's own unique id when run by StackStorm. However it ca
 in other ways. Such as being able to see all executions for a particular runfolder for example. You can achieve this by
  using  the `--trace-tag` argument when staring a job, e.g:
  
-    st2 run arteria-packs.ngi_uu_workflow \
+    st2 run arteria.ngi_uu_workflow \
         runfolder=/data/testarteria1/150605_M00485_0183_000000000-ABGT6_testbio14 \
         host=testarteria1 \
         --trace-tag 150605_M00485_0183_000000000-ABGT6_testbio14

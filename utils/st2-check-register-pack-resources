@@ -17,7 +17,7 @@
 # DOCS
 # This script has been adopted from st2-check-register-pack-resources
 # provided by StackStorm, but has been modified to work more easily
-# in the arteria-packs environment.
+# in the arteria environment.
 #
 # The script which tries to register all the resources from a particular pack and
 # fails (exits with non-zero) if registering a particular resource fails.
@@ -35,7 +35,7 @@ PACK_PATH=$2
 
 source ${SCRIPT_PATH}/common.sh
 
-PACK_NAME=$(basename ${PACK_PATH})
+PACK_NAME=$(basename ${PACK_PATH} | cut -d "-" -f 1)
 
 ST2_REPO_PATH="st2/"
 ST2_COMPONENTS=$(get_st2_components)

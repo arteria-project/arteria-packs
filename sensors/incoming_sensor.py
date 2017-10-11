@@ -8,7 +8,7 @@ class IncomingSensor(RunfolderSensor):
         super(IncomingSensor, self).__init__(sensor_service=sensor_service,
                                              config=config,
                                              poll_interval=poll_interval,
-                                             trigger='arteria-packs.incoming_ready')
+                                             trigger='arteria.incoming_ready')
         self._logger = self._sensor_service.get_logger(__name__)
         self._infolog("__init__")
         self._client = None

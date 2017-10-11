@@ -4,14 +4,14 @@ description: Deliver a runfolder
 enabled: true
 runner_type: mistral-v2
 entry_point: workflows/delivery_runfolder_workflow.yaml
-pack: arteria-packs
+pack: arteria
 parameters:
   context:
     default: {}
     immutable: true
     type: object
   workflow:
-    default: arteria-packs.delivery_runfolder_workflow
+    default: arteria.delivery_runfolder_workflow
     immutable: true
     type: string
   runfolder_name:
