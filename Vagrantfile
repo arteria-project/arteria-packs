@@ -24,14 +24,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     arteria.vm.network :private_network, ip: "192.168.16.20"
 
     # Start shell provisioning.
-    arteria.vm.provision "shell", 
+    arteria.vm.provision "shell",
       inline: "sudo apt-get update && sudo apt-get install -y curl python-virtualenv vim"
 
-    arteria.vm.provision "shell", 
+    arteria.vm.provision "shell",
       inline: "curl -sSL https://stackstorm.com/packages/install.sh | bash -s -- --user=#{arteriauser} --password=#{arteriapasswd} --version=#{st2version}"
 
-    arteria.vm.provision "shell", 
-      inline: "ln -s /vagrant /opt/stackstorm/packs/arteria-packs"
+    arteria.vm.provision "shell",
+      inline: "ln -s /vagrant /opt/stackstorm/packs/arteria"
 
   end
 

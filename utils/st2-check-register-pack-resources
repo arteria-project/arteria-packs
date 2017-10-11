@@ -17,7 +17,7 @@
 # DOCS
 # This script has been adopted from st2-check-register-pack-resources
 # provided by StackStorm, but has been modified to work more easily
-# in the arteria-packs environment.
+# in the arteria environment.
 #
 # The script which tries to register all the resources from a particular pack and
 # fails (exits with non-zero) if registering a particular resource fails.
