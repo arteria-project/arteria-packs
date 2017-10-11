@@ -23,7 +23,8 @@ hosts = cfg['runfolder_svc_urls']
 print "status\trunfolder_link"
 
 for host in hosts:
-    result = requests.get("{}/api/1.0/runfolders?state=*".format(host))
+    url_base = '/'.join(host.split('/')[:-1])
+    result = requests.get("{}?state=*".format(url_base))
     result_json = json.loads(result.text)
     all_runfolders = result_json["runfolders"]
     for runfolder in all_runfolders:
