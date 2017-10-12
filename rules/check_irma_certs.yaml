@@ -2,7 +2,7 @@
 name: "arteria.check_irma_certs"
 pack: "arteria"
 description: "Warn if Irma certs expire soon"
-enabled: true
+enabled: false
 
 trigger:
     type: "core.st2.CronTimer"

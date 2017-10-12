@@ -2,7 +2,7 @@
 name: get_pi_id_for_email_from_supr
 runner_type: run-python
 description: Get the SUPR if of PI with a given email adresss
-enabled: true
+enabled: false
 entry_point: supr.py
 parameters:
     timeout:

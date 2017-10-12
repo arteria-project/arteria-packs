@@ -2,7 +2,7 @@
 name: delivery_service_stage_project
 runner_type: run-python
 description: Stage a runfolder through the Arteria delivery service
-enabled: true
+enabled: false
 entry_point: arteria_delivery_service.py
 parameters:
     timeout:

@@ -2,7 +2,7 @@
     name: 'create_archive_dir'
     runner_type: 'run-local'
     description: 'Creates a copy of the runfolder, consisting of symlinks, for archiving purposes.'
-    enabled: true
+    enabled: false
     entry_point: ''
     parameters:
         timeout:

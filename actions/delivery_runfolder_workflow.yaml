@@ -1,7 +1,7 @@
 ---
 name: delivery_runfolder_workflow
 description: Deliver a runfolder
-enabled: true
+enabled: false
 runner_type: mistral-v2
 entry_point: workflows/delivery_runfolder_workflow.yaml
 pack: arteria

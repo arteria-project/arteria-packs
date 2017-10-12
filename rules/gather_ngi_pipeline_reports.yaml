@@ -2,7 +2,7 @@
 name: "arteria.gather_ngi_pipeline_reports"
 pack: "arteria"
 description: "Attempts to synchronize project reports from the ngi_pipeline at the set intervals."
-enabled: true
+enabled: false
 
 trigger:
     type: "core.st2.IntervalTimer"

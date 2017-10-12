@@ -2,7 +2,7 @@
 name: read_projects_email_file
 runner_type: run-python
 description: Reads a csv file of projects and email
-enabled: true
+enabled: false
 entry_point: read_projects_email_file.py
 parameters:
     timeout:

@@ -2,7 +2,7 @@
 name: "download_samplesheet_clarity"
 runner_type: "python-script"
 description: "Downloads samplesheets from the Clarity LIMS based on flowcell id"
-enabled: true
+enabled: false
 entry_point: "download_samplesheet_clarity.py"
 parameters:
   flowcell_name:

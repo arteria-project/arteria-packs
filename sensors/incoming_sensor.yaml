@@ -3,6 +3,7 @@
   entry_point: "incoming_sensor.py"
   description: "Sensor which monitors runfolders uploaded by instruments"
   poll_interval: 300 # Every 5 minutes
+  enabled: false
   trigger_types:
     -
       name: "incoming_ready"
@@ -24,4 +25,3 @@
             type: "string"
           user_key:
             type: "string"
-

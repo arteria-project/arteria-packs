@@ -1,7 +1,7 @@
 ---
 name: gather_ngi_pipeline_reports
 description: Downloads the ngi pipeline reports to the summary host
-enabled: true
+enabled: false
 runner_type: mistral-v2
 entry_point: workflows/gather_ngi_pipeline_reports.yaml
 pack: arteria

@@ -1,7 +1,7 @@
 ---
 name: delivery_runfolders_for_project_workflow
 description: Deliver a project (i.e. a directory placed in the directory defined by the arteria delivery service `general_project_directory` configuration)
-enabled: true
+enabled: false
 runner_type: mistral-v2
 entry_point: workflows/delivery_runfolders_for_project_workflow.yaml
 pack: arteria

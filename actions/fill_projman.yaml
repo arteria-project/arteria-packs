@@ -1,7 +1,7 @@
 ---
 name: fill_projman
 description: Fill the ProjMan database with QC data
-enabled: true
+enabled: false
 runner_type: mistral-v2
 entry_point: workflows/fill_projman.yaml
 pack: arteria

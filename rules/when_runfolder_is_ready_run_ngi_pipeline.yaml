@@ -1,7 +1,7 @@
 ---
 name: "arteria.when_runfolder_is_ready_run_ngi_pipeline"
 description: "Fires of the NGI pipeline when a runfolder is ready"
-enabled: true
+enabled: false
 
 trigger:
     type: "arteria.runfolder_ready"

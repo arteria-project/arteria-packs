@@ -2,5 +2,5 @@
 name: get_pack_config
 runner_type: python-script
 description: Loads the config.yaml from the pack root and publishes it's content
-enabled: true
+enabled: false
 entry_point: lib/get_pack_config.py

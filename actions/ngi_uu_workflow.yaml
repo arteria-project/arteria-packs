@@ -4,7 +4,7 @@ description: >
   Run the complete NGI Uppsala workflow, taking data of the sequencing instrument
   running bcl2fastq, collecting qc metrics using Sisyphus and delivering it to
   a remote host.
-enabled: true
+enabled: false
 runner_type: mistral-v2
 entry_point: workflows/ngi_uu_workflow.yaml
 pack: arteria

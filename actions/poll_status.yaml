@@ -2,7 +2,7 @@
 name: poll_status
 runner_type: run-python
 description: Posts data to a url starting a process, and polls the status link it gets back until it finishes or fails.
-enabled: true
+enabled: false
 entry_point: poll_status.py
 parameters:
     timeout:
