@@ -48,6 +48,9 @@ runfolder_svc_urls:
 incoming_svc_urls:
   - url: http://testarteria1:10850/api/1.0/runfolders/next
     dest_folder: /data/testarteria1/runfolders
+    remote_user: arteria
+    user_key: /home/arteria/.ssh/id_rsa
+
 
 charon_api_token: dummy_token
 charon_base_url: http://charon.url

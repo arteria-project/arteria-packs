@@ -14,7 +14,7 @@ class RunfolderSensor(PollingSensor):
         self._infolog("__init__")
         self._client = None
         self._trigger = trigger
-        self._destinations = {}
+        self._hostconfigs = {}
 
     def setup(self):
         self._infolog("setup")
@@ -66,8 +66,10 @@ class RunfolderSensor(PollingSensor):
             'timestamp': datetime.utcnow().isoformat(),
             'destination': ""
         }
-        if result['requesturl'] in self._destinations:
-            payload['destination'] = self._destinations[result['requesturl']]
+        if result['requesturl'] in self._hostconfigs:
+            payload['destination'] = self._hostconfigs[result['requesturl']].get('dest_folder', "")
+            payload['remote_user'] = self._hostconfigs[result['requesturl']].get('remote_user', "")
+            payload['user_key'] = self._hostconfigs[result['requesturl']].get('user_key', "")
         self._sensor_service.dispatch(trigger=trigger, payload=payload, trace_tag=runfolder_name)
 
     def _load_config(self):
