@@ -1,5 +1,5 @@
 version: "2.0" # mistral version
-name: arteria-packs.check_irma_certs
+name: arteria.check_irma_certs
 description: Logins to all hosts daily and warns if the SSH certs expires within two weeks.
 
 workflows:
@@ -16,12 +16,12 @@ workflows:
               action: core.local
               input:
                 cmd: git rev-parse HEAD
-                cwd: /opt/stackstorm/packs/arteria-packs/
+                cwd: /opt/stackstorm/packs/arteria/
               on-success:
                   - get_config
 
             get_config:
-              action: arteria-packs.get_pack_config
+              action: arteria.get_pack_config
               publish:
                 biotank_hosts: <% task(get_config).result.result.biotank_hosts %>
                 biotank_user: <% task(get_config).result.result.biotank_user %>
@@ -51,7 +51,7 @@ workflows:
                 private_key: <% $.biotank_user_key %>
 
             post_failed_message_to_slack:
-              action: arteria-packs.post_to_slack
+              action: arteria.post_to_slack
               input:
                 user: 'Cert Police'
                 emoji_icon: ':robot_face:'

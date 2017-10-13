@@ -36,7 +36,7 @@
             default: '-e Data -e Thumbnail_Images'
         cmd:
             immutable: true 
-            default: 'ssh -v {{host}} "{{python_path}} -u - {{exclude_links}} -t {{fastq_threshold}} --remove={{remove_previous}} {{runfolder}}" < /opt/stackstorm/packs/arteria-packs/actions/lib/create_archive_dir.py'
+            default: 'ssh -v {{host}} "{{python_path}} -u - {{exclude_links}} -t {{fastq_threshold}} --remove={{remove_previous}} {{runfolder}}" < /opt/stackstorm/packs/arteria/actions/lib/create_archive_dir.py'
         connect_timeout:
             type: 'integer'
             description: 'SSH connect timeout in seconds'

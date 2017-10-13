@@ -7,14 +7,14 @@ description: >
 enabled: true
 runner_type: mistral-v2
 entry_point: workflows/ngi_uu_workflow.yaml
-pack: arteria-packs
+pack: arteria
 parameters:
   context:
     default: {}
     immutable: true
     type: object
   workflow:
-    default: arteria-packs.ngi_uu_workflow
+    default: arteria.ngi_uu_workflow
     immutable: true
     type: string
   host:

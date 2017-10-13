@@ -4,14 +4,14 @@ description: Deliver a project (i.e. a directory placed in the directory defined
 enabled: true
 runner_type: mistral-v2
 entry_point: workflows/delivery_runfolders_for_project_workflow.yaml
-pack: arteria-packs
+pack: arteria
 parameters:
   context:
     default: {}
     immutable: true
     type: object
   workflow:
-    default: arteria-packs.delivery_runfolers_for_workflow
+    default: arteria.delivery_runfolers_for_workflow
     immutable: true
     type: string
   project_name:
