@@ -2,7 +2,7 @@
 name: "arteria.fill_projman"
 pack: "arteria"
 description: "Attempts to fill the ProjMan database at the set intervals."
-enabled: true
+enabled: false
 
 trigger:
     type: "core.st2.IntervalTimer"

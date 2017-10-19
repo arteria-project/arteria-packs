@@ -17,6 +17,9 @@ git clone https://github.com/StackStorm/st2.git --depth 1 --single-branch --bran
 pip install -r ./st2/requirements.txt
 pip install -r ./st2/test-requirements.txt
 
+# Put the database user/password in place
+
+grep -C2 database /etc/st2/st2.conf >> ./utils/st2.tests.conf
+
 # Exit the virtualenv
 deactivate
-

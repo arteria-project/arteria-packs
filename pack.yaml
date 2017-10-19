@@ -1,6 +1,5 @@
 ---
-name: Arteria Packs
-ref: arteria
+name: arteria
 description: Pack for running sequencing center operations
 keywords:
   - sequencing
@@ -8,4 +7,3 @@ keywords:
 version: 0.1.0
 author: Johan Dahlberg
 email: johan.dahlberg@medsci.uu.se
-

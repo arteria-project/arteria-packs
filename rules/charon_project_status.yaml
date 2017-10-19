@@ -2,7 +2,7 @@
 name: "arteria.charon_project_status"
 pack: "arteria"
 description: "Attempts to get the status OPEN projects in Charon and posts them to a Slack channel"
-enabled: true
+enabled: false
 
 trigger:
     type: "core.st2.CronTimer"

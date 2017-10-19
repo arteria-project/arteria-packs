@@ -2,7 +2,7 @@
     name: 'create_sis_style_checksums'
     runner_type: 'run-local'
     description: 'Create a list of files and their md5sums based on a file list created by rsync, in the style that they have been created by Sisyphus.'
-    enabled: true
+    enabled: false
     entry_point: ''
     parameters:
         timeout:

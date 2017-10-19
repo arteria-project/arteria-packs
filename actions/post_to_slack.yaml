@@ -1,7 +1,7 @@
 ---
 name: post_to_slack
 description: Will post the given message to slack on the specified channel.
-enabled: true
+enabled: false
 runner_type: run-python
 entry_point: lib/slack.py
 pack: arteria

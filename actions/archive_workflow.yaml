@@ -2,7 +2,7 @@
 name: archive_workflow
 description: >
   Archives a runfolder to PDC with TSM
-enabled: true
+enabled: false
 runner_type: mistral-v2
 entry_point: workflows/archive_workflow.yaml
 pack: arteria

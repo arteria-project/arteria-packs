@@ -2,7 +2,7 @@
 name: parse_bcl2fastq_args
 runner_type: python-script
 description: Parses a bcl2fastq args to json
-enabled: true
+enabled: false
 entry_point: lib/parse_arguments_to_json.py
 parameters:
   bcl2fastq_version:

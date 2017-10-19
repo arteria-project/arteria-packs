@@ -2,7 +2,7 @@
 name: check_ngi_ready_in_supr
 runner_type: run-python
 description: Check if a project has been marked as ngi_ready in supr
-enabled: true
+enabled: false
 entry_point: supr.py
 parameters:
     timeout:

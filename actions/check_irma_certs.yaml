@@ -1,7 +1,7 @@
 ---
 name: check_irma_certs
 description: Warn if Irma SSH certs are soon to expire 
-enabled: true
+enabled: false
 runner_type: mistral-v2
 entry_point: workflows/check_irma_certs.yaml
 pack: arteria
