@@ -19,7 +19,11 @@ pip install -r ./st2/test-requirements.txt
 
 # Put the database user/password in place
 
-grep -C2 database /etc/st2/st2.conf >> ./utils/st2.tests.conf
+if [ -n "$TRAVIS_BUILD_DIR" ]; then
+	grep -C2 database $TRAVIS_BUILD_DIR/etc/st2/st2.conf >> ./utils/st2.tests.conf
+else
+	grep -C2 database /etc/st2/st2.conf >> ./utils/st2.tests.conf
+fi
 
 # Exit the virtualenv
 deactivate
