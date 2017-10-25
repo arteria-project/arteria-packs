@@ -1,10 +1,9 @@
 ---
-name: arteria-packs
+name: arteria
 description: Pack for running sequencing center operations
 keywords:
   - sequencing
   - life science
-version: 0.1
+version: 0.1.0
 author: Johan Dahlberg
 email: johan.dahlberg@medsci.uu.se
-

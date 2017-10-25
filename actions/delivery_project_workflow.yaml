@@ -1,17 +1,17 @@
 ---
 name: delivery_project_workflow
 description: Deliver a project (i.e. a directory placed in the directory defined by the arteria delivery service `general_project_directory` configuration)
-enabled: true
+enabled: false
 runner_type: mistral-v2
 entry_point: workflows/delivery_project_workflow.yaml
-pack: arteria-packs
+pack: arteria
 parameters:
   context:
     default: {}
     immutable: true
     type: object
   workflow:
-    default: arteria-packs.delivery_project_workflow
+    default: arteria.delivery_project_workflow
     immutable: true
     type: string
   project_name:

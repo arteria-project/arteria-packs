@@ -2,7 +2,7 @@
 name: create_delivery_project_in_super
 runner_type: run-python
 description: Create a delivery project in SUPR for the specified PI and project name
-enabled: true
+enabled: false
 entry_point: supr.py
 parameters:
     timeout:

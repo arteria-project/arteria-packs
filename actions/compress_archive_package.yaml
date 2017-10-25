@@ -2,7 +2,7 @@
     name: 'compress_archive_package'
     runner_type: 'run-local'
     description: 'Creates a compressed archive of a subset of files inside a runfolder, ready to be sent to PDC with TSM.'
-    enabled: true
+    enabled: false
     entry_point: ''
     parameters:
         timeout:
@@ -26,7 +26,7 @@
             position: 3
         cmd:
             immutable: true 
-            default: 'ssh -v {{host}} "bash -s" < /opt/stackstorm/packs/arteria-packs/actions/lib/compress_archive_package.sh {{ runfolder }} {{ exclude }}'
+            default: 'ssh -v {{host}} "bash -s" < /opt/stackstorm/packs/arteria/actions/lib/compress_archive_package.sh {{ runfolder }} {{ exclude }}'
         connect_timeout:
             type: 'integer'
             description: 'SSH connect timeout in seconds'

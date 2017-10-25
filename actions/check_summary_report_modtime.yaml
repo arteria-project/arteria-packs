@@ -4,7 +4,7 @@ runner_type: remote-shell-script
 description: |
   This will list all the directories in a remote directory which have a mod time older than
    the given value and return them as a json array.
-enabled: true
+enabled: false
 entry_point: lib/check_summary_report_modtime.py
 parameters:
   directory:

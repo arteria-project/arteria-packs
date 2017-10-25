@@ -1,5 +1,5 @@
 version: "2.0" # mistral version
-name: arteria-packs.gather_ngi_pipeline_reports
+name: arteria.gather_ngi_pipeline_reports
 description: Downloads ngi pipeline reports from e.g. irma to our summary host.
 
 workflows:
@@ -11,12 +11,12 @@ workflows:
               action: core.local
               input:
                 cmd: git rev-parse HEAD
-                cwd: /opt/stackstorm/packs/arteria-packs/
+                cwd: /opt/stackstorm/packs/arteria/
               on-success:
                   - get_config
 
             get_config:
-              action: arteria-packs.get_pack_config
+              action: arteria.get_pack_config
               publish:
                 summary_host: <% task(get_config).result.result.summary_host %>
                 summary_user: <% task(get_config).result.result.summary_user %>

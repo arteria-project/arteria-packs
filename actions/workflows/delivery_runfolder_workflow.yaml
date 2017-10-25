@@ -1,5 +1,5 @@
 version: "2.0" # mistral version
-name: arteria-packs.delivery_runfolder_workflow
+name: arteria.delivery_runfolder_workflow
 description: Deliver data from a runfolder to a SNIC delivery project
 
 workflows:
@@ -21,12 +21,12 @@ workflows:
               action: core.local
               input:
                 cmd: git rev-parse HEAD
-                cwd: /opt/stackstorm/packs/arteria-packs/
+                cwd: /opt/stackstorm/packs/arteria/
               on-success:
                   - get_config
 
             get_config:
-              action: arteria-packs.get_pack_config
+              action: arteria.get_pack_config
               publish:
                 supr_api_user: <% task(get_config).result.result.supr_api_user %>
                 supr_api_key: <% task(get_config).result.result.supr_api_key %>
@@ -38,7 +38,7 @@ workflows:
                  - post_start_message_to_slack
 
             post_start_message_to_slack:
-              action: arteria-packs.post_to_slack
+              action: arteria.post_to_slack
               input:
                 user: 'Bot D Liver'
                 emoji_icon: ':robot_face:'
@@ -60,7 +60,7 @@ workflows:
                 - get_pi_emails
 
             get_pi_emails:
-              action: arteria-packs.read_projects_email_file
+              action: arteria.read_projects_email_file
               input:
                 file_path: <% $.projects_pi_email_file %>
                 projects:
@@ -72,7 +72,7 @@ workflows:
                 - get_pi_ids
 
             get_pi_ids:
-              action: arteria-packs.get_pi_id_for_email_from_supr
+              action: arteria.get_pi_id_for_email_from_supr
               input:
                 project_to_email_sensitive_dict: <% $.projects_to_emails_sensitive %>
                 api_user: <% $.supr_api_user %>
@@ -84,7 +84,7 @@ workflows:
                 - stage_runfolder
 
             stage_runfolder:
-              action: arteria-packs.delivery_service_stage_runfolder
+              action: arteria.delivery_service_stage_runfolder
               input:
                  delivery_base_api_url: <% $.delivery_service_url %>
                  runfolder_name: <% $.runfolder_name %>
@@ -100,7 +100,7 @@ workflows:
                 - create_delivery_projects
 
             create_delivery_projects:
-              action: arteria-packs.create_delivery_project_in_super
+              action: arteria.create_delivery_project_in_super
               input:
                 project_names_and_ids: <% $.pi_supr_ids %>
                 staging_info: <% $.projects_and_stage_ids %>
@@ -115,7 +115,7 @@ workflows:
 
             # TODO Remember to pass correct md5sum files for the project.
             deliver_runfolder:
-              action: arteria-packs.delivery_service_deliver
+              action: arteria.delivery_service_deliver
               with-items: ngi_project_name in <% $.projects_and_stage_ids.keys() %>
               input:
                 ngi_project_name: <% $.ngi_project_name %>
@@ -130,7 +130,7 @@ workflows:
                 - check_delivery_status
 
             check_delivery_status:
-              action: arteria-packs.delivery_service_delivery_status
+              action: arteria.delivery_service_delivery_status
               with-items:
                 - id in <% $.delivery_projects_and_ids.delivery_id %>
                 - ngi_project_name in <% $.delivery_projects_and_ids.project_name %>
@@ -146,7 +146,7 @@ workflows:
                 - post_finish_message_to_slack: <% $.skip_mover = true %>
 
             check_ngi_ready_status:
-              action: arteria-packs.check_ngi_ready_in_supr
+              action: arteria.check_ngi_ready_in_supr
               with-items:
                 - project in <% $.delivery_projects.keys() %>
               input:
@@ -158,7 +158,7 @@ workflows:
                 - post_finish_message_to_slack
 
             post_finish_message_to_slack:
-              action: arteria-packs.post_to_slack
+              action: arteria.post_to_slack
               input:
                 user: 'Bot D Liver'
                 emoji_icon: ':robot_face:'
@@ -166,7 +166,7 @@ workflows:
                 message: 'I just finished a delivery for `<% $.runfolder_name %>`. You can see the details by running: `st2 execution get <% env().st2_execution_id %>`'
 
             post_failed_message_to_slack:
-              action: arteria-packs.post_to_slack
+              action: arteria.post_to_slack
               input:
                 user: 'Bot D Liver'
                 emoji_icon: ':robot_face:'

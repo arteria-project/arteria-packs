@@ -1,6 +1,6 @@
 #!/bin/bash
 what=$1
 if [ "$what" == "" ]; then
-    what="arteria-packs"
+    what="arteria"
 fi
 tail -f /var/log/st2/* | grep -i "$what"
