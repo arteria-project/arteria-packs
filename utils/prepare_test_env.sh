@@ -20,7 +20,8 @@ pip install -r ./st2/test-requirements.txt
 # Put the database user/password in place
 
 if [ -n "$TRAVIS_BUILD_DIR" ]; then
-	grep -C2 database $TRAVIS_BUILD_DIR/etc/st2/st2.conf >> ./utils/st2.tests.conf
+	echo $TRAVIS_BUILD_DIR
+	grep -C2 database /home/travis/build/arteria-project/arteria-packs/etc/st2/st2.conf >> ./utils/st2.tests.conf
 else
 	grep -C2 database /etc/st2/st2.conf >> ./utils/st2.tests.conf
 fi
