@@ -2,7 +2,7 @@
     name: 'rsync'
     runner_type: 'run-local'
     description: 'Copy file(s) from one place to another w/ rsync. The major difference from linux.rsync is that this requires an include-file.'
-    enabled: true
+    enabled: false
     entry_point: ''
     parameters:
         timeout:

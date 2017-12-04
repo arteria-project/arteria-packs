@@ -1,12 +1,12 @@
 ---
 
-name: "arteria-packs.mv_runfolders_from_incoming_to_processing"
-pack: "arteria-packs"
+name: "arteria.mv_runfolders_from_incoming_to_processing"
+pack: "arteria"
 description: "Checks the incoming runfolders service for runfolders that have been uploaded completely and moves them to the processing folder"
-enabled: true
+enabled: false
 
 trigger:
-    type: "arteria-packs.incoming_ready"
+    type: "arteria.incoming_ready"
 
 action:
     ref: "linux.mv"

@@ -14,10 +14,12 @@ pip install -r requirements-test.txt
 
 # Checkout and install st2 requirements
 git clone https://github.com/StackStorm/st2.git --depth 1 --single-branch --branch v$(cat utils/st2.version.txt) ./st2
-sed -i 's/ipython/ipython==5.3.0/' ./st2/test-requirements.txt
 pip install -r ./st2/requirements.txt
 pip install -r ./st2/test-requirements.txt
 
+# Put the database user/password in place
+
+grep -C2 database /etc/st2/st2.conf >> ./utils/st2.tests.conf
+
 # Exit the virtualenv
 deactivate
-

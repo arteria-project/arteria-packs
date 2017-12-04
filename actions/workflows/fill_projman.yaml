@@ -1,5 +1,5 @@
 version: "2.0" # mistral version
-name: arteria-packs.fill_projman
+name: arteria.fill_projman
 description: Downloads summary statistics data from irma and fills the projman database.
 
 workflows:
@@ -13,12 +13,12 @@ workflows:
               action: core.local
               input:
                 cmd: git rev-parse HEAD
-                cwd: /opt/stackstorm/packs/arteria-packs/
+                cwd: /opt/stackstorm/packs/arteria/
               on-success:
                   - get_config
 
             get_config:
-              action: arteria-packs.get_pack_config
+              action: arteria.get_pack_config
               publish:
                 summary_host: <% task(get_config).result.result.summary_host %>
                 summary_user: <% task(get_config).result.result.summary_user %>
@@ -39,7 +39,7 @@ workflows:
                 - check_for_runfolders
 
             check_for_runfolders:
-              action: arteria-packs.get_remote_folder_list
+              action: arteria.get_remote_folder_list
               input:
                 directory: <% $.summary_destination %>/<% $.current_year %>/
                 username: <% $.summary_user %>
@@ -73,7 +73,7 @@ workflows:
                 - check_reports_old_enough
 
             check_reports_old_enough:
-              action: arteria-packs.check_summary_report_modtime
+              action: arteria.check_summary_report_modtime
               input:
                 directory: <% $.summary_destination %>/<% $.current_year %>/
                 username: <% $.summary_user %>

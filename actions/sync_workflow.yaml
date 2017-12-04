@@ -2,17 +2,17 @@
 name: sync_workflow
 description: >
   Syncs a runfolder to a host and checks MD5 sums of the transfered files.
-enabled: true
+enabled: false
 runner_type: mistral-v2
 entry_point: workflows/sync_workflow.yaml
-pack: arteria-packs
+pack: arteria
 parameters:
   context:
     default: {}
     immutable: true
     type: object
   workflow:
-    default: arteria-packs.sync_workflow
+    default: arteria.sync_workflow
     immutable: true
     type: string
   runfolder:
