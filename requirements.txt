@@ -1,0 +1,4 @@
+jsonpickle
+requests
+unittest2
+mock

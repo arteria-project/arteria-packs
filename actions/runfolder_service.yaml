@@ -1,0 +1,27 @@
+---
+name: "runfolder_service"
+runner_type: "python-script"
+description: "Pass commands to the runfolder service"
+enabled: true
+entry_point: "runfolder_service.py"
+parameters:
+      cmd:
+        type: "string"
+        description: "Command to issue to the runfolder. Options are: get_state, set_state"
+        required: true
+        position: 0      
+      url:
+        type: "string"
+        description: "URL to runfolder-service"
+        required: true
+        position: 1
+      runfolder:
+        type: "string"
+        description: "Runfolder to get or set state for. Valid with commmands: get_state and set_state"
+        required: false
+        position: 2
+      state:
+        type: "string"
+        description: "State to the a runfolder to. Valid options are none, pending, ready, started, done, error, cancelled"
+        required: false
+        position: 3

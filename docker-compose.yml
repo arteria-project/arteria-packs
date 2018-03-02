@@ -1,0 +1,136 @@
+# This file has been modified from the https://github.com/StackStorm/st2-docker repo
+# It is therefore subject to Apache Licence 2.0.
+# It has been modified to work with the specific Arteria services and workflow.
+
+version: '3'
+
+services:
+
+### Stackstorm
+  stackstorm:
+    image: stackstorm/stackstorm
+    container_name: stackstorm
+    env_file:
+      - docker-conf/stackstorm.env
+      - docker-conf/mongo.env
+      - docker-conf/rabbitmq.env
+      - docker-conf/postgres.env
+      - docker-conf/redis.env
+    ports:
+      - "443:443"
+    networks:
+      - public
+      - private
+    volumes:
+      # Mount this development dir into the packs
+      - ./:/opt/stackstorm/packs/arteria
+      - stackstorm-log-volume:/var/log
+      - ./docker-runtime/entrypoint.d:/st2-docker/entrypoint.d
+      - ./docker-runtime/st2.d:/st2-docker/st2.d
+      - ./docker-conf/stackstorm.env:/st2-docker/env
+    dns_search: .
+    depends_on:
+      - mongo
+      - rabbitmq
+      - postgres
+      - redis
+
+### Arteria Services
+  runfolder-service:
+    build: docker-images/runfolder-service
+    container_name: runfolder-service
+    ports:
+      - "8080:80"
+    networks:
+      - private
+    volumes:
+      - monitored-dir-volume:/opt/monitored-folder
+    dns_search: .
+
+  bcl2fastq-service:
+    build: docker-images/bcl2fastq-service
+    container_name: bcl2fastq-service
+    ports:
+      - "8081:80"
+    networks:
+      - private
+    volumes:
+      - monitored-dir-volume:/opt/monitored-folder
+      - ./docker-mountpoints/bcl2fastq-output:/bcl2fastq-output
+    dns_search: .
+
+  checkqc-service:
+    build: docker-images/checkqc-service
+    container_name: checkqc-service
+    ports:
+      - "8082:80"
+    networks:
+      - private
+    volumes:
+      - monitored-dir-volume:/opt/monitored-folder
+      - ./docker-mountpoints/bcl2fastq-output:/bcl2fastq-output
+    dns_search: .
+### External Services
+
+  mongo:
+    image: mongo:3.4
+    container_name: mongo
+    env_file:
+      - docker-conf/mongo.env
+    networks:
+      - private
+    volumes:
+      - mongo-volume:/data/db
+    dns_search: .
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    env_file:
+      - docker-conf/rabbitmq.env
+    networks:
+      - private
+    volumes:
+      - rabbitmq-volume:/var/lib/rabbitmq
+    dns_search: .
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    env_file:
+      - docker-conf/postgres.env
+    networks:
+      - private
+    volumes:
+      - postgres-volume:/var/lib/postgresql/data
+    dns_search: .
+  redis:
+    image: redis:latest
+    container_name: redis
+    env_file:
+      - docker-conf/redis.env
+    networks:
+      - private
+    volumes:
+      - redis-volume:/data
+    command: [
+    'bash', '-c', 'docker-entrypoint.sh --requirepass "$$REDIS_PASSWORD"'
+    ]
+    dns_search: .
+
+volumes:
+  mongo-volume:
+  postgres-volume:
+  rabbitmq-volume:
+  redis-volume:
+  stackstorm-log-volume:
+  monitored-dir-volume:
+    driver_opts:
+      type: none
+      device: $ARTERIA_MONITORED_FOLDER
+      o: bind
+
+networks:
+  public:
+    driver: bridge
+  private:
+    driver: bridge
+    internal: true
