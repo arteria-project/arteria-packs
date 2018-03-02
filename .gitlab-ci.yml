@@ -1,0 +1,22 @@
+variables:
+  ARTERIA_MONITORED_FOLDER: /data/
+
+before_script:
+  - make up
+
+test_pack:
+  stage: test
+  script:
+    - make test-pack
+  tags:
+    - docker_compose
+
+test_integration:
+  stage: test
+  script:
+    - make test-integration
+  tags:
+    - docker_compose
+
+after_script:
+  - make down

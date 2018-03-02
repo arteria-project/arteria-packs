@@ -1,0 +1,11 @@
+language: python
+sudo: required
+services:
+ - docker
+env:
+  - ARTERIA_MONITORED_FOLDER=${PWD}/docker-mountpoints/monitored-folder/
+before_script:
+ - make up
+
+script:
+ - make test-pack
