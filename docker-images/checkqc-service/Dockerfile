@@ -2,10 +2,9 @@ FROM python:3.6
 
 RUN apt-get update
 
-RUN pip install -f https://github.com/Illumina/interop/releases/tag/v1.1.1 interop
-# TODO Specify version to be installed here!
-RUN pip install checkqc
+RUN pip install checkqc==v1.4.0
 RUN mkdir /opt/monitored-folder
+COPY config.yaml /config.yaml
 EXPOSE 80
-CMD checkqc-ws --debug --port 80 /opt/monitored-folder/
+CMD checkqc-ws --config /config.yaml --debug --port 80 /opt/monitored-folder/
 
