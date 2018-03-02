@@ -1,4 +1,0 @@
-jsonpickle
-requests
-click
-tabulate

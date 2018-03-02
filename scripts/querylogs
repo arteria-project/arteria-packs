@@ -1,5 +1,0 @@
-echo "Latest entries"
-echo "--------------"
-sudo grep "Runfolder" /var/log/st2/st2sensorcontainer.log | tail -n 10
-
-printf "Total: `sudo grep -c "RunfolderSensor" /var/log/st2/st2sensorcontainer.log`\n"
