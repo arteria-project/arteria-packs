@@ -34,8 +34,5 @@ exec:
 remove-all: down
 	docker rmi $$(docker images -a -q)
 
-clean: remove-all
-	echo "Cleaned!"
-
 remove-st2: down
 	docker images -a  | grep stackstorm | awk '{print($$1)}' | xargs docker rmi
