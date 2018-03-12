@@ -20,13 +20,13 @@ Just want to get going and already have Docker and Docker Compose installed?
 Here is how you can get going:
 
 ```
-git clone https://github.com/johandahlberg/arteria-incubation.git
-cd arteria-incubation
+git clone https://github.com/arteria-project/arteria-packs
+cd arteria-packs
 make prepare
 make up
 
 # Place a runfolder in `/docker-mountpoints/monitored-folder`
-
+docker exec stackstorm st2ctl reload --register-all
 docker exec stackstorm st2 run packs.setup_virtualenv packs=arteria
 docker exec stackstorm st2 run arteria.workflow_bcl2fastq_and_checkqc \
   runfolder_path='/opt/monitored-folder/<name of the runfolder>' \
@@ -92,8 +92,8 @@ your favorite package manager). Then you can get the system up and running by ex
 following set of commands:
 
 ```
-git clone https://github.com/johandahlberg/arteria-incubation.git
-cd arteria-incubation
+git clone https://github.com/arteria-project/arteria-packs.git
+cd arteria-packs
 make prepare
 make up
 ```
@@ -104,6 +104,13 @@ To get into the StackStorm master node, run:
 
 ```
 make interact
+```
+
+**A Note on sudo**: If you are running the make and docker with `sudo` you need to do so with the `-E` flag to
+ensure that the environment variables get passed correctly. For example:
+
+```
+sudo -E make up
 ```
 
 Running a workflow
