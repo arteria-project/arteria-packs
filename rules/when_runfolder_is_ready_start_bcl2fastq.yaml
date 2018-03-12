@@ -1,0 +1,16 @@
+---
+name: when_runfolder_is_ready_start_bcl2fastq
+description: "Fires bcl2fastq processing when a runfolder is ready"
+enabled: false
+
+trigger:
+    type: "arteria.runfolder_ready"
+
+criteria: {}
+
+action:
+    ref: "arteria.workflow_bcl2fastq_and_checkqc"
+    parameters:
+        runfolder_path: "{{trigger.runfolder}}"
+
+

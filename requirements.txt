@@ -1,4 +1,4 @@
 jsonpickle
 requests
-click
-tabulate
+unittest2
+mock

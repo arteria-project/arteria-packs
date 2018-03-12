@@ -1,10 +1,11 @@
 ---
-name: arteria-packs
-description: Pack for running sequencing center operations
+ref: arteria
+name: Arteria 
+description: Arteria is a project collecting useful components for automating sequencing core data management and analysis
 keywords:
-  - sequencing
-  - life science
-version: 0.1
+      - arteria
+      - genomics
+      - sequencing
+version: 0.1.0
 author: Johan Dahlberg
 email: johan.dahlberg@medsci.uu.se
-

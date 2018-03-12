@@ -6,7 +6,7 @@ import os
 
 class RunfolderSensor(PollingSensor):
 
-    def __init__(self, sensor_service, config=None, poll_interval=None, trigger='arteria-packs.runfolder_ready'):
+    def __init__(self, sensor_service, config=None, poll_interval=None, trigger='arteria.runfolder_ready'):
         super(RunfolderSensor, self).__init__(sensor_service=sensor_service,
                                               config=config,
                                               poll_interval=poll_interval)
@@ -18,28 +18,18 @@ class RunfolderSensor(PollingSensor):
 
     def setup(self):
         self._infolog("setup")
-        try:
-            self._load_config()
-            client_urls = self.config["runfolder_svc_urls"]
-            self._client = RunfolderClient(client_urls, self._logger)
-            self._infolog("Created client: {0}".format(self._client))
-        except Exception as ex:
-            # TODO: It seems that st2 isn't logging the entire exception, or
-            # they're not in /var/log/st2
-            self._logger.error(str(ex))
+        client_urls = self._config["runfolder_service_url"]
+        self._client = RunfolderClient(client_urls, self._logger)
+        self._infolog("Created client: {0}".format(self._client))
         self._infolog("setup finished")
 
     def poll(self):
-        try:
-            self._infolog("poll")
-            self._infolog("Checking for available runfolders")
-            result = self._client.next_ready()
-            self._infolog("Result from client: {0}".format(result))
-
-            if result:
-                self._handle_result(result)
-        except Exception as ex:
-            self._logger.error(str(ex))
+        self._infolog("poll")
+        self._infolog("Checking for available runfolders")
+        result = self._client.next_ready()
+        self._infolog("Result from client: {0}".format(result))
+        if result:
+            self._handle_result(result)
 
     def cleanup(self):
         self._infolog("cleanup")
@@ -71,12 +61,6 @@ class RunfolderSensor(PollingSensor):
             payload['remote_user'] = self._hostconfigs[result['requesturl']].get('remote_user', "")
             payload['user_key'] = self._hostconfigs[result['requesturl']].get('user_key', "")
         self._sensor_service.dispatch(trigger=trigger, payload=payload, trace_tag=runfolder_name)
-
-    def _load_config(self):
-        config_path = "/opt/stackstorm/packs/arteria-packs/config.yaml"
-        with open(config_path) as stream:
-            self.config = yaml.load(stream)
-            self._infolog("Loaded configuration from {}".format(config_path))
 
     def _infolog(self, msg):
         self._logger.info("[arteria-packs." + self.__class__.__name__ + "] " + msg)
