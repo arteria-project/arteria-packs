@@ -1,6 +1,9 @@
 Arteria Pack
 ============
 
+[![Build Status](https://travis-ci.org/arteria-project/arteria-packs.svg?branch=master)](https://travis-ci.org/arteria-project/arteria-packs)
+[![Join the chat at https://gitter.im/arteria-project/arteria-project](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/arteria-project/arteria-project)
+
 This is the new and improved version of the Arteria StackStorm pack.
 
 The aim of this pack is to provide re-usable units for automating tasks at a
