@@ -17,6 +17,9 @@ however, the components provided here can make that work easier.
 For more information on Arteria in general, look at our pre-print here:
 https://www.biorxiv.org/content/early/2017/11/06/214858
 
+Here is a quick demo:
+[![asciicast](https://asciinema.org/a/YSz20Jfo7U1hCYzWP5K05mT1S.png)](https://asciinema.org/a/YSz20Jfo7U1hCYzWP5K05mT1S)
+
 tl;dr
 =====
 Just want to get going and already have Docker and Docker Compose installed?
