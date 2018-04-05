@@ -29,6 +29,8 @@ make prepare
 make up
 
 # Place a runfolder in `/docker-mountpoints/monitored-folder`
+# You can find a small test data set suitable for testing this
+# here: https://doi.org/10.5281/zenodo.1204292
 docker exec stackstorm st2ctl reload --register-all
 docker exec stackstorm st2 run packs.setup_virtualenv packs=arteria
 docker exec stackstorm st2 run arteria.workflow_bcl2fastq_and_checkqc \
@@ -136,7 +138,9 @@ st2 run packs.setup_virtualenv packs=arteria
 Now the environment should be ready to run a workflow.
 
 All you need to do is place a runfolder under `docker-mountpoints/monitored-directory`,
-then give its path as a parameter when initiating the workflow:
+then give its path as a parameter when initiating the workflow.
+
+You can find some useful testdata here: [https://doi.org/10.5281/zenodo.1204292](https://doi.org/10.5281/zenodo.1204292)
 
 ```
 st2 run arteria.workflow_bcl2fastq_and_checkqc runfolder_path="/opt/monitored-folder/<runfolder name>"
