@@ -2,9 +2,10 @@
 
 runfolder_service_url:
   description: "Urls for the runfolder service"
-  type: "string"
+  type: "array"
+  items:
+    type: "string"
   required: false
-  default: http://runfolder-service/api/1.0/runfolders/pickup
 
 bcl2fastq_service_url:
   description: "Url for the bcl2fastq service"

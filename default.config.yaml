@@ -1,3 +1,4 @@
 bcl2fastq_service_url: http://bcl2fastq-service
 checkqc_service_url: http://checkqc-service
-runfolder_service_url: http://runfolder-service/api/1.0/runfolders/pickup
+runfolder_service_url:
+  - http://runfolder-service/api/1.0/runfolders/pickup
