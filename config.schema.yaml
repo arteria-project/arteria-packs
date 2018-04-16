@@ -5,6 +5,7 @@ runfolder_service_url:
   type: "array"
   items:
     type: "string"
+  default: http://runfolder-service/api/1.0/runfolders/pickup
   required: false
 
 bcl2fastq_service_url:
