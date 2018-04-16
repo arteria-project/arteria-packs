@@ -18,7 +18,7 @@ class RunfolderSensorSensorTest(BaseSensorTestCase):
 
         with mock.patch('requests.get', return_value=FakeResponse(status_code=200,
                                                                   text=runfolder_service_response)):
-            sensor = self.get_sensor_instance(config={'runfolder_service_url': 'http://bar'})
+            sensor = self.get_sensor_instance(config={'runfolder_service_url': ['http://bar']})
             sensor.setup()
             sensor.poll()
             # ...
