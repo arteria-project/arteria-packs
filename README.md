@@ -1,23 +1,33 @@
-Arteria Pack
-============
+Arteria Stackstorm Pack
+=======================
 
 [![Build Status](https://travis-ci.org/arteria-project/arteria-packs.svg?branch=master)](https://travis-ci.org/arteria-project/arteria-packs)
 [![Join the chat at https://gitter.im/arteria-project/arteria-project](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/arteria-project/arteria-project)
 
-This is the new and improved version of the Arteria StackStorm pack.
+This pack provides re-usable units for automating tasks at a
+sequencing core facility using the automation engine Stackstorm.
 
-The aim of this pack is to provide re-usable units for automating tasks at a
-sequencing core facility. However, the type of things presented here can be of use to any
-group which does enough sequencing that a high degree of automation is necessary.
+It forms the core of the Arteria automation system, 
+which you can read about on our [website](https://arteria-project.github.io/) 
+or [preprint](https://www.biorxiv.org/content/early/2017/11/06/214858).
+This pack integrates with a series of bioinformatic micro-services, 
+which can be found at https://github.com/arteria-project.
+
+This repository includes a Docker environment allowing you to install 
+Arteria and its dependencies within a containerized environment.
 
 This pack is intended as a starting point, not a turn-key solution. Most sequencing cores
-will have a sufficiently unique environment that a specialized solution has to be developed,
-however, the components provided here can make that work easier.
+will have a sufficiently unique environment that a specialized solution must be developed,
+but our goal is to provide components to facilitate this development.
 
-For more information on Arteria in general, look at our pre-print here:
-https://www.biorxiv.org/content/early/2017/11/06/214858
 
-Here is a quick demo:
+Demo
+=====
+
+Here we demonstrate using Docker to bootstrap an Arteria system
+comprised of arteria-packs and several Arteria microservices. 
+We then use the system to run a simple workflow on a runfolder.
+
 [![asciicast](https://asciinema.org/a/YSz20Jfo7U1hCYzWP5K05mT1S.png)](https://asciinema.org/a/YSz20Jfo7U1hCYzWP5K05mT1S)
 
 tl;dr
