@@ -53,7 +53,6 @@ Installation
 ```
 git clone https://github.com/arteria-project/arteria-packs
 cd arteria-packs
-make prepare
 make up
 ```
 
@@ -210,6 +209,12 @@ service for state information.
 By activating this sensor, we can automatically trigger 
 a workflow once a runfolder is marked "ready" in the runfolder service.
 
+You can confirm that the sensor is activated by running:
+
+```
+st2 sensor list
+```
+
 To connect the sensor and workflow, activate the rule:
 
 ```
@@ -223,16 +228,31 @@ set its state to `ready` using:
 docker exec stackstorm st2 run arteria.runfolder_service cmd="set_state" state="ready" runfolder="/opt/monitored-folder/<name of your runfolder>" url="http://runfolder-service"
 ```
 
-Within 15s you should if you execute `st2 execution list` see that a workflow processing that runfolder
+Within 15s you should if you execute `docker exec stackstorm st2 execution list` see that a workflow processing that runfolder
 has started. This is the way that Arteria can be used to automatically start processes as needed.
+
+You can see details of the sensor's inner workings with:
+
+```
+docker exec stackstorm /opt/stackstorm/st2/bin/st2sensorcontainer --config-file=/etc/st2/st2.conf --debug --sensor-ref=arteria.RunfolderSensor
+```
+
+Re-building the environment
+---------------------------
+
+You can remove the existing environment with:
+
+```
+make remove-all
+```
+
+Then, re-run the Installation instructions.
 
 Running tests
 -------------
 
-To run the pack tests, run the following command in the StackStorm container:
-
 ```
-st2-run-pack-tests -c -v -p /opt/stackstorm/packs/arteria
+docker exec stackstorm st2-run-pack-tests -c -v -p /opt/stackstorm/packs/arteria
 ```
 
 Acknowledgements
