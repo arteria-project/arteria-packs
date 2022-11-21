@@ -1,82 +1,96 @@
-version: '2.0'
+version: 1.0
 
-name: arteria.workflow_bcl2fastq_and_checkqc
 description: >
   This sample workflow will run bcl2fastq and checkqc on a runfolder.
 
-workflows:
-  main:
-    type: direct
+input:
+  - runfolder_path
+  - bcl2fastq_url
+  - checkqc_url
+  - bcl2fastq_body
+
+vars:
+  - bcl2fastq_status_url: null
+  - runfolder: null
+
+tasks:
+  get_runfolder_name:
+    action: core.local
     input:
-      - runfolder_path
-      - runfolder_url
-      - bcl2fastq_url
-      - checkqc_url
-      - bcl2fastq_body
-    tasks:
-      get_runfolder_name:
-        action: core.local
-        input:
-          cmd: python -c 'import sys; sys.stdout.write("{{ _.runfolder_path }}".split("/")[-1])'
+      cmd: python3 -c 'import sys; sys.stdout.write("<% ctx(runfolder_path) %>".split("/")[-1])'
+    next:
+      - when: <% succeeded() %>
         publish:
-          runfolder: "{{ task('get_runfolder_name').result.stdout }}"
-        on-success:
+          - runfolder: <% result().stdout %>
+        do:
           - mark_as_started
 
-      mark_as_started:
-        action: arteria.runfolder_service
-        input:
-          cmd: set_state
-          runfolder: "{{ _.runfolder_path }}"
-          url: http://runfolder-service
-          state: started
-        on-success:
+  mark_as_started:
+    action: arteria.runfolder_service
+    input:
+      cmd: set_state
+      runfolder: <% ctx(runfolder_path) %>
+      url: http://runfolder-service
+      state: started
+    next:
+      - when: <% succeeded() %>
+        do:
           - start_bcl2fastq
 
-      start_bcl2fastq:
-        action: arteria.bcl2fastq_service
-        input:
-          cmd: start
-          runfolder: "{{ _.runfolder }}"
-          url: http://bcl2fastq-service
-          bcl2fastq_body: "{{ _.bcl2fastq_body }}"
+  start_bcl2fastq:
+    action: arteria.bcl2fastq_service
+    input:
+      cmd: start
+      runfolder: "<% ctx(runfolder) %>"
+      url: http://bcl2fastq-service
+      bcl2fastq_body: <% ctx(bcl2fastq_body) %>
+    next:
+      - when: <% succeeded() %>
         publish:
-          bcl2fastq_status_url: "{{ task('start_bcl2fastq').result.result.link }}"
-        on-success:
+          - bcl2fastq_status_url: <% result().result.link %>
+        do:
           - poll_bcl2fastq
 
-      poll_bcl2fastq:
-        action: arteria.bcl2fastq_service
-        input:
-          cmd: poll
-          status_url: "{{ _.bcl2fastq_status_url }}"
-          sleep: 5
-          timeout: 36000 # 10h
-        on-success:
+  poll_bcl2fastq:
+    action: arteria.bcl2fastq_service
+    input:
+      cmd: poll
+      status_url: <% ctx(bcl2fastq_status_url) %>
+      sleep: 5
+      timeout: 36000 # 10h
+    next:
+      - when: <% succeeded() %>
+        do:
           - checkqc
 
-      checkqc:
-        action: core.http
-        input:
-          url: "http://checkqc-service/qc/{{ _.runfolder }}"
-        on-success:
-          - mark_as_done: "{{ task('checkqc').result.body.exit_status == 0 }}"
-          - mark_as_error: "{{ task('checkqc').result.body.exit_status != 0}}"
+  checkqc:
+    action: core.http
+    input:
+      url: "http://checkqc-service/qc/<% ctx(runfolder) %>"
+    next:
+      - when: <% succeeded() %>
+        do:
+          - mark_as_done
+      - when: <% failed() %>
+        do:
+          - mark_as_error
 
-      mark_as_done:
-        action: arteria.runfolder_service
-        input:
-          cmd: set_state
-          url: http://runfolder-service
-          runfolder: "{{ _.runfolder_path }}"
-          state: done
+  mark_as_done:
+    action: arteria.runfolder_service
+    input:
+      cmd: set_state
+      url: http://runfolder-service
+      runfolder: <% ctx(runfolder_path) %>
+      state: done
 
-      mark_as_error:
-        action: arteria.runfolder_service
-        input:
-          cmd: set_state
-          url: http://runfolder-service
-          runfolder: "{{ _.runfolder_path }}"
-          state: error
-        on-success:
-          - fail
+  mark_as_error:
+    action: arteria.runfolder_service
+    input:
+      cmd: set_state
+      url: http://runfolder-service
+      runfolder: <% ctx(runfolder_path) %>
+      state: error
+    next:
+      - when: <% succeeded() %>
+        do:
+         - fail

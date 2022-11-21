@@ -5,6 +5,7 @@
 # If ARTERIA_MONITORED_FOLDER is not defined in the environment set it to the
 # default of using a monitored folder in the arteria repo
 export ARTERIA_MONITORED_FOLDER ?= ${PWD}/docker-mountpoints/monitored-folder/
+export ST2_VERSION=3.7
 
 prepare:
 	mkdir -p -m 2770 docker-mountpoints/bcl2fastq-output
@@ -15,6 +16,7 @@ prepare:
 
 up: prepare
 	docker-compose up -d
+	sleep 20
 
 down:
 	docker-compose down
@@ -23,10 +25,11 @@ interact: up
 	docker exec -it stackstorm /bin/bash
 
 test-pack: up
-	docker exec stackstorm st2-run-pack-tests -c -v -p /opt/stackstorm/packs/arteria
+	docker exec arteria-packs_st2actionrunner_1 st2-run-pack-tests -c -v -p /opt/stackstorm/packs/arteria
 
 test-integration: up
-	docker exec stackstorm /opt/stackstorm/packs/arteria/tests/integration_tests
+	docker exec arteria-packs_st2actionrunner_1 /opt/stackstorm/packs/arteria/tests/integration_tests_setup
+	docker exec arteria-packs_st2client_1 /opt/stackstorm/packs/arteria/tests/integration_tests_run
 
 exec:
 	docker exec -it stackstorm $(cmd)
