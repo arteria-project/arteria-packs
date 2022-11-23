@@ -1,24 +1,15 @@
 ---
 name: "workflow_bcl2fastq_and_checkqc"
-runner_type: mistral-v2
 description: "This workflow will run bcl2fastq and CheckQC on a specified runfolder"
+runner_type: orquesta
 enabled: true
 entry_point: workflows/bcl2fastq_and_checkqc.yaml
+pack: arteria
 parameters:
       runfolder_path:
         type: "string"
         description: "Path to the runfolder to execute the workflow on"
         required: true
-      runfolder_url:
-        type: "string"
-        description: "URL to the runfolder service"
-        required: true
-        default: "{{ config_context.runfolder_service_url }}"
-      bcl2fastq_url:
-        type: "string"
-        description: "URL to the runfolder service"
-        required: true
-        default: "{{ config_context.bcl2fastq_service_url }}"
       checkqc_url:
         type: "string"
         description: "URL to the runfolder service"
@@ -28,4 +19,3 @@ parameters:
         type: "string"
         description: "Body to send to bcl2fastq (can e.g. be used to specify additional args for bcl2fastq."
         required: false
-

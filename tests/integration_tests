@@ -5,9 +5,7 @@ set -o xtrace
 
 cp /opt/stackstorm/packs/arteria/default.config.yaml /opt/stackstorm/configs/arteria.yaml
 st2ctl reload --register-all
-export ST2_AUTH_TOKEN=$(st2 auth --only-token st2admin -p pp1asr+v)
-st2 run packs.setup_virtualenv packs=arteria
-st2 run arteria.workflow_bcl2fastq_and_checkqc \
-  runfolder_path='/opt/monitored-folder/copy_170612_A00181_0011_AH2JK7DMXX' \
-  bcl2fastq_body='{"additional_args": "--ignore-missing-bcls --ignore-missing-filter --ignore-missing-positions --tiles s_1", "use_base_mask": "--use-bases-mask y1n*,n*"}'
 
+#export ST2_AUTH_TOKEN=$(st2 auth --only-token st2admin -p pp1asr+v)
+st2 run packs.setup_virtualenv packs=arteria
+st2 run arteria.workflow_bcl2fastq_and_checkqc runfolder_path=/opt/monitored-folder/copy_170612_A00181_0011_AH2JK7DMXX bcl2fastq_body='{"additional_args": "--ignore-missing-bcls --ignore-missing-filter --ignore-missing-positions --tiles s_1", "use_base_mask": "--use-bases-mask y1n*,n*"}'

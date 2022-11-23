@@ -5,16 +5,16 @@ Arteria Stackstorm Pack
 [![Join the chat at https://gitter.im/arteria-project/arteria-project](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/arteria-project/arteria-project)
 
 This pack provides re-usable units for automating tasks at a
-sequencing core facility using the [StackStorm](http://stackstorm.com/) 
+sequencing core facility using the [StackStorm](http://stackstorm.com/)
 event-driven automation platform.
 
-It forms the core of the Arteria automation system, 
-which you can read about on our [website](https://arteria-project.github.io/) 
+It forms the core of the Arteria automation system,
+which you can read about on our [website](https://arteria-project.github.io/)
 or [preprint](https://www.biorxiv.org/content/early/2017/11/06/214858).
-This pack integrates with a series of bioinformatic micro-services, 
+This pack integrates with a series of bioinformatic micro-services,
 which can be found at https://github.com/arteria-project.
 
-This repository includes a Docker environment allowing you to install 
+This repository includes a Docker environment allowing you to install
 Arteria and its dependencies within a containerized environment.
 
 This pack is intended as a starting point, not a turn-key solution. Most sequencing cores
@@ -32,7 +32,7 @@ Demo
 =====
 
 Here we demonstrate using Docker to bootstrap an Arteria system
-comprised of arteria-packs and several Arteria microservices. 
+comprised of arteria-packs and several Arteria microservices.
 We then use the system to run a simple workflow on a runfolder.
 
 [![asciicast](https://asciinema.org/a/YSz20Jfo7U1hCYzWP5K05mT1S.png)](https://asciinema.org/a/YSz20Jfo7U1hCYzWP5K05mT1S)
@@ -45,9 +45,14 @@ System requirements
 -------------------
 You will need to have the following installed:
 - [docker](https://docs.docker.com/)
-- [docker-compose](https://docs.docker.com/compose/) 
+- [docker-compose](https://docs.docker.com/compose/)
 - make
- 
+
+bcl2fastq
+---------
+You also need to download Illumina software bcl2fastq manually since Illumina requires that you register before donwloading.
+Download the [zip file](https://support.illumina.com/softwaredownload.html?assetId=e8ed3335-5201-48ff-a2bc-db4bfb792c85&assetDetails=bcl2fastq2-v2-20-0-linux-x86-64.zip) containing the rpm. Save in at docker-images/bcl2fastq-service/local_files
+
 Installation
 ------------
 ```
@@ -58,8 +63,8 @@ make up
 
 To register the Arteria pack with Stackstorm, run:
 ```
-docker exec stackstorm st2ctl reload --register-all
-docker exec stackstorm st2 run packs.setup_virtualenv packs=arteria
+docker exec arteria-packs_st2client_1 st2ctl reload --register-all
+docker exec arteria-packs_st2client_1 st2 run packs.setup_virtualenv packs=arteria
 ```
 
 Congratulations, you're now ready to run workflows.
@@ -68,14 +73,14 @@ Congratulations, you're now ready to run workflows.
 Running the sample workflow
 ---------------------------
 
-Put a runfolder in the `docker-mountpoints/monitored-folder` directory. 
+Put a runfolder in the `docker-mountpoints/monitored-folder` directory.
 
 You can find a suitably small test data set here: https://doi.org/10.5281/zenodo.1204292
 
 Then run:
 
 ```
-docker exec stackstorm st2 run arteria.workflow_bcl2fastq_and_checkqc \
+docker exec arteria-packs_st2client_1 st2 run arteria.workflow_bcl2fastq_and_checkqc \
   runfolder_path='/opt/monitored-folder/<name of the runfolder>' \
   bcl2fastq_body='{"additional_args": "--ignore-missing-bcls --ignore-missing-filter --ignore-missing-positions --tiles s_1", "use_base_mask": "--use-bases-mask y1n*,n*"}'
 ```
@@ -117,20 +122,20 @@ You can find bcl2fastq output in `docker-mountpoints/bcl2fastq-output`.
 Architecture
 ============
 
-This project provides re-usable components for StackStorm in the 
-form of actions, workflows, sensors, and rules. 
+This project provides re-usable components for StackStorm in the
+form of actions, workflows, sensors, and rules.
 
-The [StackStorm docs](https://docs.stackstorm.com) are a 
+The [StackStorm docs](https://docs.stackstorm.com) are a
 comprehensive guide to these concept, but here we provide a summary:
 
 - **Actions** encapsulate system tasks such as calling a web service or running a shell script
 - **Workflows** tie actions together
 - **Sensors** pick up events from the environment, e.g. listening for new files to appear in a directory, or polling a web service for new events
-- **Rules** parse events from sensors and determine if an action or a workflow should be initiated 
+- **Rules** parse events from sensors and determine if an action or a workflow should be initiated
 
 In order to facilitate quick setup, this repo also provides a Docker environment.
-In addition to running a StackStorm instance, it also runs a set of Arteria micro-services, 
-which make it possible to run bcl2fastq on an Illumina runfolder, 
+In addition to running a StackStorm instance, it also runs a set of Arteria micro-services,
+which make it possible to run bcl2fastq on an Illumina runfolder,
 and then check that is passes a set of quality criteria using [checkQC](https://github.com/Molmed/checkQC)
 
 The code is structured as follows:
@@ -148,7 +153,7 @@ The code is structured as follows:
 │   ├── bcl2fastq-output = will contain bcl2fastq output from the sample workflow
 │   └── monitored-folder = deposit your runfolders here for processing
 ├── docker-runtime = startup container scripts, see: https://github.com/StackStorm/st2-docker#running-custom-shell-scripts-on-boot
-├── rules = StackStorm rules 
+├── rules = StackStorm rules
 ├── sensors = StackStorm sensors
 └── tests = unit and integration tests
 ```
@@ -197,7 +202,7 @@ You may encounter failures during one or more steps in the workflow:
 You can troubleshoot the failed step further by getting the execution id, in this case:
 
 ```
-docker exec stackstorm st2 execution get 5c78e3bb8123e601273911a0 
+docker exec arteria-packs_st2client_1 st2 execution get 5c78e3bb8123e601273911a0
 ```
 
 Activating sensors
@@ -206,7 +211,7 @@ Stackstorm can detect changes in the surrounding environment through sensors.
 This pack provides a `RunfolderSensor`, which queries the the runfolder
 service for state information.
 
-By activating this sensor, we can automatically trigger 
+By activating this sensor, we can automatically trigger
 a workflow once a runfolder is marked "ready" in the runfolder service.
 
 You can confirm that the sensor is activated by running:
@@ -218,23 +223,23 @@ st2 sensor list
 To connect the sensor and workflow, activate the rule:
 
 ```
-docker exec stackstorm st2 rule enable arteria.when_runfolder_is_ready_start_bcl2fastq
+docker exec arteria-packs_st2client_1 st2 rule enable arteria.when_runfolder_is_ready_start_bcl2fastq
 ```
 
 Put a runfolder in `docker-mountpoints/monitored-folder`, and
 set its state to `ready` using:
 
 ```
-docker exec stackstorm st2 run arteria.runfolder_service cmd="set_state" state="ready" runfolder="/opt/monitored-folder/<name of your runfolder>" url="http://runfolder-service"
+docker exec arteria-packs_st2client_1 st2 run arteria.runfolder_service cmd="set_state" state="ready" runfolder="/opt/monitored-folder/<name of your runfolder>" url="http://runfolder-service"
 ```
 
-Within 15s you should if you execute `docker exec stackstorm st2 execution list` see that a workflow processing that runfolder
+Within 15s you should if you execute `docker exec arteria-packs_st2client_1 st2 execution list` see that a workflow processing that runfolder
 has started. This is the way that Arteria can be used to automatically start processes as needed.
 
 You can see details of the sensor's inner workings with:
 
 ```
-docker exec stackstorm /opt/stackstorm/st2/bin/st2sensorcontainer --config-file=/etc/st2/st2.conf --debug --sensor-ref=arteria.RunfolderSensor
+docker exec arteria-packs_st2client_1 /opt/stackstorm/st2/bin/st2sensorcontainer --config-file=/etc/st2/st2.conf --debug --sensor-ref=arteria.RunfolderSensor
 ```
 
 Re-building the environment
@@ -252,11 +257,10 @@ Running tests
 -------------
 
 ```
-docker exec stackstorm st2-run-pack-tests -c -v -p /opt/stackstorm/packs/arteria
+docker exec arteria-packs_st2client_1 st2-run-pack-tests -c -v -p /opt/stackstorm/packs/arteria
 ```
 
 Acknowledgements
 ================
 The docker environment provided here has been heavily inspired by the ones provided by
 [StackStorm](https://github.com/StackStorm/st2-docker) and [UMCCR](https://github.com/umccr/st2-arteria-docker).
-
