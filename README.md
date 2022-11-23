@@ -63,8 +63,8 @@ make up
 
 To register the Arteria pack with Stackstorm, run:
 ```
-docker exec stackstorm st2ctl reload --register-all
-docker exec stackstorm st2 run packs.setup_virtualenv packs=arteria
+docker exec arteria-packs_st2client_1 st2ctl reload --register-all
+docker exec arteria-packs_st2client_1 st2 run packs.setup_virtualenv packs=arteria
 ```
 
 Congratulations, you're now ready to run workflows.
@@ -80,7 +80,7 @@ You can find a suitably small test data set here: https://doi.org/10.5281/zenodo
 Then run:
 
 ```
-docker exec stackstorm st2 run arteria.workflow_bcl2fastq_and_checkqc \
+docker exec arteria-packs_st2client_1 st2 run arteria.workflow_bcl2fastq_and_checkqc \
   runfolder_path='/opt/monitored-folder/<name of the runfolder>' \
   bcl2fastq_body='{"additional_args": "--ignore-missing-bcls --ignore-missing-filter --ignore-missing-positions --tiles s_1", "use_base_mask": "--use-bases-mask y1n*,n*"}'
 ```
@@ -223,23 +223,23 @@ st2 sensor list
 To connect the sensor and workflow, activate the rule:
 
 ```
-docker exec stackstorm st2 rule enable arteria.when_runfolder_is_ready_start_bcl2fastq
+docker exec arteria-packs_st2client_1 st2 rule enable arteria.when_runfolder_is_ready_start_bcl2fastq
 ```
 
 Put a runfolder in `docker-mountpoints/monitored-folder`, and
 set its state to `ready` using:
 
 ```
-docker exec stackstorm st2 run arteria.runfolder_service cmd="set_state" state="ready" runfolder="/opt/monitored-folder/<name of your runfolder>" url="http://runfolder-service"
+docker exec arteria-packs_st2client_1 st2 run arteria.runfolder_service cmd="set_state" state="ready" runfolder="/opt/monitored-folder/<name of your runfolder>" url="http://runfolder-service"
 ```
 
-Within 15s you should if you execute `docker exec stackstorm st2 execution list` see that a workflow processing that runfolder
+Within 15s you should if you execute `docker exec arteria-packs_st2client_1 st2 execution list` see that a workflow processing that runfolder
 has started. This is the way that Arteria can be used to automatically start processes as needed.
 
 You can see details of the sensor's inner workings with:
 
 ```
-docker exec stackstorm /opt/stackstorm/st2/bin/st2sensorcontainer --config-file=/etc/st2/st2.conf --debug --sensor-ref=arteria.RunfolderSensor
+docker exec arteria-packs_st2client_1 /opt/stackstorm/st2/bin/st2sensorcontainer --config-file=/etc/st2/st2.conf --debug --sensor-ref=arteria.RunfolderSensor
 ```
 
 Re-building the environment
@@ -257,7 +257,7 @@ Running tests
 -------------
 
 ```
-docker exec stackstorm st2-run-pack-tests -c -v -p /opt/stackstorm/packs/arteria
+docker exec arteria-packs_st2client_1 st2-run-pack-tests -c -v -p /opt/stackstorm/packs/arteria
 ```
 
 Acknowledgements
