@@ -111,7 +111,6 @@ services:
       # Action runner needs access to keys since action definitions (Jinja
       # templates) can reference secrets
       - stackstorm-keys:/etc/st2/keys:ro
-    dns_search: .
   st2garbagecollector:
     image: ${ST2_IMAGE_REPO:-stackstorm/}st2garbagecollector:${ST2_VERSION:-latest}
     restart: on-failure
