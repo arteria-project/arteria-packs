@@ -51,7 +51,7 @@ You will need to have the following installed:
 bcl2fastq
 ---------
 You also need to download Illumina software bcl2fastq manually since Illumina requires that you register before donwloading.
-- Download the [zip file](https://support.illumina.com/softwaredownload.html?assetId=e8ed3335-5201-48ff-a2bc-db4bfb792c85&assetDetails=bcl2fastq2-v2-20-0-linux-x86-64.zip) containing the rpm. Save in at docker-images/bcl2fastq-service/local_files
+Download the [zip file](https://support.illumina.com/softwaredownload.html?assetId=e8ed3335-5201-48ff-a2bc-db4bfb792c85&assetDetails=bcl2fastq2-v2-20-0-linux-x86-64.zip) containing the rpm. Save in at docker-images/bcl2fastq-service/local_files
 
 Installation
 ------------
