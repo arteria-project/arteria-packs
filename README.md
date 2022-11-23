@@ -48,6 +48,11 @@ You will need to have the following installed:
 - [docker-compose](https://docs.docker.com/compose/)
 - make
 
+File
+----
+You also need to download Illumina software bcl2fastq manually since Illumina requires that you register before donwloading.
+- Download the [zip file](https://support.illumina.com/softwaredownload.html?assetId=e8ed3335-5201-48ff-a2bc-db4bfb792c85&assetDetails=bcl2fastq2-v2-20-0-linux-x86-64.zip) containing the rpm. Save in at docker-images/bcl2fastq-service/local_files
+
 Installation
 ------------
 ```
@@ -71,8 +76,6 @@ Running the sample workflow
 Put a runfolder in the `docker-mountpoints/monitored-folder` directory.
 
 You can find a suitably small test data set here: https://doi.org/10.5281/zenodo.1204292
-
-To be able to build bcl2fast image the zip file containing the software must be downloaded and placed in docker-images/bcl2fastq-service/local_files
 
 Then run:
 
@@ -199,7 +202,7 @@ You may encounter failures during one or more steps in the workflow:
 You can troubleshoot the failed step further by getting the execution id, in this case:
 
 ```
-docker exec stackstorm st2 execution get 5c78e3bb8123e601273911a0
+docker exec arteria-packs_st2client_1 st2 execution get 5c78e3bb8123e601273911a0
 ```
 
 Activating sensors

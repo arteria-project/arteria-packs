@@ -1,7 +1,0 @@
-#!/bin/bash
-
-set -o errexit
-set -o xtrace
-
-cp /opt/stackstorm/packs/arteria/default.config.yaml /opt/stackstorm/configs/arteria.yaml
-st2ctl reload --register-all

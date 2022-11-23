@@ -25,11 +25,10 @@ interact: up
 	docker exec -it stackstorm /bin/bash
 
 test-pack: up
-	docker exec arteria-packs_st2actionrunner_1 st2-run-pack-tests -c -v -p /opt/stackstorm/packs/arteria
+	docker exec arteria-packs_st2client_1 st2-run-pack-tests -c -v -p /opt/stackstorm/packs/arteria
 
 test-integration: up
-	docker exec arteria-packs_st2actionrunner_1 /opt/stackstorm/packs/arteria/tests/integration_tests_setup
-	docker exec arteria-packs_st2client_1 /opt/stackstorm/packs/arteria/tests/integration_tests_run
+	docker exec arteria-packs_st2client_1 /opt/stackstorm/packs/arteria/tests/integration_tests
 
 exec:
 	docker exec -it stackstorm $(cmd)

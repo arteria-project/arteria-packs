@@ -4,7 +4,6 @@ workdir /tmp
 RUN yum install -y epel-release
 RUN yum update -y
 RUN yum install -y unzip python-pip python-virtualenv git gcc-c++ wget python-pathlib2
-#RUN wget https://support.illumina.com/content/dam/illumina-support/documents/downloads/software/bcl2fastq/bcl2fastq2-v2-20-0-linux-x86-64.zip
 COPY local_files/bcl2fastq2-v2-20-0-linux-x86-64.zip  bcl2fastq2-v2-20-0-linux-x86-64.zip
 RUN unzip bcl2fastq2-v2-20-0-linux-x86-64.zip
 RUN yum install -y bcl2fastq2-v2.20.0.422-Linux-x86_64.rpm
