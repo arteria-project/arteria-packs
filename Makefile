@@ -22,7 +22,7 @@ down:
 	docker-compose down
 
 interact: up
-	docker exec -it stackstorm /bin/bash
+	docker exec -it arteria-packs_st2client_1 /bin/bash
 
 test-pack: up
 	docker exec arteria-packs_st2client_1 st2-run-pack-tests -c -v -p /opt/stackstorm/packs/arteria
