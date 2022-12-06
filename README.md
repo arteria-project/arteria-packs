@@ -217,7 +217,7 @@ a workflow once a runfolder is marked "ready" in the runfolder service.
 You can confirm that the sensor is activated by running:
 
 ```
-st2 sensor list
+docker exec arteria-packs_st2client_1 st2 sensor list
 ```
 
 To connect the sensor and workflow, activate the rule:
